@@ -28,6 +28,19 @@
         .patient-card { opacity: 0; animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
         input, select, textarea { background: var(--surface); color: var(--fg); border-color: var(--border); transition: all 0.2s ease; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.12); background: var(--card); }
+        
+        /* Fix for Dark Mode Inputs: Force text color to be light */
+        body.dark-mode input, body.dark-mode select, body.dark-mode textarea { color: #E5E7EB !important; caret-color: #E5E7EB; }
+        
+        /* Fix for Dark Mode Autocomplete backgrounds */
+        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--surface) inset !important;
+            -webkit-text-fill-color: var(--fg) !important;
+        }
+        body.dark-mode input:-webkit-autofill, body.dark-mode input:-webkit-autofill:hover, body.dark-mode input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #E5E7EB !important;
+        }
+
         .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%); transition: all 0.25s ease; }
         .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(15,118,110,0.25); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -424,7 +437,6 @@
             showToast('Saving...', 'info');
             try {
                 await savePatientToFirestore(newPatient);
-                // Snapshot will handle UI update automatically
                 $('inputName').value='';$('inputWeight').value='';$('inputGA').value='';$('inputAge').value='';currentDrugs=[];renderDrugsList();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');
                 showToast('Saved successfully');
             } catch (e) { showToast(`Save Failed: ${e.message}`, 'error'); }
