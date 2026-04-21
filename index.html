@@ -44,6 +44,8 @@
         .pdf-cell-header { background: #FFF; margin: -3mm -3mm 2mm -3mm; padding: 2mm 3mm; border-radius: 2mm 2mm 0 0; border-bottom: 2px solid #000; }
         .pdf-drug-item { margin-bottom: 1.5mm; padding-bottom: 1.5mm; border-bottom: 1px dashed #999; color: #000; }
         .pdf-drug-item:last-child { border-bottom: none; }
+        .connection-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #10B981; color: white; }
+        .connection-badge.offline { background: #EF4444; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -59,10 +61,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                 <button id="btnRefresh" class="dark-toggle p-2.5 rounded-xl flex items-center gap-2 text-xs font-semibold" aria-label="Refresh Data">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                    <span class="hidden sm:inline">Sync</span>
-                </button>
+                <div id="connectionStatus" class="connection-badge hidden sm:inline-block">Live</div>
                 <button id="darkModeToggle" class="dark-toggle p-2.5 rounded-xl" aria-label="Toggle Dark Mode">
                     <svg class="w-5 h-5 sun-icon hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     <svg class="w-5 h-5 moon-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
@@ -75,6 +74,7 @@
     </header>
 
     <main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+        <!-- Input Section -->
         <section id="inputSection" class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
             <div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4">
                 <h2 class="text-xl text-white font-semibold">Patient Information</h2>
@@ -109,7 +109,7 @@
                             <input type="text" id="inputCustomMethod" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="طريقة الإعطاء">
                         </div>
                         <div class="space-y-2 lg:col-span-1" id="freqContainer"><label class="block text-sm font-semibold text-[var(--fg)]">Frequency</label><select id="inputFreq" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"><option value="1">Once daily (x 1)</option><option value="2">Twice daily (x 2)</option><option value="3">Three times (x 3)</option><option value="4">Four times (x 4)</option><option value="q36hr">q36hr</option><option value="q48hr">q48hr</option></select></div>
-                        <div class="space-y-2 lg:col-span-1 hidden" id="targetVolContainer"><label class="block text-sm font-semibold text-[var(--accent)]">Target Volume</label><select id="inputTargetVol" class="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--accent)]/5"><option value="10">10 ml (x2)</option><option value="5">5 ml (x3)</option></select></div>
+                        <div class="space-y-2 lg:col-span-1 hidden" id="targetVolContainer"><label class="block text-sm font-semibold text-[var(--accent)]">Target Volume</label><select id="inputTargetVol" class="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--accent)]/5"><option value="10">10 ml</option><option value="5">5 ml</option></select></div>
                         <div class="lg:col-span-1 flex flex-col gap-2">
                              <div id="addonContainer" class="hidden grid grid-cols-2 gap-2">
                                 <div class="space-y-1"><label class="block text-[10px] font-bold text-[var(--accent)] uppercase">Vol</label><input type="text" id="inputAddonVol" inputmode="decimal" oninput="this.value = this.value.replace(/[،,٫]/g, '.')" class="w-full px-2 py-2 rounded-lg border border-[var(--border)] text-sm" placeholder="ml"></div>
@@ -139,6 +139,7 @@
             </div>
         </section>
 
+        <!-- Patient Queue -->
         <section class="space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h2 class="text-2xl font-bold text-[var(--fg)]">Patient Queue</h2>
@@ -152,7 +153,7 @@
             <div id="emptyState" class="text-center py-20 bg-[var(--card)] rounded-2xl border-2 border-dashed border-[var(--border)]">
                 <svg class="w-20 h-20 mx-auto text-[var(--muted)]/30 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656 0.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                 <p class="text-[var(--muted)] text-lg font-medium">No patients in queue</p>
-                <p class="text-[var(--muted)]/60 text-sm mt-1">Add patient information above to begin</p>
+                <p class="text-[var(--muted)]/60 text-sm mt-1">Connect to Firebase to load data</p>
             </div>
         </section>
     </main>
@@ -160,13 +161,43 @@
     <div id="pdf-render-container"></div>
     <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl font-medium shadow-xl z-50 opacity-0 translate-y-4 transition-all duration-300 pointer-events-none"><span id="toastMsg">Message</span></div>
 
-    <script>
+    <!-- Firebase SDKs (Modular) -->
+    <script type="module">
         // ==========================================
-        // CONFIGURATION
+        // 1. FIREBASE CONFIGURATION
         // ==========================================
-        // 1. PASTE YOUR DEPLOYED WEB APP URL HERE:
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyp8PnOo_fJdDsoIJyF-3AWoUoM_xf95Pex1wHmY3D3VzRT82YjU9bGv8K44EiXaz8C/exec'; 
-        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAaMqxvBAuTkOykYHF5w_xjS98bDOhZoPY",
+            authDomain: "documentation2-dd1aa.firebaseapp.com",
+            projectId: "documentation2-dd1aa",
+            storageBucket: "documentation2-dd1aa.firebasestorage.app",
+            messagingSenderId: "236681783643",
+            appId: "1:236681783643:web:dc4d715258955b3413d27e",
+            measurementId: "G-WRK2C3121X"
+        };
+
+        // ==========================================
+        // 2. FIREBASE INITIALIZATION
+        // ==========================================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            deleteDoc, 
+            doc, 
+            onSnapshot, 
+            query, 
+            orderBy 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const patientsRef = collection(db, "patients");
+
+        // ==========================================
+        // 3. APP STATE & LOGIC
+        // ==========================================
         const METHODS = { 1: '** / 5min', 2: '** + 5 ml GW / 10 min', 3: '** + ## ml GW >> ^^ ml /30 min', 4: '** + 3 ml GW / 3 min', 5: '** / 60 min', 6: 'over 24 hr', 7: 'Special Nutrients', 9: 'كل اثنين وخميس', 8: '** <span class="arabic-text" style="display:inline-block; direction:rtl;">مع المغذي</span> ', 10: '** + ## ml GW >> ^^ ml /24 hr', 11: ' ** + 3ml NS / 15 min <span class="arabic-text" style="display:inline-block; direction:rtl;">تبخير</span>', 12: 'تحل الكبسولة ب ٢ سي سي كلوكوز وتر ثم يدفع عن طريق ال OG ثم يدفع ٢ سي سي كلوكوز وتر عن طريق ال OG', 13: 'بالفم', 14: ' 3ml NS / 15 min <span class="arabic-text" style="display:inline-block; direction:rtl;">تبخير</span>' };
         
         const DRUG_CONFIG = [
@@ -228,11 +259,7 @@
         const boldNumbersInText = (text) => !text ? '' : text.toString().replace(/\d+(\.\d+)?/g, '<strong style="font-weight: 900;">$&</strong>');
         
         const daysDiff = (date1Str, date2) => Math.round((new Date(date2) - new Date(date1Str)) / 86400000);
-        const getLiveAge = (p) => {
-            if (!p.saveDate || p.ageBaseline === '>30') return p.ageBaseline || p.age;
-            const baseline = parseInt(p.ageBaseline) || 0;
-            return Math.max(0, baseline + daysDiff(p.saveDate, new Date()));
-        };
+        const getLiveAge = (p) => { if (!p.saveDate || p.ageBaseline === '>30') return p.ageBaseline || p.age; const baseline = parseInt(p.ageBaseline) || 0; return Math.max(0, baseline + daysDiff(p.saveDate, new Date())); };
         const isAgeLive = (p) => p.saveDate && p.ageBaseline !== '>30' && daysDiff(p.saveDate, new Date()) > 0;
 
         const initDarkMode = () => { const isDark = localStorage.getItem('theme') === 'dark'; document.body.classList.toggle('dark-mode', isDark); $('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden', !isDark); $('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden', isDark); };
@@ -242,7 +269,10 @@
         const generateMethodString = (drug, finalDoseMg) => {
             if(drug.isDopamine && drug.methodIndex !== 10 && drug.methodIndex !== 8) return '1 ml dopamin + 39 ml GW';
             if(drug.isNutrient) { if(drug.noPrep) return " "; let totalFluid = finalDoseMg; const addonVol = cleanInputNumber($('inputAddonVol').value), addonType = $('inputAddonType').value.trim()||'Add-on'; let calcFluid = totalFluid, calcAddon = addonVol, sf=""; if((totalFluid + addonVol) > 160){ calcFluid = totalFluid / 2; calcAddon = addonVol / 2; sf=" X2"; } let txt = addonVol > 0 ? ` + ${calcAddon.toFixed(0)} ml ${addonType}` : ""; let prep = ""; if(drug.name==='1/5 GS') prep = `(5% GW ${(calcFluid * 0.8).toFixed(0)} ml + ${(calcFluid * 0.2).toFixed(0)} ml NS${txt})${sf}`; else if(drug.name==='10% GW') prep = `(5% GW ${(calcFluid * 0.9).toFixed(0)} ml + ${(calcFluid * 0.1).toFixed(0)} ml HT${txt})${sf}`; else prep = `(${drug.name} ${calcFluid} ml${txt})${sf}`; return `${prep}`; }
-            if(!METHODS[drug.methodIndex]) return '-'; let v=finalDoseMg/drug.factor, s=METHODS[drug.methodIndex], dl; if(drug.methodIndex===3||drug.methodIndex===10){ const t=parseInt($('inputTargetVol').value); if(t===10){ v*=2; dl=20-v; s=s.replace('^^','10'); } else if(t===5){ v*=3; dl=15-v; s=s.replace('^^','5'); } } else dl=20-v; let dv=v, us=' ml'; if(v<1){ dv=v*100; us=' units'; } let ds=us===' units'?Math.round(dv):dv.toFixed(1); s=s.replace('**',`${ds}${us}`); if(s.includes('##')) s=s.replace('##',dl.toFixed(0)); return s;
+            if(!METHODS[drug.methodIndex]) return '-';
+            let v=finalDoseMg/drug.factor, s=METHODS[drug.methodIndex], dl;
+            if(drug.methodIndex===3||drug.methodIndex===10){ const t=parseInt($('inputTargetVol').value); if(t===10){ v*=2; dl=20-v; s=s.replace('^^','10'); } else if(t===5){ v*=3; dl=15-v; s=s.replace('^^','5'); } } else dl=20-v;
+            let dv=v, us=' ml'; if(v<1){ dv=v*100; us=' units'; } let ds=us===' units'?Math.round(dv):dv.toFixed(1); s=s.replace('**',`${ds}${us}`); if(s.includes('##')) s=s.replace('##',dl.toFixed(0)); return s;
         };
 
         const updateDrugListByCategory = () => { const c = $('selectCategory').value, ds = $('selectDrug'); ds.innerHTML = ''; $('freqContainer').classList.toggle('hidden', c === 'Fluids'); if(!c){ ds.innerHTML='<option value="">-- Select Category First --</option>'; handleDrugSelectionChange(); return; } const cat = DRUG_CATEGORIES.find(x=>x.name===c); let o='<option value="">-- Select Drug --</option>'; if(c==='Other+') o+='<option value="other">Other+ (علاج آخر)</option>'; else cat.ids.forEach(id=>{ const d=DRUG_CONFIG.find(i=>i.id===id); if(d) o+=`<option value="${d.id}">${d.name}</option>`; }); ds.innerHTML=o; handleDrugSelectionChange(); };
@@ -309,51 +339,55 @@
         const renderDopamineTable = (w) => { const tb=$('dopamineTableBody'); tb.innerHTML=[2,5,7,10].map(d=>`<tr><td class="p-2 pb-3 text-center font-bold text-[var(--accent)] border border-[var(--border)]">${((d*w*1440)/1000).toFixed(0)} ml/24hr</td><td class="p-2 pb-3 text-center border border-[var(--border)]">${d} mcg/kg/min</td></tr>`).join(''); };
 
         // ==========================================
-        // GOOGLE SHEET API LOGIC (FIXED)
+        // 4. FIRESTORE LOGIC (REAL-TIME)
         // ==========================================
         
-        // Check for placeholder URL on load
-        if (WEB_APP_URL.includes('PASTE_')) {
-            showToast("Config Error: Paste your URL in code", "error");
-        }
-
-        const fetchPatients = async () => {
-            if (WEB_APP_URL.includes('PASTE_')) return;
-            try {
-                // Added Cache Buster '?t=...' to force fresh data
-                const response = await fetch(WEB_APP_URL + '?t=' + Date.now()); 
-                const result = await response.json();
-                
-                if (result.success) {
-                    patients = result.patients || [];
-                    renderQueue();
-                } else {
-                    // This will show the actual error from the script (e.g., "Sheet not found")
-                    showToast(`Script Error: ${result.error || 'Unknown'}`, "error");
-                }
-            } catch (e) {
-                console.error(e);
-                showToast('Connection failed. Check URL/Permissions.', 'error');
+        // Helper to update connection status UI
+        const setConnectionStatus = (isOnline) => {
+            const badge = $('connectionStatus');
+            if (isOnline) {
+                badge.textContent = "Live";
+                badge.classList.remove('offline');
+            } else {
+                badge.textContent = "Offline";
+                badge.classList.add('offline');
             }
         };
 
-        const savePatientToSheet = async (patient) => {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Use text/plain to avoid CORS preflight issues
-                body: JSON.stringify({ action: 'save', patient: patient })
-            });
-            return await response.json();
+        // 1. Real-time Listener
+        const unsubscribe = onSnapshot(query(patientsRef, orderBy("saveDate", "desc")), (snapshot) => {
+            setConnectionStatus(true);
+            patients = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderQueue();
+        }, (error) => {
+            console.error("Firestore error: ", error);
+            setConnectionStatus(false);
+            showToast("Connection Lost", "error");
+        });
+
+        // 2. Save Patient
+        const savePatientToFirestore = async (patient) => {
+            try {
+                await addDoc(patientsRef, patient);
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                throw e;
+            }
         };
 
-        const deletePatientFromSheet = async (id) => {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'delete', id: id })
-            });
-            return await response.json();
+        // 3. Delete Patient
+        const deletePatientFromFirestore = async (id) => {
+            try {
+                await deleteDoc(doc(db, "patients", id));
+            } catch (e) {
+                console.error("Error deleting document: ", e);
+                throw e;
+            }
         };
+
+        // ==========================================
+        // 5. UI RENDERING
+        // ==========================================
         
         const renderQueue = () => {
             $('patientQueue').innerHTML = patients.map(p => {
@@ -403,12 +437,10 @@
 
         window.removeDrug = (index) => { currentDrugs.splice(index, 1); renderDrugsList(); };
 
-        // FIXED SAVE: Wait for success before adding to UI
         const savePatient = async () => {
             const name=$('inputName').value.trim(),weight=cleanInputNumber($('inputWeight').value); if(!name||!weight||currentDrugs.length===0){showToast('Missing info','error');return;}
             const sortedDrugs=[...currentDrugs].sort((a,b)=>{if(a.isNutrient&&!b.isNutrient)return 1;if(!a.isNutrient&&b.isNutrient)return -1;return 0;});
             const newPatient = {
-                id: generateId(), 
                 name, weight, 
                 age: $('inputAge').value, 
                 ageBaseline: $('inputAge').value, 
@@ -417,23 +449,17 @@
                 drugs: sortedDrugs
             };
             
-            // 1. Send to Sheet
             showToast('Saving...', 'info');
-            const result = await savePatientToSheet(newPatient);
-
-            // 2. Only update UI if success
-            if(result.success){
-                patients.push(newPatient);
-                renderQueue();
+            try {
+                await savePatientToFirestore(newPatient);
+                // No need to manually update UI, onSnapshot will handle it automatically!
                 $('inputName').value='';$('inputWeight').value='';$('inputGA').value='';$('inputAge').value='';currentDrugs=[];renderDrugsList();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');
                 showToast('Saved successfully');
-            } else {
-                // Keep data in form so user doesn't lose it
-                showToast(`Save Failed: ${result.error || 'Server Error'}`, 'error');
+            } catch (e) {
+                showToast(`Save Failed: ${e.message}`, 'error');
             }
         };
 
-        // FIXED DELETE: Optimistic delete is fine, but handle failure
         window.deletePatient = async (id) => {
             const pIndex = patients.findIndex(p=>p.id===id);
             if(pIndex === -1) return;
@@ -444,12 +470,13 @@
             selectedPatientIds.delete(id); 
             renderQueue();
             
-            const result = await deletePatientFromSheet(id);
-            if(!result.success){
+            try {
+                await deletePatientFromFirestore(id);
+            } catch (e) {
                 // Rollback
                 patients.splice(pIndex, 0, backup);
                 renderQueue();
-                showToast(`Delete Failed: ${result.error || 'Server Error'}`, 'error');
+                showToast(`Delete Failed: ${e.message}`, 'error');
             }
         };
         
@@ -468,7 +495,6 @@
             doc.save('NICU_Report.pdf'); container.style.opacity='0'; showToast('PDF Generated Successfully');
         };
 
-        $('btnRefresh').addEventListener('click', () => { fetchPatients(); showToast('Syncing...', 'info'); });
         $('btnAddDrug').addEventListener('click', addDrug);
         $('btnSavePatient').addEventListener('click', savePatient);
         $('btnPdf').addEventListener('click', generatePDF);
@@ -487,7 +513,8 @@
         $('inputAddonType').addEventListener('input', () => handleManualDoseChange('addon'));
         $('darkModeToggle').addEventListener('click', () => { const isDark=document.body.classList.toggle('dark-mode'); localStorage.setItem('theme',isDark?'dark':'light'); $('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!isDark); $('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',isDark); });
 
-        populateDropdowns(); initDarkMode(); fetchPatients(); 
+        populateDropdowns(); initDarkMode();
+        // Note: onSnapshot is initialized automatically at the top of the script
     </script>
 </body>
 </html>
