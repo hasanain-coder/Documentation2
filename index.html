@@ -44,8 +44,6 @@
         .pdf-cell-header { background: #FFF; margin: -3mm -3mm 2mm -3mm; padding: 2mm 3mm; border-radius: 2mm 2mm 0 0; border-bottom: 2px solid #000; }
         .pdf-drug-item { margin-bottom: 1.5mm; padding-bottom: 1.5mm; border-bottom: 1px dashed #999; color: #000; }
         .pdf-drug-item:last-child { border-bottom: none; }
-        .loading-spinner { border: 3px solid var(--surface); border-top: 3px solid var(--accent); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen">
@@ -61,8 +59,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                 <!-- Refresh Button -->
-                <button id="btnRefresh" class="dark-toggle p-2.5 rounded-xl flex items-center gap-2 text-xs font-semibold" aria-label="Refresh Data">
+                 <button id="btnRefresh" class="dark-toggle p-2.5 rounded-xl flex items-center gap-2 text-xs font-semibold" aria-label="Refresh Data">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                     <span class="hidden sm:inline">Sync</span>
                 </button>
@@ -99,7 +96,7 @@
                         <div class="space-y-2 lg:col-span-1"><label class="block text-sm font-semibold text-[var(--fg)]">Category</label><select id="selectCategory" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select></div>
                         <div class="space-y-2 lg:col-span-1">
                             <label class="block text-sm font-semibold text-[var(--fg)]">Drug</label><select id="selectDrug" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select>
-                            <input type="text" id="inputCustomDrug" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)] mt-2" placeholder="اسم العلاج (مثال: Paracetamol)">
+                            <input type="text" id="inputCustomDrug" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)] mt-2" placeholder="اسم العلاج">
                         </div>
                         <div class="lg:col-span-2 space-y-2" id="doseWrapper">
                             <div class="grid grid-cols-2 gap-2 sm:gap-3">
@@ -109,10 +106,10 @@
                                     <div class="flex gap-1"><input type="text" id="inputDose" inputmode="decimal" oninput="this.value = this.value.replace(/[،,٫]/g, '.')" class="flex-1 px-3 py-3 rounded-xl border border-[var(--border)] min-w-0" placeholder="Dose"><input type="text" id="inputCustomUnit" class="hidden w-14 sm:w-20 px-1 py-3 rounded-xl border border-[var(--border)]" placeholder="Unit"></div>
                                 </div>
                             </div>
-                            <input type="text" id="inputCustomMethod" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="طريقة الإعطاء (اختياري)">
+                            <input type="text" id="inputCustomMethod" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="طريقة الإعطاء">
                         </div>
                         <div class="space-y-2 lg:col-span-1" id="freqContainer"><label class="block text-sm font-semibold text-[var(--fg)]">Frequency</label><select id="inputFreq" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"><option value="1">Once daily (x 1)</option><option value="2">Twice daily (x 2)</option><option value="3">Three times (x 3)</option><option value="4">Four times (x 4)</option><option value="q36hr">q36hr</option><option value="q48hr">q48hr</option></select></div>
-                        <div class="space-y-2 lg:col-span-1 hidden" id="targetVolContainer"><label class="block text-sm font-semibold text-[var(--accent)]">Target Volume</label><select id="inputTargetVol" class="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--accent)]/5"><option value="10">10 ml (Multiplier x2)</option><option value="5">5 ml (Multiplier x3)</option></select></div>
+                        <div class="space-y-2 lg:col-span-1 hidden" id="targetVolContainer"><label class="block text-sm font-semibold text-[var(--accent)]">Target Volume</label><select id="inputTargetVol" class="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--accent)]/5"><option value="10">10 ml (x2)</option><option value="5">5 ml (x3)</option></select></div>
                         <div class="lg:col-span-1 flex flex-col gap-2">
                              <div id="addonContainer" class="hidden grid grid-cols-2 gap-2">
                                 <div class="space-y-1"><label class="block text-[10px] font-bold text-[var(--accent)] uppercase">Vol</label><input type="text" id="inputAddonVol" inputmode="decimal" oninput="this.value = this.value.replace(/[،,٫]/g, '.')" class="w-full px-2 py-2 rounded-lg border border-[var(--border)] text-sm" placeholder="ml"></div>
@@ -167,8 +164,8 @@
         // ==========================================
         // CONFIGURATION
         // ==========================================
-        // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyUYfloZg4E9CFU4PHOcOsEMnKbqf9HsqTmF4u3KvORshLcSTM7dzUddsyoZ9OuaeIT/exec'; 
+        // 1. PASTE YOUR DEPLOYED WEB APP URL HERE:
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyp8PnOo_fJdDsoIJyF-3AWoUoM_xf95Pex1wHmY3D3VzRT82YjU9bGv8K44EiXaz8C/exec'; 
         
         const METHODS = { 1: '** / 5min', 2: '** + 5 ml GW / 10 min', 3: '** + ## ml GW >> ^^ ml /30 min', 4: '** + 3 ml GW / 3 min', 5: '** / 60 min', 6: 'over 24 hr', 7: 'Special Nutrients', 9: 'كل اثنين وخميس', 8: '** <span class="arabic-text" style="display:inline-block; direction:rtl;">مع المغذي</span> ', 10: '** + ## ml GW >> ^^ ml /24 hr', 11: ' ** + 3ml NS / 15 min <span class="arabic-text" style="display:inline-block; direction:rtl;">تبخير</span>', 12: 'تحل الكبسولة ب ٢ سي سي كلوكوز وتر ثم يدفع عن طريق ال OG ثم يدفع ٢ سي سي كلوكوز وتر عن طريق ال OG', 13: 'بالفم', 14: ' 3ml NS / 15 min <span class="arabic-text" style="display:inline-block; direction:rtl;">تبخير</span>' };
         
@@ -312,51 +309,50 @@
         const renderDopamineTable = (w) => { const tb=$('dopamineTableBody'); tb.innerHTML=[2,5,7,10].map(d=>`<tr><td class="p-2 pb-3 text-center font-bold text-[var(--accent)] border border-[var(--border)]">${((d*w*1440)/1000).toFixed(0)} ml/24hr</td><td class="p-2 pb-3 text-center border border-[var(--border)]">${d} mcg/kg/min</td></tr>`).join(''); };
 
         // ==========================================
-        // GOOGLE SHEET API LOGIC
+        // GOOGLE SHEET API LOGIC (FIXED)
         // ==========================================
         
+        // Check for placeholder URL on load
+        if (WEB_APP_URL.includes('PASTE_')) {
+            showToast("Config Error: Paste your URL in code", "error");
+        }
+
         const fetchPatients = async () => {
+            if (WEB_APP_URL.includes('PASTE_')) return;
             try {
-                const response = await fetch(WEB_APP_URL);
+                // Added Cache Buster '?t=...' to force fresh data
+                const response = await fetch(WEB_APP_URL + '?t=' + Date.now()); 
                 const result = await response.json();
+                
                 if (result.success) {
                     patients = result.patients || [];
                     renderQueue();
                 } else {
-                    showToast('Error loading data', 'error');
+                    // This will show the actual error from the script (e.g., "Sheet not found")
+                    showToast(`Script Error: ${result.error || 'Unknown'}`, "error");
                 }
             } catch (e) {
                 console.error(e);
-                showToast('Connection failed', 'error');
+                showToast('Connection failed. Check URL/Permissions.', 'error');
             }
         };
 
         const savePatientToSheet = async (patient) => {
-            try {
-                const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'save', patient: patient })
-                });
-                const result = await response.json();
-                if (!result.success) showToast('Save failed', 'error');
-            } catch (e) {
-                showToast('Connection error', 'error');
-            }
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Use text/plain to avoid CORS preflight issues
+                body: JSON.stringify({ action: 'save', patient: patient })
+            });
+            return await response.json();
         };
 
         const deletePatientFromSheet = async (id) => {
-            try {
-                const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'delete', id: id })
-                });
-                const result = await response.json();
-                if (!result.success) showToast('Delete failed', 'error');
-            } catch (e) {
-                showToast('Connection error', 'error');
-            }
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'delete', id: id })
+            });
+            return await response.json();
         };
         
         const renderQueue = () => {
@@ -407,6 +403,7 @@
 
         window.removeDrug = (index) => { currentDrugs.splice(index, 1); renderDrugsList(); };
 
+        // FIXED SAVE: Wait for success before adding to UI
         const savePatient = async () => {
             const name=$('inputName').value.trim(),weight=cleanInputNumber($('inputWeight').value); if(!name||!weight||currentDrugs.length===0){showToast('Missing info','error');return;}
             const sortedDrugs=[...currentDrugs].sort((a,b)=>{if(a.isNutrient&&!b.isNutrient)return 1;if(!a.isNutrient&&b.isNutrient)return -1;return 0;});
@@ -420,27 +417,40 @@
                 drugs: sortedDrugs
             };
             
-            // Optimistic UI update
-            patients.push(newPatient);
-            renderQueue();
-            
-            // Send to Sheet
-            await savePatientToSheet(newPatient);
-            
-            // Reset Form
-            $('inputName').value='';$('inputWeight').value='';$('inputGA').value='';$('inputAge').value='';currentDrugs=[];renderDrugsList();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');
-            showToast('Patient saved');
+            // 1. Send to Sheet
+            showToast('Saving...', 'info');
+            const result = await savePatientToSheet(newPatient);
+
+            // 2. Only update UI if success
+            if(result.success){
+                patients.push(newPatient);
+                renderQueue();
+                $('inputName').value='';$('inputWeight').value='';$('inputGA').value='';$('inputAge').value='';currentDrugs=[];renderDrugsList();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');
+                showToast('Saved successfully');
+            } else {
+                // Keep data in form so user doesn't lose it
+                showToast(`Save Failed: ${result.error || 'Server Error'}`, 'error');
+            }
         };
 
+        // FIXED DELETE: Optimistic delete is fine, but handle failure
         window.deletePatient = async (id) => {
+            const pIndex = patients.findIndex(p=>p.id===id);
+            if(pIndex === -1) return;
+            
             // Optimistic UI update
-            patients=patients.filter(p=>p.id!==id); 
+            const backup = patients[pIndex];
+            patients.splice(pIndex, 1); 
             selectedPatientIds.delete(id); 
             renderQueue();
             
-            // Send to Sheet
-            await deletePatientFromSheet(id);
-            showToast('Deleted');
+            const result = await deletePatientFromSheet(id);
+            if(!result.success){
+                // Rollback
+                patients.splice(pIndex, 0, backup);
+                renderQueue();
+                showToast(`Delete Failed: ${result.error || 'Server Error'}`, 'error');
+            }
         };
         
         window.editPatient = (id) => { const p=patients.find(px=>px.id===id); if(!p) return; $('inputName').value=p.name; $('inputWeight').value=p.weight; $('inputGA').value=p.ga; $('inputAge').value=p.ageBaseline || p.age; currentDrugs=[...p.drugs]; renderDrugsList(); deletePatient(id); window.scrollTo({top:0,behavior:'smooth'}); };
@@ -462,7 +472,7 @@
         $('btnAddDrug').addEventListener('click', addDrug);
         $('btnSavePatient').addEventListener('click', savePatient);
         $('btnPdf').addEventListener('click', generatePDF);
-        $('btnClearAll').addEventListener('click', () => { if(confirm('Clear all?')){patients=[];selectedPatientIds.clear(); patients.forEach(p => deletePatientFromSheet(p.id)); renderQueue();} });
+        $('btnClearAll').addEventListener('click', () => { if(confirm('Clear all local data?')){patients=[];selectedPatientIds.clear(); renderQueue();} });
         $('selectAllCheckbox').addEventListener('change', toggleSelectAll);
         $('selectCategory').addEventListener('change', updateDrugListByCategory);
         $('selectDrug').addEventListener('change', handleDrugSelectionChange);
@@ -477,7 +487,7 @@
         $('inputAddonType').addEventListener('input', () => handleManualDoseChange('addon'));
         $('darkModeToggle').addEventListener('click', () => { const isDark=document.body.classList.toggle('dark-mode'); localStorage.setItem('theme',isDark?'dark':'light'); $('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!isDark); $('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',isDark); });
 
-        populateDropdowns(); initDarkMode(); fetchPatients(); // Load from Sheet on start
+        populateDropdowns(); initDarkMode(); fetchPatients(); 
     </script>
 </body>
 </html>
