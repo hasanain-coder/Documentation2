@@ -62,13 +62,8 @@
         body.dark-mode .room-tag.r2 { color: #FCD34D; background: rgba(252,211,77,0.15); }
         body.dark-mode .room-tag.rec { color: #6EE7B7; background: rgba(110,231,183,0.15); }
         body.dark-mode .room-tag.un { color: var(--muted); background: rgba(156,163,175,0.1); border-color: var(--muted); }
-        @media (max-width: 640px) {
-            .med-grid { grid-template-columns: 1fr !important; }
-            .med-grid > div { min-width: 0 !important; }
-        }
-        @media (min-width: 641px) and (max-width: 1023px) {
-            .med-grid { grid-template-columns: 1fr 1fr !important; }
-        }
+        @media (max-width: 640px) { .med-grid { grid-template-columns: 1fr !important; } .med-grid > div { min-width: 0 !important; } }
+        @media (min-width: 641px) and (max-width: 1023px) { .med-grid { grid-template-columns: 1fr 1fr !important; } }
     </style>
 </head>
 <body class="min-h-screen">
@@ -139,6 +134,12 @@
                                     <div class="flex gap-1"><input type="text" id="inputDose" inputmode="decimal" oninput="this.value = this.value.replace(/[،,٫]/g, '.')" class="flex-1 px-3 py-3 rounded-xl border border-[var(--border)] min-w-0" placeholder="Dose"><input type="text" id="inputCustomUnit" class="hidden w-14 sm:w-20 px-1 py-3 rounded-xl border border-[var(--border)] opacity-60" placeholder="mg (opt)"></div>
                                 </div>
                             </div>
+                            <div class="hidden" id="girContainer">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="space-y-1"><label class="block text-sm font-semibold text-[var(--accent)]">GIR (mg/kg/min)</label><input type="text" id="inputGIR" inputmode="decimal" oninput="this.value = this.value.replace(/[،,٫]/g, '.')" class="w-full px-3 py-3 rounded-xl border border-[var(--accent)]/30 font-bold" placeholder="e.g., 6"></div>
+                                    <div class="space-y-1"><label class="block text-sm font-semibold text-[var(--accent)]">Bag Volume (ml)</label><input type="text" id="inputBagVol" inputmode="decimal" oninput="this.value = this.value.replace(/[،,٫]/g, '.')" class="w-full px-3 py-3 rounded-xl border border-[var(--accent)]/30 font-bold" placeholder="e.g., 100"></div>
+                                </div>
+                            </div>
                             <select id="selectCustomMethod" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select>
                             <input type="text" id="inputCustomMethod" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="طريقة الإعطاء المخصصة" style="direction: rtl; text-align: right; font-family: 'Cairo', 'Noto Sans Arabic', sans-serif;">
                             <div class="space-y-2 hidden" id="concentrationContainer">
@@ -204,39 +205,25 @@
         const app = initializeApp(firebaseConfig), db = getFirestore(app), patientsRef = collection(db, "patients");
 
         const METHODS = {
-            1: '** / 5min',
-            2: '** + 5 ml GW / 10 min',
+            1: '** / 5min', 2: '** + 5 ml GW / 10 min',
             3: '** + ## ml GW >> <span class="arabic-text" style="display:inline-block; direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /30 min',
-            4: '** + 3 ml GW / 3 min',
-            5: '** / 60 min',
-            6: 'over 24 hr',
-            7: 'Special Nutrients',
-            9: 'كل اثنين وخميس',
-            8: '** <span class="arabic-text" style="display:inline-block; direction:rtl;">مع المغذي</span> ',
+            4: '** + 3 ml GW / 3 min', 5: '** / 60 min', 6: 'over 24 hr', 7: 'Special Nutrients',
+            9: 'كل اثنين وخميس', 8: '** <span class="arabic-text" style="display:inline-block; direction:rtl;">مع المغذي</span> ',
             10: '** + ## ml GW >> <span class="arabic-text" style="display:inline-block; direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /24 hr',
             11: ' ** + 3ml NS / 15 min <span class="arabic-text" style="display:inline-block; direction:rtl;">تبخير</span>',
             12: 'تحل الكبسولة ب ٢ سي سي كلوكوز وتر ثم يدفع عن طريق ال OG ثم يدفع ٢ سي سي كلوكوز وتر عن طريق ال OG',
-            13: 'بالفم',
-            14: ' 3ml NS / 15 min <span class="arabic-text" style="display:inline-block; direction:rtl;">تبخير</span>',
+            13: 'بالفم', 14: ' 3ml NS / 15 min <span class="arabic-text" style="display:inline-block; direction:rtl;">تبخير</span>',
             15: '<span class="arabic-text" style="display:inline-block; direction:rtl;">قطرة واحدة بالعين المصابة</span>'
         };
         const METHOD_OPTIONS = [
-            { value: 1, label: 'IV push / 5 min' },
-            { value: 2, label: '+ 5ml GW / 10 min' },
-            { value: 3, label: '+ GW >> flush 10cc >> / 30 min' },
-            { value: 4, label: '+ 3ml GW / 3 min (rapid)' },
-            { value: 5, label: 'IV infusion / 60 min' },
-            { value: 6, label: 'Continuous / 24 hr' },
-            { value: 7, label: 'Special Nutrients' },
-            { value: 8, label: 'مع المغذي (with TPN)' },
-            { value: 9, label: 'كل اثنين وخميس (Mon & Thu)' },
-            { value: 10, label: '+ GW >> flush 10cc >> / 24 hr' },
-            { value: 11, label: '+ 3ml NS / 15 min تبخير (neb)' },
-            { value: 12, label: 'بال OG (capsule via OG tube)' },
-            { value: 13, label: 'بالفم (oral)' },
-            { value: 14, label: '3ml NS / 15 min تبخير (neb)' },
-            { value: 15, label: 'قطرة بالعين (eye drops)' },
-            { value: 'other', label: 'Other (custom) / مخصص' },
+            { value: 1, label: 'IV push / 5 min' }, { value: 2, label: '+ 5ml GW / 10 min' },
+            { value: 3, label: '+ GW >> flush 10cc >> / 30 min' }, { value: 4, label: '+ 3ml GW / 3 min (rapid)' },
+            { value: 5, label: 'IV infusion / 60 min' }, { value: 6, label: 'Continuous / 24 hr' },
+            { value: 7, label: 'Special Nutrients' }, { value: 8, label: 'مع المغذي (with TPN)' },
+            { value: 9, label: 'كل اثنين وخميس (Mon & Thu)' }, { value: 10, label: '+ GW >> flush 10cc >> / 24 hr' },
+            { value: 11, label: '+ 3ml NS / 15 min تبخير (neb)' }, { value: 12, label: 'بال OG (capsule via OG tube)' },
+            { value: 13, label: 'بالفم (oral)' }, { value: 14, label: '3ml NS / 15 min تبخير (neb)' },
+            { value: 15, label: 'قطرة بالعين (eye drops)' }, { value: 'other', label: 'Other (custom) / مخصص' },
         ];
         const METHODS_WITH_CALC = [1, 2, 3, 4, 5, 8, 10, 11];
         const DRUG_CONFIG = [
@@ -269,8 +256,8 @@
             { id: 12, name: 'TPN', methodIndex: 6, defaultFreq: 1, hideDetails: true, inputMode: 'volume' },
             { id: 13, name: '1/5 GS', methodIndex: 7, defaultFreq: 1, hideDetails: true, isNutrient: true, inputMode: 'volume' },
             { id: 14, name: '10% GW', methodIndex: 7, defaultFreq: 1, hideDetails: true, isNutrient: true, inputMode: 'volume' },
-            /* [CHANGE 3] Removed noPrep: true from 5% GW so add-on fields appear */
             { id: 15, name: '5% GW', methodIndex: 7, defaultFreq: 1, hideDetails: true, isNutrient: true, inputMode: 'volume' },
+            { id: 43, name: 'GIR Fluid', methodIndex: 7, defaultFreq: 1, hideDetails: true, isNutrient: true, isGIR: true, inputMode: 'gir' },
             { id: 30, name: 'Vit D drop', dosePerKg: 400, unit: 'IU', factor: 1, methodIndex: 13, defaultFreq: 1, inputMode: 'fixed', fixedDose: 400 },
             { id: 31, name: 'HydroCHLOROthiazide cap', dosePerKg: 1, unit: 'mg', methodIndex: 12, defaultFreq: 2, inputMode: 'weightBased' },
             { id: 32, name: 'Ventolin neb.', dosePerKg: 1.25, unit: 'mg', factor: 5, methodIndex: 11, defaultFreq: 4, inputMode: 'fixed', fixedDose: 1.25 },
@@ -288,7 +275,7 @@
             { name: 'Antibiotics', ids: [1, 2, 5, 6, 7, 8, 11, 16, 24] },
             { name: 'Sedatives & Inotropes', ids: [9, 17, 18, 19, 20, 22, 23, 26, 27, 37] },
             { name: 'Miscellaneous', ids: [3, 4, 10, 25, 28, 35, 36, 38, 41] },
-            { name: 'Fluids', ids: [12, 13, 14, 15] },
+            { name: 'Fluids', ids: [12, 13, 14, 15, 43] },
             { name: 'Oral & Ocular', ids: [21, 29, 30, 31, 39, 40, 42] },
             { name: 'Nebulization', ids: [32, 33, 34] },
             { name: 'Other+', ids: ['other'] }
@@ -314,11 +301,9 @@
 
         const showToast = (message, type = 'success') => {
             const colors = { success: 'bg-[#047857] text-white', error: 'bg-[#B91C1C] text-white', info: 'bg-[#334155] text-white' };
-            const toast = $('toast');
-            $('toastMsg').textContent = message;
+            const toast = $('toast'); $('toastMsg').textContent = message;
             toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl font-medium shadow-xl z-50 transition-all duration-300 ${colors[type]}`;
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateX(-50%) translateY(0)';
+            toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(0)';
             setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(16px)'; }, 3000);
         };
 
@@ -335,22 +320,53 @@
             if (w > 0 && (w < 0.4 || w > 6)) warnings.push(`Weight ${w}kg is outside the typical NICU range (0.4–6 kg)`);
             if (ga > 0 && (ga < 22 || ga > 44)) warnings.push(`Gestational age ${ga}w is outside the typical range (22–44 weeks)`);
             if (warnings.length > 0) { $('clinicalWarningText').innerHTML = warnings.join('<br>'); $('clinicalWarning').classList.remove('hidden'); }
-            else { $('clinicalWarning').classList.add('hidden'); }
+            else $('clinicalWarning').classList.add('hidden');
         };
 
         const checkClinicalAlerts = (drug) => {
             const ga = cleanInputNumber($('inputGA').value), age = getPnaForCalc($('inputAge').value), freq = $('inputFreq').value, w = cleanInputNumber($('inputWeight').value);
             $('warningMessage').classList.add('hidden');
-            if (drug && drug.warning_rule) {
-                const a = drug.warning_rule(ga, age, freq, w);
-                if (a) { $('warningMessage').innerHTML = a; $('warningMessage').classList.remove('hidden'); }
-            }
+            if (drug && drug.warning_rule) { const a = drug.warning_rule(ga, age, freq, w); if (a) { $('warningMessage').innerHTML = a; $('warningMessage').classList.remove('hidden'); } }
+        };
+
+        /* ===== GIR Calculation — returns null if inputs invalid ===== */
+        const calculateGIR = (w, gir, vol) => {
+            if (w <= 0 || gir <= 0 || vol <= 0) return null;
+            let ht = Math.round(((w * gir * 1440 / 50) - vol) / 9);
+            let gw = vol - ht;
+            let warnings = [];
+            if (ht < 0) { ht = 0; gw = vol; warnings.push("تنبيه: الـ 5% GW وحده يوفر تركيزاً أعلى من GIR المطلوب. لا داعي لإضافة 50% HT."); }
+            else if (ht > vol) { ht = vol; gw = 0; warnings.push("خطأ: الحجم الكلي غير كافٍ لتحضير هذا الـ GIR. قم بزيادة الحجم أو تقليل GIR."); }
+            const totalDextrose = gw * 50 + ht * 500;
+            const conc = totalDextrose / vol / 10;
+            const actualGIR = totalDextrose / w / 1440;
+            if (conc > 12.5) warnings.push("تحذير: التركيز النهائي أعلى من 12.5% — يجب الإعطاء حصرياً عبر القسطرة السرية (Umbilical Catheter).");
+            return { gw, ht, conc, actualGIR, warnings };
         };
 
         const generateMethodString = (drug, finalDoseMg) => {
             if (drug.isDopamine && drug.methodIndex !== 10 && drug.methodIndex !== 8) return '1 ml dopamin + 39 ml GW';
+
+            /* GIR Fluid — returns prep recipe only, summary is built separately */
+            if (drug.isGIR) {
+                const w = cleanInputNumber($('inputWeight').value);
+                const gir = cleanInputNumber($('inputGIR').value);
+                const vol = cleanInputNumber($('inputBagVol').value);
+                if (gir <= 0 || vol <= 0) return '<span style="color:var(--muted);font-weight:400;font-style:italic;">Enter GIR and bag volume to see preparation method</span>';
+                const result = calculateGIR(w, gir, vol);
+                if (!result) return '-';
+                const addonVol = cleanInputNumber($('inputAddonVol').value), addonType = esc($('inputAddonType').value.trim()) || 'Add-on';
+                let calcGW = result.gw, calcHT = result.ht, calcAddon = addonVol, splitFlag = "";
+                if ((vol + addonVol) > 160) { calcGW = result.gw / 2; calcHT = result.ht / 2; calcAddon = addonVol / 2; splitFlag = " X2"; }
+                let parts = [];
+                if (calcGW > 0) parts.push(`5% GW ${Math.round(calcGW)} ml`);
+                if (calcHT > 0) parts.push(`50% HT ${Math.round(calcHT)} ml`);
+                if (calcAddon > 0) parts.push(`${calcAddon.toFixed(0)} ml ${addonType}`);
+                return `(${parts.join(' + ')})${splitFlag}`;
+            }
+
+            /* Other Nutrients */
             if (drug.isNutrient) {
-                /* [CHANGE 3] Removed noPrep early-return so 5% GW goes through add-on logic */
                 let totalFluid = finalDoseMg;
                 if (totalFluid <= 0) return '<span style="color:var(--muted);font-weight:400;font-style:italic;">Enter volume to see preparation method</span>';
                 const addonVol = cleanInputNumber($('inputAddonVol').value), addonType = esc($('inputAddonType').value.trim()) || 'Add-on';
@@ -360,10 +376,10 @@
                 let prep = "";
                 if (drug.name === '1/5 GS') prep = `(5% GW ${(calcFluid * 0.8).toFixed(0)} ml + ${(calcFluid * 0.2).toFixed(0)} ml NS${addonText})${splitFlag}`;
                 else if (drug.name === '10% GW') prep = `(5% GW ${(calcFluid * 0.9).toFixed(0)} ml + ${(calcFluid * 0.1).toFixed(0)} ml HT${addonText})${splitFlag}`;
-                /* [CHANGE 3] 5% GW now outputs as "(5% GW 100 ml + 2 ml KCL)" instead of blank */
                 else prep = `(${drug.name} ${calcFluid} ml${addonText})${splitFlag}`;
                 return `${prep}`;
             }
+
             if (!METHODS[drug.methodIndex]) return '-';
             let reconstitutedVol = finalDoseMg / drug.factor, methodTemplate = METHODS[drug.methodIndex], diluentVol;
             if (drug.methodIndex === 3 || drug.methodIndex === 10) {
@@ -388,6 +404,9 @@
             return boldNumbersInText(drug.method);
         };
 
+        /* ===== GIR summary line: Fluid 100 ml / 24 hr | GIR= 6 | Conc.= 10% ===== */
+        const girSummary = (d) => `Fluid ${d.dose} ml / 24 hr | GIR= ${d.girRate} | Conc.= ${d.girConc}%`;
+
         const updateDrugListByCategory = () => {
             const c = $('selectCategory').value, ds = $('selectDrug');
             ds.innerHTML = '';
@@ -401,10 +420,7 @@
             handleDrugSelectionChange();
         };
 
-        const updateConcentrationLabel = () => {
-            const unit = $('inputCustomUnit').value.trim();
-            $('concentrationLabel').textContent = unit ? `Concentration (${unit}/ml)` : 'Concentration (/ml)';
-        };
+        const updateConcentrationLabel = () => { const unit = $('inputCustomUnit').value.trim(); $('concentrationLabel').textContent = unit ? `Concentration (${unit}/ml)` : 'Concentration (/ml)'; };
 
         const updateOtherMethodPreview = () => {
             const methodVal = $('selectCustomMethod').value;
@@ -413,18 +429,10 @@
             if (!METHODS[methodIdx]) return;
             if (METHODS_WITH_CALC.includes(methodIdx)) {
                 const concentration = cleanInputNumber($('inputConcentration').value);
-                if (concentration <= 0) {
-                    $('methodPreviewContainer').classList.remove('hidden');
-                    $('previewMethod').innerHTML = '<span style="color:var(--muted);font-weight:400;font-style:italic;">Enter concentration to see preparation method</span>';
-                    return;
-                }
+                if (concentration <= 0) { $('methodPreviewContainer').classList.remove('hidden'); $('previewMethod').innerHTML = '<span style="color:var(--muted);font-weight:400;font-style:italic;">Enter concentration to see preparation method</span>'; return; }
                 const tempDrug = { methodIndex: methodIdx, factor: concentration, isDopamine: false, isNutrient: false };
-                $('methodPreviewContainer').classList.remove('hidden');
-                $('previewMethod').innerHTML = generateMethodString(tempDrug, dose);
-            } else {
-                $('methodPreviewContainer').classList.remove('hidden');
-                $('previewMethod').innerHTML = boldNumbersInText(METHODS[methodIdx]);
-            }
+                $('methodPreviewContainer').classList.remove('hidden'); $('previewMethod').innerHTML = generateMethodString(tempDrug, dose);
+            } else { $('methodPreviewContainer').classList.remove('hidden'); $('previewMethod').innerHTML = boldNumbersInText(METHODS[methodIdx]); }
         };
 
         const handleCustomMethodChange = () => {
@@ -438,147 +446,104 @@
             } else {
                 $('inputCustomMethod').classList.add('hidden');
                 const methodIdx = parseInt(val);
-                if (METHODS_WITH_CALC.includes(methodIdx)) { $('concentrationContainer').classList.remove('hidden'); updateConcentrationLabel(); }
-                else $('concentrationContainer').classList.add('hidden');
-                if (methodIdx === 3 || methodIdx === 10) $('targetVolContainer').classList.remove('hidden');
-                else $('targetVolContainer').classList.add('hidden');
+                if (METHODS_WITH_CALC.includes(methodIdx)) { $('concentrationContainer').classList.remove('hidden'); updateConcentrationLabel(); } else $('concentrationContainer').classList.add('hidden');
+                if (methodIdx === 3 || methodIdx === 10) $('targetVolContainer').classList.remove('hidden'); else $('targetVolContainer').classList.add('hidden');
                 updateOtherMethodPreview();
             }
         };
 
         const handleDrugSelectionChange = () => {
             const val = $('selectDrug').value, ga = cleanInputNumber($('inputGA').value), w = cleanInputNumber($('inputWeight').value), pna = getPnaForCalc($('inputAge').value);
-            $('totalDoseContainer').classList.remove('hidden');
-            $('freqContainer').classList.remove('hidden');
-            $('addonContainer').classList.add('hidden');
-            $('dosePerKgContainer').classList.add('hidden');
-            $('alertMessage').classList.add('hidden');
-            $('warningMessage').classList.add('hidden');
-            $('selectCustomMethod').classList.add('hidden');
-            $('inputCustomMethod').classList.add('hidden');
-            $('concentrationContainer').classList.add('hidden');
+            $('totalDoseContainer').classList.remove('hidden'); $('freqContainer').classList.remove('hidden');
+            $('addonContainer').classList.add('hidden'); $('dosePerKgContainer').classList.add('hidden'); $('girContainer').classList.add('hidden');
+            $('alertMessage').classList.add('hidden'); $('warningMessage').classList.add('hidden');
+            $('selectCustomMethod').classList.add('hidden'); $('inputCustomMethod').classList.add('hidden'); $('concentrationContainer').classList.add('hidden');
 
             if (val === '') {
-                $('inputDose').value = ''; $('inputDose').disabled = false;
-                $('methodPreviewContainer').classList.add('hidden');
-                $('inputCustomDrug').classList.add('hidden');
-                $('selectCustomMethod').classList.add('hidden');
-                $('inputCustomMethod').classList.add('hidden');
-                $('inputCustomUnit').classList.add('hidden');
-                $('concentrationContainer').classList.add('hidden');
-                $('targetVolContainer').classList.add('hidden');
-                $('dopamineTableContainer').classList.add('hidden');
-                return;
+                $('inputDose').value = ''; $('inputDose').disabled = false; $('methodPreviewContainer').classList.add('hidden');
+                $('inputCustomDrug').classList.add('hidden'); $('selectCustomMethod').classList.add('hidden'); $('inputCustomMethod').classList.add('hidden');
+                $('inputCustomUnit').classList.add('hidden'); $('concentrationContainer').classList.add('hidden'); $('targetVolContainer').classList.add('hidden');
+                $('dopamineTableContainer').classList.add('hidden'); return;
             }
 
             const drugId = parseInt(val), drug = DRUG_CONFIG.find(d => d.id === drugId);
             if ($('selectCategory').value === 'Fluids') $('freqContainer').classList.add('hidden');
-            /* [CHANGE 3] No more noPrep check — all isNutrient drugs get add-on fields */
             if (drug && drug.isNutrient) $('addonContainer').classList.remove('hidden');
 
             if (val === 'other') {
-                $('inputCustomDrug').classList.remove('hidden');
-                $('selectCustomMethod').classList.remove('hidden');
-                $('selectCustomMethod').value = '';
-                $('inputCustomUnit').classList.remove('hidden');
-                $('inputDose').disabled = false;
-                $('inputDose').placeholder = 'Manual Dose';
-                $('inputDose').value = '';
-                $('concentrationContainer').classList.add('hidden');
-                $('inputCustomMethod').classList.add('hidden');
-                $('methodPreviewContainer').classList.add('hidden');
-                $('targetVolContainer').classList.add('hidden');
-                $('dopamineTableContainer').classList.add('hidden');
-                $('alertMessage').classList.add('hidden');
-                $('warningMessage').classList.add('hidden');
+                $('inputCustomDrug').classList.remove('hidden'); $('selectCustomMethod').classList.remove('hidden'); $('selectCustomMethod').value = '';
+                $('inputCustomUnit').classList.remove('hidden'); $('inputDose').disabled = false; $('inputDose').placeholder = 'Manual Dose'; $('inputDose').value = '';
+                $('concentrationContainer').classList.add('hidden'); $('inputCustomMethod').classList.add('hidden'); $('methodPreviewContainer').classList.add('hidden');
+                $('targetVolContainer').classList.add('hidden'); $('dopamineTableContainer').classList.add('hidden'); $('alertMessage').classList.add('hidden'); $('warningMessage').classList.add('hidden');
                 return;
             } else {
-                $('inputCustomDrug').classList.add('hidden');
-                $('selectCustomMethod').classList.add('hidden');
-                $('inputCustomMethod').classList.add('hidden');
-                $('inputCustomUnit').classList.add('hidden');
-                $('concentrationContainer').classList.add('hidden');
+                $('inputCustomDrug').classList.add('hidden'); $('selectCustomMethod').classList.add('hidden'); $('inputCustomMethod').classList.add('hidden');
+                $('inputCustomUnit').classList.add('hidden'); $('concentrationContainer').classList.add('hidden');
             }
 
             if (!drug) return;
             $('targetVolContainer').classList.toggle('hidden', drug.methodIndex !== 3 && drug.methodIndex !== 10);
 
-            if (drug.inputMode === 'dopaminePump') {
-                $('inputDose').value = ''; $('inputDose').placeholder = 'See table below'; $('inputDose').disabled = true;
-                $('dopamineTableContainer').classList.remove('hidden');
-                $('methodPreviewContainer').classList.add('hidden');
-                renderDopamineTable(w);
-                return;
+            if (drug.inputMode === 'gir') {
+                $('totalDoseContainer').classList.add('hidden'); $('girContainer').classList.remove('hidden');
+                $('methodPreviewContainer').classList.remove('hidden'); $('dopamineTableContainer').classList.add('hidden');
+                updateMethodPreview(drug, 0); return;
             }
 
-            $('inputDose').disabled = false;
-            $('inputDose').placeholder = 'Auto';
-            $('dopamineTableContainer').classList.add('hidden');
-            $('methodPreviewContainer').classList.remove('hidden');
+            if (drug.inputMode === 'dopaminePump') {
+                $('inputDose').value = ''; $('inputDose').placeholder = 'See table below'; $('inputDose').disabled = true;
+                $('dopamineTableContainer').classList.remove('hidden'); $('methodPreviewContainer').classList.add('hidden');
+                renderDopamineTable(w); return;
+            }
+
+            $('inputDose').disabled = false; $('inputDose').placeholder = 'Auto';
+            $('dopamineTableContainer').classList.add('hidden'); $('methodPreviewContainer').classList.remove('hidden');
 
             switch (drug.inputMode) {
                 case 'infusion':
-                    $('dosePerKgContainer').classList.remove('hidden');
-                    $('inputDosePerKg').value = drug.defaultDosePerKg;
-                    if (w > 0) {
-                        let calc;
-                        if (drug.perMinute) calc = w * drug.defaultDosePerKg * 1440;
-                        else if (drug.isDopamine) calc = (w * drug.defaultDosePerKg * 1440) / 1000;
-                        else calc = w * drug.defaultDosePerKg * 24;
-                        $('inputDose').value = calc.toFixed(2);
-                    }
+                    $('dosePerKgContainer').classList.remove('hidden'); $('inputDosePerKg').value = drug.defaultDosePerKg;
+                    if (w > 0) { let calc; if (drug.perMinute) calc = w * drug.defaultDosePerKg * 1440; else if (drug.isDopamine) calc = (w * drug.defaultDosePerKg * 1440) / 1000; else calc = w * drug.defaultDosePerKg * 24; $('inputDose').value = calc.toFixed(2); }
                     break;
-                case 'fixed':
-                    $('inputDose').value = drug.fixedDose;
-                    break;
-                case 'volume':
-                    $('inputDose').value = '';
-                    $('inputDose').placeholder = 'Total Volume (ml)';
-                    if (drug.isNutrient) updateMethodPreview(drug, 0);
-                    break;
-                default:
-                    if (w > 0 && drug.dosePerKg) $('inputDose').value = (w * drug.dosePerKg).toFixed(1);
-                    else $('inputDose').value = '';
-                    break;
+                case 'fixed': $('inputDose').value = drug.fixedDose; break;
+                case 'volume': $('inputDose').value = ''; $('inputDose').placeholder = 'Total Volume (ml)'; if (drug.isNutrient) updateMethodPreview(drug, 0); break;
+                default: if (w > 0 && drug.dosePerKg) $('inputDose').value = (w * drug.dosePerKg).toFixed(1); else $('inputDose').value = ''; break;
             }
 
             if (drug.getRecommendedFreq) $('inputFreq').value = drug.getRecommendedFreq(ga, pna, w);
             else $('inputFreq').value = drug.defaultFreq || 1;
-            checkClinicalAlerts(drug);
-            updateMethodPreview(drug, parseFloat($('inputDose').value) || 0);
+            checkClinicalAlerts(drug); updateMethodPreview(drug, parseFloat($('inputDose').value) || 0);
             if (drug.alert) { $('alertText').textContent = drug.alert; $('alertMessage').classList.remove('hidden'); }
         };
 
         const handleManualDoseChange = (source) => {
-            const val = $('selectDrug').value;
-            if (val === '') return;
+            const val = $('selectDrug').value; if (val === '') return;
             if (val === 'other') { updateOtherMethodPreview(); return; }
             const drugId = parseInt(val), drug = DRUG_CONFIG.find(d => d.id === drugId), w = cleanInputNumber($('inputWeight').value);
 
             if (source === 'dosePerKg' && drug.inputMode === 'infusion') {
                 const doseKg = cleanInputNumber($('inputDosePerKg').value);
-                if (w > 0) {
-                    let calc;
-                    if (drug.perMinute) calc = w * doseKg * 1440;
-                    else if (drug.isDopamine) calc = (w * doseKg * 1440) / 1000;
-                    else calc = w * doseKg * 24;
-                    $('inputDose').value = calc.toFixed(2);
-                }
+                if (w > 0) { let calc; if (drug.perMinute) calc = w * doseKg * 1440; else if (drug.isDopamine) calc = (w * doseKg * 1440) / 1000; else calc = w * doseKg * 24; $('inputDose').value = calc.toFixed(2); }
             } else if (source === 'totalDose' && drug.inputMode === 'infusion') {
                 const totalDose = cleanInputNumber($('inputDose').value);
-                if (w > 0) {
-                    let calc;
-                    if (drug.perMinute) calc = totalDose / (w * 1440);
-                    else if (drug.isDopamine) calc = (totalDose * 1000) / (w * 1440);
-                    else calc = totalDose / (w * 24);
-                    $('inputDosePerKg').value = calc.toFixed(3);
-                }
+                if (w > 0) { let calc; if (drug.perMinute) calc = totalDose / (w * 1440); else if (drug.isDopamine) calc = (totalDose * 1000) / (w * 1440); else calc = totalDose / (w * 24); $('inputDosePerKg').value = calc.toFixed(3); }
+            }
+
+            /* GIR live recalculation */
+            if (drug && drug.isGIR && (source === 'gir' || source === 'bagVol' || source === 'addon')) {
+                const gir = cleanInputNumber($('inputGIR').value), vol = cleanInputNumber($('inputBagVol').value);
+                if (gir > 0 && vol > 0 && w > 0) {
+                    const result = calculateGIR(w, gir, vol);
+                    if (result) {
+                        $('alertMessage').classList.toggle('hidden', result.warnings.length === 0);
+                        $('alertText').innerHTML = result.warnings.join('<br>');
+                    }
+                } else { $('alertMessage').classList.add('hidden'); }
+                updateMethodPreview(drug, 0); return;
             }
 
             if (source === 'freq') checkClinicalAlerts(drug);
             if (source === 'targetVol' && drug && (drug.methodIndex === 3 || drug.methodIndex === 10)) updateMethodPreview(drug, cleanInputNumber($('inputDose').value));
             if (source === 'addon' && drug && drug.isNutrient) updateMethodPreview(drug, cleanInputNumber($('inputDose').value));
-
             if (source === 'totalDose' || source === 'dosePerKg') {
                 const md = cleanInputNumber($('inputDose').value);
                 if (drug && !drug.isDopamine) { checkClinicalAlerts(drug); updateMethodPreview(drug, md); }
@@ -586,51 +551,28 @@
             }
         };
 
-        const updateMethodPreview = (drug, dose) => {
-            $('previewMethod').innerHTML = generateMethodString(drug, dose);
-            $('methodPreviewContainer').classList.remove('hidden');
-        };
-
-        const renderDopamineTable = (w) => {
-            const tb = $('dopamineTableBody');
-            if (w <= 0) { tb.innerHTML = '<tr><td colspan="2" class="p-4 text-center text-[var(--muted)]">Enter weight to see rates</td></tr>'; return; }
-            tb.innerHTML = [2, 5, 7, 10].map(d => `<tr><td class="p-2 pb-3 text-center font-bold text-[var(--accent)] border border-[var(--border)]">${((d * w * 1440) / 1000).toFixed(0)} ml/24hr</td><td class="p-2 pb-3 text-center border border-[var(--border)]">${d} mcg/kg/min</td></tr>`).join('');
-        };
+        const updateMethodPreview = (drug, dose) => { $('previewMethod').innerHTML = generateMethodString(drug, dose); $('methodPreviewContainer').classList.remove('hidden'); };
+        const renderDopamineTable = (w) => { const tb = $('dopamineTableBody'); if (w <= 0) { tb.innerHTML = '<tr><td colspan="2" class="p-4 text-center text-[var(--muted)]">Enter weight to see rates</td></tr>'; return; } tb.innerHTML = [2, 5, 7, 10].map(d => `<tr><td class="p-2 pb-3 text-center font-bold text-[var(--accent)] border border-[var(--border)]">${((d * w * 1440) / 1000).toFixed(0)} ml/24hr</td><td class="p-2 pb-3 text-center border border-[var(--border)]">${d} mcg/kg/min</td></tr>`).join(''); };
 
         const clearForm = () => {
             editingPatientId = null;
             $('inputName').value = ''; $('inputWeight').value = ''; $('inputGA').value = ''; $('inputAge').value = ''; $('inputRoom').value = '';
-            currentDrugs = [];
-            renderDrugsList();
-            $('methodPreviewContainer').classList.add('hidden');
-            $('dopamineTableContainer').classList.add('hidden');
-            $('selectCategory').value = '';
-            updateDrugListByCategory();
-            $('inputAddonVol').value = ''; $('inputAddonType').value = '';
-            $('inputConcentration').value = '';
-            $('concentrationContainer').classList.add('hidden');
-            $('editingBanner').classList.add('hidden');
-            $('clinicalWarning').classList.add('hidden');
+            $('inputGIR').value = ''; $('inputBagVol').value = '';
+            currentDrugs = []; renderDrugsList();
+            $('methodPreviewContainer').classList.add('hidden'); $('dopamineTableContainer').classList.add('hidden');
+            $('selectCategory').value = ''; updateDrugListByCategory();
+            $('inputAddonVol').value = ''; $('inputAddonType').value = ''; $('inputConcentration').value = '';
+            $('concentrationContainer').classList.add('hidden'); $('editingBanner').classList.add('hidden'); $('clinicalWarning').classList.add('hidden');
             $('btnSavePatient').textContent = 'Save Patient to Queue';
         };
 
-        const setConnectionStatus = (isOnline) => {
-            const badge = $('connectionStatus');
-            if (isOnline) { badge.textContent = "Live"; badge.classList.remove('offline'); }
-            else { badge.textContent = "Offline"; badge.classList.add('offline'); }
-        };
+        const setConnectionStatus = (isOnline) => { const badge = $('connectionStatus'); if (isOnline) { badge.textContent = "Live"; badge.classList.remove('offline'); } else { badge.textContent = "Offline"; badge.classList.add('offline'); } };
 
         const unsubscribe = onSnapshot(query(patientsRef, orderBy("saveDate", "desc")), (snapshot) => {
-            setConnectionStatus(true);
-            patients = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setConnectionStatus(true); patients = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             if (editingPatientId && !patients.find(p => p.id === editingPatientId)) { clearForm(); showToast('Patient was deleted by another user', 'error'); }
             renderQueue(); renderFilterBar();
-        }, (error) => {
-            console.error("Firestore error: ", error);
-            setConnectionStatus(false);
-            patients = [];
-            renderQueue(); renderFilterBar();
-        });
+        }, (error) => { console.error("Firestore error: ", error); setConnectionStatus(false); patients = []; renderQueue(); renderFilterBar(); });
 
         const savePatientToFirestore = async (patient) => { try { await addDoc(patientsRef, patient); } catch (e) { console.error("Error adding document: ", e); throw e; } };
         const deletePatientFromFirestore = async (id) => { try { await deleteDoc(doc(db, "patients", id)); } catch (e) { console.error("Error deleting document: ", e); throw e; } };
@@ -648,6 +590,13 @@
 
         window.setFilter = (filter) => { activeFilter = filter; renderFilterBar(); renderQueue(); };
         window.toggleCard = (id) => { const body = document.getElementById('body-' + id); const chevron = document.getElementById('chevron-' + id); if (!body || !chevron) return; body.classList.toggle('expanded'); chevron.classList.toggle('rotated'); };
+
+        const nutrientBadge = (d) => {
+            if (d.isGIR) return `<span class="text-[var(--accent)]">${girSummary(d)}</span>`;
+            let t = `${d.dose} ml`;
+            if (d.addonVol) t += ` (+ ${d.addonVol} ml ${esc(d.addonType)})`;
+            return `<span class="text-[var(--accent)]">${t} / 24 hr</span>`;
+        };
 
         const renderQueue = () => {
             const filtered = getFilteredPatients();
@@ -678,7 +627,7 @@
                             <button onclick="editPatient('${p.id}')" class="p-2 hover:bg-[var(--accent)]/10 rounded-lg text-[var(--accent)] transition-colors" ${isBeingEdited ? 'disabled style="opacity:0.3;cursor:default;"' : ''}><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
                             <button onclick="deletePatient('${p.id}')" class="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-[var(--danger)] transition-colors" ${isBeingEdited ? 'disabled style="opacity:0.3;cursor:default;"' : ''}><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
                         </div>
-                        <div class="px-4 pb-2 space-y-3">${p.drugs.map(d => `<div class="text-sm border-b border-dashed border-[var(--border)] last:border-0 pb-2"><div class="flex justify-between font-bold text-[var(--fg)]"><span>${esc(d.name)}</span>${d.isNutrient ? `<span class="text-[var(--accent)]">${d.dose} ml${d.addonVol ? ' (+ ' + d.addonVol + ' ml ' + esc(d.addonType) + ')' : ''} / 24 hr</span>` : (d.hideDetails ? '' : `<span>${d.dose}${d.unit ? d.unit : ''} ${d.freq}</span>`)}</div>${d.alert ? `<p class="text-[var(--danger)] font-bold text-[10px] mt-1 arabic-text">${esc(d.alert)}</p>` : ''}<p class="text-xs text-[var(--muted)] mt-1" style="direction: ltr; text-align: left;">${renderMethod(d)}</p></div>`).join('')}</div>
+                        <div class="px-4 pb-2 space-y-3">${p.drugs.map(d => `<div class="text-sm border-b border-dashed border-[var(--border)] last:border-0 pb-2"><div class="flex justify-between font-bold text-[var(--fg)]"><span>${esc(d.name)}</span>${d.isNutrient ? nutrientBadge(d) : (d.hideDetails ? '' : `<span>${d.dose}${d.unit ? d.unit : ''} ${d.freq}</span>`)}</div>${d.alert ? `<p class="text-[var(--danger)] font-bold text-[10px] mt-1 arabic-text">${esc(d.alert)}</p>` : ''}<p class="text-xs text-[var(--muted)] mt-1" style="direction: ltr; text-align: left;">${renderMethod(d)}</p></div>`).join('')}</div>
                     </div>
                 </div>`;
             }).join('');
@@ -706,7 +655,14 @@
         };
 
         const renderDrugsList = () => {
-            $('drugsList').innerHTML = currentDrugs.map((d, i) => `<div class="animate-slide-in bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-3"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><p class="font-bold text-[var(--fg)]">${esc(d.name)}</p>${d.isNutrient ? `<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose} ml${d.addonVol ? ' (+ ' + d.addonVol + ' ml ' + esc(d.addonType) + ')' : ''} / 24 hr</span>` : (d.hideDetails ? '' : `<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose}${d.unit ? d.unit : ''} ${d.freq}</span>`)}</div>${d.alert ? `<p class="text-[var(--danger)] font-bold text-xs mb-1 arabic-text">${esc(d.alert)}</p>` : ''}<p class="text-sm text-[var(--fg)] leading-relaxed" style="direction: ltr; text-align: left;">${renderMethod(d)}</p></div><button onclick="removeDrug(${i})" class="ml-1 p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg group flex-shrink-0"><svg class="w-5 h-5 text-[var(--muted)] group-hover:text-[var(--danger)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>`).join('');
+            $('drugsList').innerHTML = currentDrugs.map((d, i) => {
+                let badgeHtml;
+                if (d.isGIR) badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${girSummary(d)}</span>`;
+                else if (d.isNutrient) badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose} ml${d.addonVol ? ' (+ ' + d.addonVol + ' ml ' + esc(d.addonType) + ')' : ''} / 24 hr</span>`;
+                else if (d.hideDetails) badgeHtml = '';
+                else badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose}${d.unit ? d.unit : ''} ${d.freq}</span>`;
+                return `<div class="animate-slide-in bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-3"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><p class="font-bold text-[var(--fg)]">${esc(d.name)}</p>${badgeHtml}</div>${d.alert ? `<p class="text-[var(--danger)] font-bold text-xs mb-1 arabic-text">${esc(d.alert)}</p>` : ''}<p class="text-sm text-[var(--fg)] leading-relaxed" style="direction: ltr; text-align: left;">${renderMethod(d)}</p></div><button onclick="removeDrug(${i})" class="ml-1 p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg group flex-shrink-0"><svg class="w-5 h-5 text-[var(--muted)] group-hover:text-[var(--danger)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>`;
+            }).join('');
             updateCounter();
         };
 
@@ -726,35 +682,35 @@
                 const methodVal = $('selectCustomMethod').value;
                 let methodStr, methodIndex = null, isCalculated = false;
                 if (methodVal && methodVal !== 'other' && METHODS[parseInt(methodVal)]) {
-                    const methodIdx = parseInt(methodVal);
-                    methodIndex = methodIdx;
-                    if (METHODS_WITH_CALC.includes(methodIdx)) {
-                        const concentration = cleanInputNumber($('inputConcentration').value);
-                        if (concentration <= 0) { showToast('Please enter concentration for this method', 'error'); return; }
-                        const tempDrug = { methodIndex: methodIdx, factor: concentration, isDopamine: false, isNutrient: false };
-                        methodStr = generateMethodString(tempDrug, cleanInputNumber($('inputDose').value));
-                        isCalculated = true;
-                    } else { methodStr = METHODS[methodIdx]; }
+                    const methodIdx = parseInt(methodVal); methodIndex = methodIdx;
+                    if (METHODS_WITH_CALC.includes(methodIdx)) { const concentration = cleanInputNumber($('inputConcentration').value); if (concentration <= 0) { showToast('Please enter concentration for this method', 'error'); return; } const tempDrug = { methodIndex: methodIdx, factor: concentration, isDopamine: false, isNutrient: false }; methodStr = generateMethodString(tempDrug, cleanInputNumber($('inputDose').value)); isCalculated = true; }
+                    else methodStr = METHODS[methodIdx];
                 } else { methodStr = $('inputCustomMethod').value.trim() || 'Manual'; methodIndex = null; }
-                currentDrugs.push({ id: generateId(), drugId: 'other', name: $('inputCustomDrug').value.trim(), dose: cleanInputNumber($('inputDose').value), unit: $('inputCustomUnit').value.trim(), freq: freqDisplay, method: methodStr, customMethodIndex: methodIndex, isCalculated, hideDetails: false, isNutrient: false, isDopamine: false, alert: '', addonVol: 0, addonType: '' });
+                currentDrugs.push({ id: generateId(), drugId: 'other', name: $('inputCustomDrug').value.trim(), dose: cleanInputNumber($('inputDose').value), unit: $('inputCustomUnit').value.trim(), freq: freqDisplay, method: methodStr, customMethodIndex: methodIndex, isCalculated, hideDetails: false, isNutrient: false, isDopamine: false, isGIR: false, alert: '', addonVol: 0, addonType: '' });
             } else {
-                const drug = drugObj;
-                const dose = cleanInputNumber($('inputDose').value);
-                /* [CHANGE 3] All isNutrient drugs now capture add-on, not just non-noPrep ones */
+                const drug = drugObj; const dose = cleanInputNumber($('inputDose').value);
                 let addonVolVal = drug.isNutrient ? cleanInputNumber($('inputAddonVol').value) : 0;
                 let addonTypeVal = drug.isNutrient ? ($('inputAddonType').value.trim() || '') : '';
+
                 if (drug.inputMode === 'dopaminePump') {
-                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose: 'Infusion', unit: '', freq: '', method: '1 ml dopamin + 39 ml GW', customMethodIndex: null, isCalculated: false, hideDetails: false, isNutrient: false, isDopamine: true, alert: drug.alert || '', addonVol: 0, addonType: '' });
+                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose: 'Infusion', unit: '', freq: '', method: '1 ml dopamin + 39 ml GW', customMethodIndex: null, isCalculated: false, hideDetails: false, isNutrient: false, isDopamine: true, isGIR: false, alert: drug.alert || '', addonVol: 0, addonType: '' });
+                } else if (drug.isGIR) {
+                    const girTarget = cleanInputNumber($('inputGIR').value);
+                    const bagVol = cleanInputNumber($('inputBagVol').value);
+                    if (girTarget <= 0 || bagVol <= 0) { showToast('Enter GIR and bag volume', 'error'); return; }
+                    const result = calculateGIR(w, girTarget, bagVol);
+                    /* Store ACTUAL GIR and concentration, not the target */
+                    const actualGIR = result ? result.actualGIR : girTarget;
+                    const conc = result ? result.conc : 0;
+                    const alertStr = result && result.warnings.length > 0 ? result.warnings.join(' | ') : '';
+                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose: bagVol, unit: 'ml', freq: '', method: generateMethodString(drug, bagVol), customMethodIndex: null, isCalculated: false, hideDetails: false, isNutrient: true, isDopamine: false, isGIR: true, girRate: actualGIR.toFixed(1), girConc: conc.toFixed(1), alert: alertStr, addonVol: addonVolVal, addonType: addonTypeVal });
                 } else {
-                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose, unit: drug.unit || '', freq: (drug.hideDetails || drug.name === 'TPN' || $('selectCategory').value === 'Fluids') ? '' : freqDisplay, method: generateMethodString(drug, dose), customMethodIndex: null, isCalculated: false, hideDetails: drug.hideDetails || false, isNutrient: drug.isNutrient || false, isDopamine: drug.isDopamine || false, alert: drug.alert || '', addonVol: addonVolVal, addonType: addonTypeVal });
+                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose, unit: drug.unit || '', freq: (drug.hideDetails || drug.name === 'TPN' || $('selectCategory').value === 'Fluids') ? '' : freqDisplay, method: generateMethodString(drug, dose), customMethodIndex: null, isCalculated: false, hideDetails: drug.hideDetails || false, isNutrient: drug.isNutrient || false, isDopamine: drug.isDopamine || false, isGIR: false, alert: drug.alert || '', addonVol: addonVolVal, addonType: addonTypeVal });
                 }
             }
-            renderDrugsList();
-            showToast('Added');
-            $('selectCategory').value = '';
-            updateDrugListByCategory();
-            $('inputAddonVol').value = '';
-            $('inputAddonType').value = '';
+            renderDrugsList(); showToast('Added');
+            $('selectCategory').value = ''; updateDrugListByCategory();
+            $('inputAddonVol').value = ''; $('inputAddonType').value = '';
         };
 
         window.removeDrug = (index) => { currentDrugs.splice(index, 1); renderDrugsList(); };
@@ -765,44 +721,27 @@
             const sortedDrugs = [...currentDrugs].sort((a, b) => { if (a.isNutrient && !b.isNutrient) return 1; if (!a.isNutrient && b.isNutrient) return -1; return 0; });
             const newPatient = { name, weight, age: $('inputAge').value, ageBaseline: $('inputAge').value, saveDate: new Date().toISOString().split('T')[0], ga: $('inputGA').value, room, drugs: sortedDrugs };
             showToast('Saving...', 'info');
-            try {
-                if (editingPatientId) { await setDoc(doc(db, "patients", editingPatientId), newPatient); }
-                else { await addDoc(patientsRef, newPatient); }
-                clearForm(); renderQueue(); renderFilterBar();
-                showToast('Saved successfully');
-            } catch (e) { showToast(`Save Failed: ${e.message}`, 'error'); }
+            try { if (editingPatientId) await setDoc(doc(db, "patients", editingPatientId), newPatient); else await addDoc(patientsRef, newPatient); clearForm(); renderQueue(); renderFilterBar(); showToast('Saved successfully'); }
+            catch (e) { showToast(`Save Failed: ${e.message}`, 'error'); }
         };
 
         window.deletePatient = async (id) => {
-            if (editingPatientId === id) return;
-            const p = patients.find(px => px.id === id);
-            if (!p) return;
+            if (editingPatientId === id) return; const p = patients.find(px => px.id === id); if (!p) return;
             if (!confirm(`Delete patient "${p.name}"?`)) return;
-            const pIndex = patients.findIndex(px => px.id === id);
-            const backup = patients[pIndex];
-            patients.splice(pIndex, 1);
-            selectedPatientIds.delete(id);
-            renderQueue(); renderFilterBar();
-            try { await deletePatientFromFirestore(id); }
-            catch (e) { patients.splice(pIndex, 0, backup); renderQueue(); renderFilterBar(); showToast(`Delete Failed: ${e.message}`, 'error'); }
+            const pIndex = patients.findIndex(px => px.id === id); const backup = patients[pIndex];
+            patients.splice(pIndex, 1); selectedPatientIds.delete(id); renderQueue(); renderFilterBar();
+            try { await deletePatientFromFirestore(id); } catch (e) { patients.splice(pIndex, 0, backup); renderQueue(); renderFilterBar(); showToast(`Delete Failed: ${e.message}`, 'error'); }
         };
 
         window.editPatient = async (id) => {
-            const p = patients.find(px => px.id === id);
-            if (!p) return;
+            const p = patients.find(px => px.id === id); if (!p) return;
             editingPatientId = id;
-            $('inputName').value = p.name;
-            $('inputWeight').value = p.weight;
-            $('inputGA').value = p.ga;
-            $('inputAge').value = p.ageBaseline || p.age;
-            $('inputRoom').value = p.room || '';
-            currentDrugs = [...p.drugs];
-            renderDrugsList();
-            $('editingBannerName').textContent = p.name;
-            $('editingBanner').classList.remove('hidden');
+            $('inputName').value = p.name; $('inputWeight').value = p.weight; $('inputGA').value = p.ga;
+            $('inputAge').value = p.ageBaseline || p.age; $('inputRoom').value = p.room || '';
+            currentDrugs = [...p.drugs]; renderDrugsList();
+            $('editingBannerName').textContent = p.name; $('editingBanner').classList.remove('hidden');
             $('btnSavePatient').textContent = 'Update Patient';
-            renderQueue(); renderFilterBar();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderQueue(); renderFilterBar(); window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         window.togglePatientSelection = (id) => { if (selectedPatientIds.has(id)) selectedPatientIds.delete(id); else selectedPatientIds.add(id); updateCounter(); renderQueue(); };
@@ -811,85 +750,40 @@
         const generatePDF = async () => {
             const sel = patients.filter(p => selectedPatientIds.has(p.id));
             if (sel.length === 0) { showToast('No patients selected', 'error'); return; }
-            if (!window.jspdf || !window.html2canvas) { showToast('PDF libraries not loaded. Check your internet connection.', 'error'); return; }
+            if (!window.jspdf || !window.html2canvas) { showToast('PDF libraries not loaded.', 'error'); return; }
             showToast('Generating...', 'info');
-            const container = $('pdf-render-container');
-            container.innerHTML = '';
-            container.style.opacity = '1';
+            const container = $('pdf-render-container'); container.innerHTML = ''; container.style.opacity = '1';
             try {
                 const now = new Date();
                 const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-
                 let processed = [];
-                sel.forEach(p => {
-                    let rem = [...p.drugs], chunks = [];
-                    while (rem.length > 0) {
-                        let chunk = [], hasDop = false;
-                        for (let i = 0; i < rem.length; i++) {
-                            if (rem[i].drugId === 9) hasDop = true;
-                            chunk.push(rem[i]);
-                            let limit = hasDop ? 15 : 20;
-                            if (chunk.length === limit || i === rem.length - 1) { chunks.push(chunk); rem = rem.slice(i + 1); break; }
-                        }
-                    }
-                    chunks.forEach((chunk, idx) => { processed.push({ ...p, name: idx === 0 ? p.name : p.name + ' (تابع)', dr: chunk }); });
-                });
-
+                sel.forEach(p => { let rem = [...p.drugs], chunks = []; while (rem.length > 0) { let chunk = [], hasDop = false; for (let i = 0; i < rem.length; i++) { if (rem[i].drugId === 9) hasDop = true; chunk.push(rem[i]); let limit = hasDop ? 15 : 20; if (chunk.length === limit || i === rem.length - 1) { chunks.push(chunk); rem = rem.slice(i + 1); break; } } } chunks.forEach((chunk, idx) => { processed.push({ ...p, name: idx === 0 ? p.name : p.name + ' (تابع)', dr: chunk }); }); });
                 let pages = [], cells = Array(6).fill(null);
-                const place = (patient) => {
-                    const hasDop = patient.dr.some(d => d.drugId === 9);
-                    const count = patient.dr.filter(d => d.drugId !== 9).length;
-                    let span = 1;
-                    if (count > 11 || (hasDop && count > 8)) span = 3;
-                    else if (count > 5 || (hasDop && count > 1)) span = 2;
-                    for (let i = 0; i < 6; i++) {
-                        if (cells[i] === null) {
-                            if (span === 3 && i < 2 && cells[i] === null && cells[i + 2] === null && cells[i + 4] === null) { cells[i] = { patient, span: 3 }; cells[i + 2] = 'blocked'; cells[i + 4] = 'blocked'; return true; }
-                            if (span === 2 && i < 4 && cells[i] === null && cells[i + 2] === null) { cells[i] = { patient, span: 2 }; cells[i + 2] = 'blocked'; return true; }
-                            if (span === 1) { cells[i] = { patient, span: 1 }; return true; }
-                        }
-                    }
-                    return false;
-                };
+                const place = (patient) => { const hasDop = patient.dr.some(d => d.drugId === 9); const count = patient.dr.filter(d => d.drugId !== 9).length; let span = 1; if (count > 11 || (hasDop && count > 8)) span = 3; else if (count > 5 || (hasDop && count > 1)) span = 2; for (let i = 0; i < 6; i++) { if (cells[i] === null) { if (span === 3 && i < 2 && cells[i] === null && cells[i + 2] === null && cells[i + 4] === null) { cells[i] = { patient, span: 3 }; cells[i + 2] = 'blocked'; cells[i + 4] = 'blocked'; return true; } if (span === 2 && i < 4 && cells[i] === null && cells[i + 2] === null) { cells[i] = { patient, span: 2 }; cells[i + 2] = 'blocked'; return true; } if (span === 1) { cells[i] = { patient, span: 1 }; return true; } } } return false; };
                 processed.forEach(p => { if (!place(p)) { pages.push([...cells]); cells = Array(6).fill(null); place(p); } });
                 if (cells.some(c => c !== null)) pages.push([...cells]);
-
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-
+                const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
                 for (let i = 0; i < pages.length; i++) {
-                    const pageDiv = document.createElement('div');
-                    pageDiv.className = 'pdf-page';
+                    const pageDiv = document.createElement('div'); pageDiv.className = 'pdf-page';
                     pageDiv.innerHTML = `<div class="pdf-page-header"><h2>NICU Pharmacist Documentation</h2><p>Baghdad Teaching Hospital &mdash; ${dateStr} ${timeStr} &mdash; Page ${i + 1} of ${pages.length}</p></div><div class="pdf-grid"></div>`;
                     const grid = pageDiv.querySelector('.pdf-grid');
                     pages[i].forEach((cellData) => {
                         if (!cellData || cellData === 'blocked') return;
-                        const el = document.createElement('div');
-                        el.className = 'pdf-cell';
-                        const p = cellData.patient;
+                        const el = document.createElement('div'); el.className = 'pdf-cell'; const p = cellData.patient;
                         if (cellData.span > 1) el.style.gridRow = `span ${cellData.span}`;
                         const liveAge = getLiveAge(p), ageDisplay = formatAgeDisplay(liveAge);
-                        el.innerHTML = `<div class="pdf-cell-header"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:10pt;color:#000;font-weight:bold;">${p.weight}kg | GA:${p.ga}w | D${ageDisplay}${p.room ? ' | ' + p.room : ''}</div><div style="font-weight:900;color:#000;direction:rtl;font-family:'Cairo'">${esc(p.name)}</div></div></div><div style="flex:1;">${p.drugs.map(d => `<div class="pdf-drug-item"><div style="display:flex;justify-content:space-between;font-weight:bold;font-size:10pt;"><span>${esc(d.name)}</span>${d.isNutrient ? `<span>${d.dose} ml${d.addonVol ? ' (+ ' + d.addonVol + ' ml ' + esc(d.addonType) + ')' : ''}</span>` : (d.hideDetails ? '' : `<span>${d.dose}${d.unit ? d.unit : ''} ${d.freq}</span>`)}</div>${d.alert ? `<div class="arabic-text" style="color:red;font-weight:bold;font-size:8.5pt;text-align:right;margin-top:1px;">${esc(d.alert)}</div>` : ''}<div style="font-size:9.5pt;text-align:left;margin-top:1px;">${renderMethod(d)}</div>${d.drugId === 9 ? `<table style="width:100%;margin-top:2mm;font-size:8.5pt;border-collapse:collapse;border:1.5px solid #000;text-align:center;"><tr style="background:#f0f0f0;"><th style="border:1px solid #000;padding:4px;">Rate ml/24h</th><th style="border:1px solid #000;padding:4px;">mcg/kg/min</th></tr>${[2, 5, 7, 10].map(ds => `<tr><td style="border:1px solid #000;padding:3px;padding-bottom:6px;font-weight:bold;">${((ds * (p.weight || 0) * 1440) / 1000).toFixed(0)} ml</td><td style="border:1px solid #000;padding:3px;padding-bottom:6px;">${ds}</td></tr>`).join('')}</table>` : ''}</div>`).join('')}</div>`;
+                        el.innerHTML = `<div class="pdf-cell-header"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:10pt;color:#000;font-weight:bold;">${p.weight}kg | GA:${p.ga}w | D${ageDisplay}${p.room ? ' | ' + p.room : ''}</div><div style="font-weight:900;color:#000;direction:rtl;font-family:'Cairo'">${esc(p.name)}</div></div></div><div style="flex:1;">${p.drugs.map(d => `<div class="pdf-drug-item"><div style="display:flex;justify-content:space-between;font-weight:bold;font-size:10pt;"><span>${esc(d.name)}</span>${d.isNutrient ? `<span>${d.isGIR ? girSummary(d) : d.dose + ' ml' + (d.addonVol ? ' (+ ' + d.addonVol + ' ml ' + esc(d.addonType) + ')' : '')}</span>` : (d.hideDetails ? '' : `<span>${d.dose}${d.unit ? d.unit : ''} ${d.freq}</span>`)}</div>${d.alert ? `<div class="arabic-text" style="color:red;font-weight:bold;font-size:8.5pt;text-align:right;margin-top:1px;">${esc(d.alert)}</div>` : ''}<div style="font-size:9.5pt;text-align:left;margin-top:1px;">${renderMethod(d)}</div>${d.drugId === 9 ? `<table style="width:100%;margin-top:2mm;font-size:8.5pt;border-collapse:collapse;border:1.5px solid #000;text-align:center;"><tr style="background:#f0f0f0;"><th style="border:1px solid #000;padding:4px;">Rate ml/24h</th><th style="border:1px solid #000;padding:4px;">mcg/kg/min</th></tr>${[2, 5, 7, 10].map(ds => `<tr><td style="border:1px solid #000;padding:3px;padding-bottom:6px;font-weight:bold;">${((ds * (p.weight || 0) * 1440) / 1000).toFixed(0)} ml</td><td style="border:1px solid #000;padding:3px;padding-bottom:6px;">${ds}</td></tr>`).join('')}</table>` : ''}</div>`).join('')}</div>`;
                         grid.appendChild(el);
                     });
-                    container.appendChild(pageDiv);
-                    await document.fonts.ready;
-                    await new Promise(r => setTimeout(r, 200));
+                    container.appendChild(pageDiv); await document.fonts.ready; await new Promise(r => setTimeout(r, 200));
                     const canvas = await html2canvas(pageDiv, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' });
                     doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
-                    if (i < pages.length - 1) doc.addPage();
-                    container.removeChild(pageDiv);
+                    if (i < pages.length - 1) doc.addPage(); container.removeChild(pageDiv);
                 }
-                doc.save('NICU_Report.pdf');
-                showToast('PDF Generated Successfully');
-            } catch (err) {
-                console.error('PDF generation error:', err);
-                showToast('PDF generation failed: ' + err.message, 'error');
-            } finally {
-                container.style.opacity = '0';
-                container.innerHTML = '';
-            }
+                doc.save('NICU_Report.pdf'); showToast('PDF Generated Successfully');
+            } catch (err) { console.error('PDF generation error:', err); showToast('PDF generation failed: ' + err.message, 'error'); }
+            finally { container.style.opacity = '0'; container.innerHTML = ''; }
         };
 
         /* ===== Event Listeners ===== */
@@ -898,16 +792,13 @@
         $('btnPdf').addEventListener('click', generatePDF);
         $('btnClearAll').addEventListener('click', async () => {
             if (patients.length === 0) return;
-            const selectedCount = selectedPatientIds.size;
-            let idsToDelete, confirmMsg, successMsg;
+            const selectedCount = selectedPatientIds.size; let idsToDelete, confirmMsg, successMsg;
             if (selectedCount > 0) { idsToDelete = [...selectedPatientIds]; confirmMsg = `Delete ${selectedCount} selected patient${selectedCount > 1 ? 's' : ''}?`; successMsg = `${selectedCount} patient${selectedCount > 1 ? 's' : ''} deleted`; }
             else { idsToDelete = patients.map(p => p.id); confirmMsg = `Delete all ${patients.length} patients from the queue?`; successMsg = 'All patients cleared'; }
             if (!confirm(confirmMsg)) return;
-            const btn = $('btnClearAll');
-            btn.disabled = true; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
+            const btn = $('btnClearAll'); btn.disabled = true; btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
             const backups = idsToDelete.map(id => { const idx = patients.findIndex(p => p.id === id); const backup = patients[idx]; patients.splice(idx, 1); return backup; });
-            selectedPatientIds.clear();
-            renderQueue(); renderFilterBar();
+            selectedPatientIds.clear(); renderQueue(); renderFilterBar();
             try { await Promise.all(idsToDelete.map(id => deletePatientFromFirestore(id))); showToast(successMsg); }
             catch (e) { backups.forEach(b => patients.push(b)); renderQueue(); renderFilterBar(); showToast(`Failed to delete some patients: ${e.message}`, 'error'); }
             finally { btn.disabled = false; btn.style.opacity = ''; btn.pointerEvents = ''; }
@@ -926,24 +817,15 @@
         $('inputTargetVol').addEventListener('change', () => handleManualDoseChange('targetVol'));
         $('inputAddonVol').addEventListener('input', () => handleManualDoseChange('addon'));
         $('inputAddonType').addEventListener('input', () => handleManualDoseChange('addon'));
+        $('inputGIR').addEventListener('input', () => handleManualDoseChange('gir'));
+        $('inputBagVol').addEventListener('input', () => handleManualDoseChange('bagVol'));
         $('inputConcentration').addEventListener('input', () => { if ($('selectDrug').value === 'other') updateOtherMethodPreview(); });
         $('inputCustomUnit').addEventListener('input', () => { updateConcentrationLabel(); if ($('selectDrug').value === 'other') updateOtherMethodPreview(); });
-        $('inputCustomMethod').addEventListener('input', () => {
-            const customText = $('inputCustomMethod').value.trim();
-            if (customText) { $('methodPreviewContainer').classList.remove('hidden'); $('previewMethod').innerHTML = `<span class="arabic-text">${safeBoldNumbers(customText)}</span>`; }
-            else $('methodPreviewContainer').classList.add('hidden');
-        });
-        $('darkModeToggle').addEventListener('click', () => {
-            const isDark = document.body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            $('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden', !isDark);
-            $('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden', isDark);
-        });
-
+        $('inputCustomMethod').addEventListener('input', () => { const customText = $('inputCustomMethod').value.trim(); if (customText) { $('methodPreviewContainer').classList.remove('hidden'); $('previewMethod').innerHTML = `<span class="arabic-text">${safeBoldNumbers(customText)}</span>`; } else $('methodPreviewContainer').classList.add('hidden'); });
+        $('darkModeToggle').addEventListener('click', () => { const isDark = document.body.classList.toggle('dark-mode'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); $('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden', !isDark); $('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden', isDark); });
         window.addEventListener('beforeunload', (e) => { if (editingPatientId) { e.preventDefault(); e.returnValue = ''; } });
 
-        populateDropdowns();
-        initDarkMode();
+        populateDropdowns(); initDarkMode();
     </script>
 </body>
 </html>
