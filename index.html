@@ -174,6 +174,15 @@
                 </div>
                 <div id="dopamineTableContainer" class="hidden mt-6 overflow-x-auto"><h4 class="text-lg font-bold text-[var(--accent)] mb-3">Dopamine Infusion Table</h4><table class="w-full text-sm border-collapse border border-[var(--border)] rounded-xl overflow-hidden"><thead class="bg-[var(--accent)] text-white"><tr><th class="p-2 border border-[#0F766E]">Rate (ml/24hr)</th><th class="p-2 border border-[#0F766E]">Dose (mcg/kg/min)</th></tr></thead><tbody id="dopamineTableBody" class="bg-[var(--card)]"></tbody></table></div>
                 <div id="drugsList" class="mt-4 space-y-2"></div>
+                <div id="fluidSummary" class="hidden rounded-xl p-4 mb-4 flex items-center gap-3" style="background: rgba(15,118,110,0.08); border: 1px solid rgba(15,118,110,0.2);">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: rgba(15,118,110,0.15);">
+                        <svg class="w-5 h-5 text-[var(--accent)]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-[var(--fg)]">Total IV Fluid: <span id="fluidTotal">0</span> ml / 24hr</p>
+                        <p class="text-xs text-[var(--muted)]"><span id="fluidPerKgDay">0</span> ml/kg/day  |  <span id="fluidPerKgHr">0</span> ml/kg/hr</p>
+                    </div>
+                </div>
                 <button id="btnSavePatient" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg mt-6">Save Patient to Queue</button>
             </div>
         </section>
@@ -343,6 +352,68 @@
             return { gw, ht, conc, actualGIR, warnings };
         };
 
+        /* ===== Total Fluid Calculation ===== */
+        const calcFluidPerDose = (d, w) => {
+            /* Explicit fluids: their dose IS the volume in ml */
+            if (d.isNutrient && !d.isDopamine) return d.dose || 0;
+            /* Dopamine syringe pump: volume at 5 mcg/kg/min */
+            if (d.drugId === 9) return (5 * w * 1440) / 1000;
+            /* Method 8 (مع المغذي): drug is inside the fluid bag, no extra fluid */
+            if (d.methodIndex === 8) return 0;
+            /* Method 3 (flush → target / 30min): only target volume counts */
+            if (d.methodIndex === 3) return d.targetVol || 10;
+            /* Method 10 (flush → target / 24hr): only target volume counts */
+            if (d.methodIndex === 10) return d.targetVol || 10;
+            /* Method 5 (IV infusion / 60min): calculated dose volume */
+            if (d.methodIndex === 5) {
+                const config = DRUG_CONFIG.find(dc => dc.id === d.drugId);
+                if (config && config.factor && d.dose) return d.dose / config.factor;
+                return 0;
+            }
+            /* Everything else: IV push, neb, oral, OG, eye drops — negligible */
+            return 0;
+        };
+
+        const getFreqMultiplier = (freqStr) => {
+            if (!freqStr) return 1;
+            if (freqStr === 'q36hr') return 24 / 36;
+            if (freqStr === 'q48hr') return 0.5;
+            const num = parseInt(freqStr);
+            return num > 0 ? num : 1;
+        };
+
+        const calcTotalFluid = (drugs, w) => {
+            if (w <= 0) return null;
+            let total = 0;
+            drugs.forEach(d => {
+                total += calcFluidPerDose(d, w) * getFreqMultiplier(d.freq);
+            });
+            if (total <= 0) return null;
+            return {
+                totalMl: Math.round(total * 10) / 10,
+                mlPerKgDay: Math.round((total / w) * 100) / 100,
+                mlPerKgHr: Math.round((total / w / 24) * 100) / 100
+            };
+        };
+
+        const updateFluidBar = () => {
+            const w = cleanInputNumber($('inputWeight').value);
+            const fluid = calcTotalFluid(currentDrugs, w);
+            if (!fluid || fluid.totalMl <= 0) { $('fluidSummary').classList.add('hidden'); return; }
+            $('fluidTotal').textContent = fluid.totalMl;
+            $('fluidPerKgDay').textContent = fluid.mlPerKgDay;
+            $('fluidPerKgHr').textContent = fluid.mlPerKgHr;
+            $('fluidSummary').classList.remove('hidden');
+        };
+
+        const fluidSummaryText = (d) => {
+            const w = parseFloat(d.weight) || 0;
+            if (w <= 0) return '';
+            const fluid = calcTotalFluid(d.drugs, w);
+            if (!fluid || fluid.totalMl <= 0) return '';
+            return `💧 ${fluid.mlPerKgDay} ml/kg/day`;
+        };
+
         const generateMethodString = (drug, finalDoseMg) => {
             if (drug.isDopamine && drug.methodIndex !== 10 && drug.methodIndex !== 8) return '1 ml dopamin + 39 ml GW';
             if (drug.isGIR) {
@@ -399,8 +470,6 @@
         };
 
         const girSummary = (d) => `Fluid ${d.dose} ml / 24 hr | GIR= ${d.girRate} | Conc.= ${d.girConc}%`;
-
-        /* Show GIR summary as display name instead of "GIR Fluid" */
         const drugDisplayName = (d) => d.isGIR ? girSummary(d) : esc(d.name);
 
         const updateDrugListByCategory = () => {
@@ -546,11 +615,12 @@
             editingPatientId = null;
             $('inputName').value = ''; $('inputWeight').value = ''; $('inputGA').value = ''; $('inputAge').value = ''; $('inputRoom').value = '';
             $('inputGIR').value = ''; $('inputBagVol').value = '';
-            currentDrugs = []; renderDrugsList();
+            currentDrugs = []; renderDrugsList(); updateFluidBar();
             $('methodPreviewContainer').classList.add('hidden'); $('dopamineTableContainer').classList.add('hidden');
             $('selectCategory').value = ''; updateDrugListByCategory();
             $('inputAddonVol').value = ''; $('inputAddonType').value = ''; $('inputConcentration').value = '';
             $('concentrationContainer').classList.add('hidden'); $('editingBanner').classList.add('hidden'); $('clinicalWarning').classList.add('hidden');
+            $('fluidSummary').classList.add('hidden');
             $('btnSavePatient').textContent = 'Save Patient to Queue';
         };
 
@@ -594,6 +664,7 @@
                 const alertBadge = alertCount > 0 ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400">${alertCount} alert${alertCount > 1 ? 's' : ''}</span>` : '';
                 const room = p.room && ROOMS.includes(p.room) ? p.room : null;
                 const roomBadge = room ? `<span class="room-tag ${ROOM_STYLES[room].tag}">${ROOM_STYLES[room].label}</span>` : (p.room ? `<span class="room-tag un">?</span>` : `<span class="room-tag un">--</span>`);
+                const fluidTxt = fluidSummaryText(p);
                 return `<div class="patient-card bg-[var(--card)] rounded-2xl border ${isBeingEdited ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-[var(--border)]'} shadow-sm overflow-hidden card-hover" style="animation-delay:${idx * 40}ms">
                     <div class="px-4 py-3 flex items-center justify-between cursor-pointer select-none" onclick="toggleCard('${p.id}')">
                         <div class="flex items-center gap-3 min-w-0">
@@ -651,6 +722,7 @@
                 return `<div class="animate-slide-in bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-3"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><p class="font-bold text-[var(--fg)]">${drugDisplayName(d)}</p>${badgeHtml}</div>${d.alert ? `<p class="text-[var(--danger)] font-bold text-xs mb-1 arabic-text">${esc(d.alert)}</p>` : ''}<p class="text-sm text-[var(--fg)] leading-relaxed" style="direction: ltr; text-align: left;">${renderMethod(d)}</p></div><button onclick="removeDrug(${i})" class="ml-1 p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg group flex-shrink-0"><svg class="w-5 h-5 text-[var(--muted)] group-hover:text-[var(--danger)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>`;
             }).join('');
             updateCounter();
+            updateFluidBar();
         };
 
         const addDrug = () => {
@@ -672,13 +744,13 @@
                     if (METHODS_WITH_CALC.includes(methodIdx)) { const concentration = cleanInputNumber($('inputConcentration').value); if (concentration <= 0) { showToast('Please enter concentration for this method', 'error'); return; } const tempDrug = { methodIndex: methodIdx, factor: concentration, isDopamine: false, isNutrient: false }; methodStr = generateMethodString(tempDrug, cleanInputNumber($('inputDose').value)); isCalculated = true; }
                     else methodStr = METHODS[methodIdx];
                 } else { methodStr = $('inputCustomMethod').value.trim() || 'Manual'; methodIndex = null; }
-                currentDrugs.push({ id: generateId(), drugId: 'other', name: $('inputCustomDrug').value.trim(), dose: cleanInputNumber($('inputDose').value), unit: $('inputCustomUnit').value.trim(), freq: freqDisplay, method: methodStr, customMethodIndex: methodIndex, isCalculated, hideDetails: false, isNutrient: false, isDopamine: false, isGIR: false, alert: '', addonVol: 0, addonType: '' });
+                currentDrugs.push({ id: generateId(), drugId: 'other', name: $('inputCustomDrug').value.trim(), dose: cleanInputNumber($('inputDose').value), unit: $('inputCustomUnit').value.trim(), freq: freqDisplay, method: methodStr, customMethodIndex: methodIndex, isCalculated, hideDetails: false, isNutrient: false, isDopamine: false, isGIR: false, alert: '', addonVol: 0, addonType: '', methodIndex: null, targetVol: null });
             } else {
                 const drug = drugObj; const dose = cleanInputNumber($('inputDose').value);
                 let addonVolVal = drug.isNutrient ? cleanInputNumber($('inputAddonVol').value) : 0;
                 let addonTypeVal = drug.isNutrient ? ($('inputAddonType').value.trim() || '') : '';
                 if (drug.inputMode === 'dopaminePump') {
-                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose: 'Infusion', unit: '', freq: '', method: '1 ml dopamin + 39 ml GW', customMethodIndex: null, isCalculated: false, hideDetails: false, isNutrient: false, isDopamine: true, isGIR: false, alert: drug.alert || '', addonVol: 0, addonType: '' });
+                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose: 'Infusion', unit: '', freq: '', method: '1 ml dopamin + 39 ml GW', customMethodIndex: null, isCalculated: false, hideDetails: false, isNutrient: false, isDopamine: true, isGIR: false, alert: drug.alert || '', addonVol: 0, addonType: '', methodIndex: null, targetVol: null });
                 } else if (drug.isGIR) {
                     const girTarget = cleanInputNumber($('inputGIR').value);
                     const bagVol = cleanInputNumber($('inputBagVol').value);
@@ -687,9 +759,10 @@
                     const actualGIR = result ? result.actualGIR : girTarget;
                     const conc = result ? result.conc : 0;
                     const alertStr = result && result.warnings.length > 0 ? result.warnings.join(' | ') : '';
-                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose: bagVol, unit: 'ml', freq: '', method: generateMethodString(drug, bagVol), customMethodIndex: null, isCalculated: false, hideDetails: false, isNutrient: true, isDopamine: false, isGIR: true, girRate: actualGIR.toFixed(1), girConc: conc.toFixed(1), alert: alertStr, addonVol: addonVolVal, addonType: addonTypeVal });
+                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose: bagVol, unit: 'ml', freq: '', method: generateMethodString(drug, bagVol), customMethodIndex: null, isCalculated: false, hideDetails: false, isNutrient: true, isDopamine: false, isGIR: true, girRate: actualGIR.toFixed(1), girConc: conc.toFixed(1), alert: alertStr, addonVol: addonVolVal, addonType: addonTypeVal, methodIndex: null, targetVol: null });
                 } else {
-                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose, unit: drug.unit || '', freq: (drug.hideDetails || drug.name === 'TPN' || $('selectCategory').value === 'Fluids') ? '' : freqDisplay, method: generateMethodString(drug, dose), customMethodIndex: null, isCalculated: false, hideDetails: drug.hideDetails || false, isNutrient: drug.isNutrient || false, isDopamine: drug.isDopamine || false, isGIR: false, alert: drug.alert || '', addonVol: addonVolVal, addonType: addonTypeVal });
+                    const targetVol = (drug.methodIndex === 3 || drug.methodIndex === 10) ? parseInt($('inputTargetVol').value) : null;
+                    currentDrugs.push({ id: generateId(), drugId: drug.id, name: drug.name, dose, unit: drug.unit || '', freq: (drug.hideDetails || drug.name === 'TPN' || $('selectCategory').value === 'Fluids') ? '' : freqDisplay, method: generateMethodString(drug, dose), customMethodIndex: null, isCalculated: false, hideDetails: drug.hideDetails || false, isNutrient: drug.isNutrient || false, isDopamine: drug.isDopamine || false, isGIR: false, alert: drug.alert || '', addonVol: addonVolVal, addonType: addonTypeVal, methodIndex: drug.methodIndex, targetVol });
                 }
             }
             renderDrugsList(); showToast('Added');
@@ -697,7 +770,7 @@
             $('inputAddonVol').value = ''; $('inputAddonType').value = '';
         };
 
-        window.removeDrug = (index) => { currentDrugs.splice(index, 1); renderDrugsList(); };
+        window.removeDrug = (index) => { currentDrugs.splice(index, 1); renderDrugsList(); updateFluidBar(); };
 
         const savePatient = async () => {
             const name = $('inputName').value.trim(), weight = cleanInputNumber($('inputWeight').value), room = $('inputRoom').value;
@@ -722,7 +795,7 @@
             editingPatientId = id;
             $('inputName').value = p.name; $('inputWeight').value = p.weight; $('inputGA').value = p.ga;
             $('inputAge').value = p.ageBaseline || p.age; $('inputRoom').value = p.room || '';
-            currentDrugs = [...p.drugs]; renderDrugsList();
+            currentDrugs = [...p.drugs]; renderDrugsList(); updateFluidBar();
             $('editingBannerName').textContent = p.name; $('editingBanner').classList.remove('hidden');
             $('btnSavePatient').textContent = 'Update Patient';
             renderQueue(); renderFilterBar(); window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -757,7 +830,8 @@
                         const el = document.createElement('div'); el.className = 'pdf-cell'; const p = cellData.patient;
                         if (cellData.span > 1) el.style.gridRow = `span ${cellData.span}`;
                         const liveAge = getLiveAge(p), ageDisplay = formatAgeDisplay(liveAge);
-                        el.innerHTML = `<div class="pdf-cell-header"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:10pt;color:#000;font-weight:bold;">${p.weight}kg | GA:${p.ga}w | D${ageDisplay}${p.room ? ' | ' + p.room : ''}</div><div style="font-weight:900;color:#000;direction:rtl;font-family:'Cairo'">${esc(p.name)}</div></div></div><div style="flex:1;">${p.drugs.map(d => `<div class="pdf-drug-item"><div style="display:flex;justify-content:space-between;font-weight:bold;font-size:10pt;"><span>${d.isGIR ? girSummary(d) : esc(d.name)}</span>${d.isNutrient && !d.isGIR ? `<span>${d.dose + ' ml' + (d.addonVol ? ' (+ ' + d.addonVol + ' ml ' + esc(d.addonType) + ')' : '')}</span>` : (d.hideDetails ? '' : `<span>${d.dose}${d.unit ? d.unit : ''} ${d.freq}</span>`)}</div>${d.alert ? `<div class="arabic-text" style="color:red;font-weight:bold;font-size:8.5pt;text-align:right;margin-top:1px;">${esc(d.alert)}</div>` : ''}<div style="font-size:9.5pt;text-align:left;margin-top:1px;">${renderMethod(d)}</div>${d.drugId === 9 ? `<table style="width:100%;margin-top:2mm;font-size:8.5pt;border-collapse:collapse;border:1.5px solid #000;text-align:center;"><tr style="background:#f0f0f0;"><th style="border:1px solid #000;padding:4px;">Rate ml/24h</th><th style="border:1px solid #000;padding:4px;">mcg/kg/min</th></tr>${[2, 5, 7, 10].map(ds => `<tr><td style="border:1px solid #000;padding:3px;padding-bottom:6px;font-weight:bold;">${((ds * (p.weight || 0) * 1440) / 1000).toFixed(0)} ml</td><td style="border:1px solid #000;padding:3px;padding-bottom:6px;">${ds}</td></tr>`).join('')}</table>` : ''}</div>`).join('')}</div>`;
+                        const fluidTxt = fluidSummaryText(p);
+                        el.innerHTML = `<div class="pdf-cell-header"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:10pt;color:#000;font-weight:bold;">${p.weight}kg | GA:${p.ga}w | D${ageDisplay}${p.room ? ' | ' + p.room : ''}</div><div style="font-weight:900;color:#000;direction:rtl;font-family:'Cairo'">${esc(p.name)}</div></div>${fluidTxt ? `<div style="font-size:8.5pt;color:#0F766E;font-weight:700;text-align:right;margin-top:1px;">${fluidTxt}</div>` : ''}</div><div style="flex:1;">${p.drugs.map(d => `<div class="pdf-drug-item"><div style="display:flex;justify-content:space-between;font-weight:bold;font-size:10pt;"><span>${d.isGIR ? girSummary(d) : esc(d.name)}</span>${d.isNutrient && !d.isGIR ? `<span>${d.dose + ' ml' + (d.addonVol ? ' (+ ' + d.addonVol + ' ml ' + esc(d.addonType) + ')' : '')}</span>` : (d.hideDetails ? '' : `<span>${d.dose}${d.unit ? d.unit : ''} ${d.freq}</span>`)}</div>${d.alert ? `<div class="arabic-text" style="color:red;font-weight:bold;font-size:8.5pt;text-align:right;margin-top:1px;">${esc(d.alert)}</div>` : ''}<div style="font-size:9.5pt;text-align:left;margin-top:1px;">${renderMethod(d)}</div>${d.drugId === 9 ? `<table style="width:100%;margin-top:2mm;font-size:8.5pt;border-collapse:collapse;border:1.5px solid #000;text-align:center;"><tr style="background:#f0f0f0;"><th style="border:1px solid #000;padding:4px;">Rate ml/24h</th><th style="border:1px solid #000;padding:4px;">mcg/kg/min</th></tr>${[2, 5, 7, 10].map(ds => `<tr><td style="border:1px solid #000;padding:3px;padding-bottom:6px;font-weight:bold;">${((ds * (p.weight || 0) * 1440) / 1000).toFixed(0)} ml</td><td style="border:1px solid #000;padding:3px;padding-bottom:6px;">${ds}</td></tr>`).join('')}</table>` : ''}</div>`).join('')}</div>`;
                         grid.appendChild(el);
                     });
                     container.appendChild(pageDiv); await document.fonts.ready; await new Promise(r => setTimeout(r, 200));
@@ -791,7 +865,7 @@
         $('selectCategory').addEventListener('change', updateDrugListByCategory);
         $('selectDrug').addEventListener('change', handleDrugSelectionChange);
         $('selectCustomMethod').addEventListener('change', handleCustomMethodChange);
-        $('inputWeight').addEventListener('input', () => { validateClinicalInputs(); handleDrugSelectionChange(); });
+        $('inputWeight').addEventListener('input', () => { validateClinicalInputs(); handleDrugSelectionChange(); updateFluidBar(); });
         $('inputGA').addEventListener('input', () => { validateClinicalInputs(); handleDrugSelectionChange(); });
         $('inputAge').addEventListener('change', handleDrugSelectionChange);
         $('inputDose').addEventListener('input', () => handleManualDoseChange('totalDose'));
