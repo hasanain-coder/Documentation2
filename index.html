@@ -329,7 +329,7 @@
             if (drug && drug.warning_rule) { const a = drug.warning_rule(ga, age, freq, w); if (a) { $('warningMessage').innerHTML = a; $('warningMessage').classList.remove('hidden'); } }
         };
 
-        /* ===== GIR Calculation — returns null if inputs invalid ===== */
+        /* ===== GIR Calculation ===== */
         const calculateGIR = (w, gir, vol) => {
             if (w <= 0 || gir <= 0 || vol <= 0) return null;
             let ht = Math.round(((w * gir * 1440 / 50) - vol) / 9);
@@ -347,7 +347,7 @@
         const generateMethodString = (drug, finalDoseMg) => {
             if (drug.isDopamine && drug.methodIndex !== 10 && drug.methodIndex !== 8) return '1 ml dopamin + 39 ml GW';
 
-            /* GIR Fluid — returns prep recipe only, summary is built separately */
+            /* GIR Fluid */
             if (drug.isGIR) {
                 const w = cleanInputNumber($('inputWeight').value);
                 const gir = cleanInputNumber($('inputGIR').value);
@@ -404,7 +404,6 @@
             return boldNumbersInText(drug.method);
         };
 
-        /* ===== GIR summary line: Fluid 100 ml / 24 hr | GIR= 6 | Conc.= 10% ===== */
         const girSummary = (d) => `Fluid ${d.dose} ml / 24 hr | GIR= ${d.girRate} | Conc.= ${d.girConc}%`;
 
         const updateDrugListByCategory = () => {
@@ -528,18 +527,23 @@
                 if (w > 0) { let calc; if (drug.perMinute) calc = totalDose / (w * 1440); else if (drug.isDopamine) calc = (totalDose * 1000) / (w * 1440); else calc = totalDose / (w * 24); $('inputDosePerKg').value = calc.toFixed(3); }
             }
 
-            /* GIR live recalculation */
-            if (drug && drug.isGIR && (source === 'gir' || source === 'bagVol' || source === 'addon')) {
-                const gir = cleanInputNumber($('inputGIR').value), vol = cleanInputNumber($('inputBagVol').value);
-                if (gir > 0 && vol > 0 && w > 0) {
-                    const result = calculateGIR(w, gir, vol);
-                    if (result) {
-                        $('alertMessage').classList.toggle('hidden', result.warnings.length === 0);
-                        $('alertText').innerHTML = result.warnings.join('<br>');
-                    }
-                } else { $('alertMessage').classList.add('hidden'); }
-                updateMethodPreview(drug, 0); return;
-            }
+            /* ===== GIR live recalculation — shows actual GIR only if HT<0 or HT>vol ===== */
+if (drug && drug.isGIR && (source === 'gir' || source === 'bagVol' || source === 'addon')) {
+    const gir = cleanInputNumber($('inputGIR').value), vol = cleanInputNumber($('inputBagVol').value);
+    if (gir > 0 && vol > 0 && w > 0) {
+        const result = calculateGIR(w, gir, vol);
+        if (result && (result.ht < 0 || result.ht > vol)) {
+            let html = `<strong>Actual GIR: ${result.actualGIR.toFixed(2)} mg/kg/min</strong>`;
+            if (Math.abs(result.actualGIR - gir) > 0.01) html += `<br><span style="color:#B91C1C;">⚠️ Actual GIR (${result.actualGIR.toFixed(2)}) ≠ Target GIR (${gir})</span>`;
+            if (result.warnings.length > 0) html += '<br>' + result.warnings.join('<br>');
+            $('alertText').innerHTML = html;
+            $('alertMessage').classList.remove('hidden');
+        } else {
+            $('alertMessage').classList.add('hidden');
+        }
+    } else { $('alertMessage').classList.add('hidden'); }
+    updateMethodPreview(drug, 0); return;
+}
 
             if (source === 'freq') checkClinicalAlerts(drug);
             if (source === 'targetVol' && drug && (drug.methodIndex === 3 || drug.methodIndex === 10)) updateMethodPreview(drug, cleanInputNumber($('inputDose').value));
@@ -699,7 +703,6 @@
                     const bagVol = cleanInputNumber($('inputBagVol').value);
                     if (girTarget <= 0 || bagVol <= 0) { showToast('Enter GIR and bag volume', 'error'); return; }
                     const result = calculateGIR(w, girTarget, bagVol);
-                    /* Store ACTUAL GIR and concentration, not the target */
                     const actualGIR = result ? result.actualGIR : girTarget;
                     const conc = result ? result.conc : 0;
                     const alertStr = result && result.warnings.length > 0 ? result.warnings.join(' | ') : '';
