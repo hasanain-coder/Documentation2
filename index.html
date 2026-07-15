@@ -527,15 +527,15 @@
                 if (w > 0) { let calc; if (drug.perMinute) calc = totalDose / (w * 1440); else if (drug.isDopamine) calc = (totalDose * 1000) / (w * 1440); else calc = totalDose / (w * 24); $('inputDosePerKg').value = calc.toFixed(3); }
             }
 
-            /* ===== GIR live recalculation — shows actual GIR only if HT<0 or HT>vol ===== */
+/* ===== GIR live recalculation — shows actual GIR only if HT<0 or HT>vol ===== */
 if (drug && drug.isGIR && (source === 'gir' || source === 'bagVol' || source === 'addon')) {
     const gir = cleanInputNumber($('inputGIR').value), vol = cleanInputNumber($('inputBagVol').value);
     if (gir > 0 && vol > 0 && w > 0) {
         const result = calculateGIR(w, gir, vol);
-        if (result && (result.ht < 0 || result.ht > vol)) {
+        if (result && result.warnings.length > 0) {
             let html = `<strong>Actual GIR: ${result.actualGIR.toFixed(2)} mg/kg/min</strong>`;
             if (Math.abs(result.actualGIR - gir) > 0.01) html += `<br><span style="color:#B91C1C;">⚠️ Actual GIR (${result.actualGIR.toFixed(2)}) ≠ Target GIR (${gir})</span>`;
-            if (result.warnings.length > 0) html += '<br>' + result.warnings.join('<br>');
+            html += '<br>' + result.warnings.join('<br>');
             $('alertText').innerHTML = html;
             $('alertMessage').classList.remove('hidden');
         } else {
