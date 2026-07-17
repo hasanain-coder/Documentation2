@@ -459,7 +459,7 @@
         window.toggleCard=id=>{const b=document.getElementById('body-'+id);const c=document.getElementById('chevron-'+id);if(!b||!c)return;b.classList.toggle('expanded');c.classList.toggle('rotated');};
 
         const calcFluidPerDose=(d,w)=>{if(d.noPrint)return 0;if(d.isNutrient&&!d.isDopamine)return d.dose||0;if(d.drugId===9)return(5*w*1440)/1000;if(d.methodIndex===3||d.methodIndex===10)return d.targetVol||10;if(d.methodIndex===5&&d.factor)return d.dose/d.factor;return 0;};
-        const getFreqMultiplier=f=>{if(!f)return 1;if(f==='q36hr')return 24/36;if(f==='q48hr')return 0.5;const n=parseInt(f);return n>0?n:1;};
+        const getFreqMultiplier=f=>{if(!f)return 1;if(f==='q36hr')return 24/36;if(f==='q48hr')return 0.5;const n=parseInt(f.replace(/[^0-9]/g,''));return n>0?n:1;};
         const calcTotalFluid=(drugs,w)=>{if(w<=0)return null;let t=0;drugs.forEach(d=>{t+=calcFluidPerDose(d,w)*getFreqMultiplier(d.freq);});if(t<=0)return null;return{totalMl:Math.round(t*10)/10,mlPerKgDay:Math.round((t/w)*100)/100,mlPerKgHr:Math.round((t/w/24)*100)/100};};
         const updateFluidBar=()=>{const w=cleanInputNumber($('inputWeight').value);const f=calcTotalFluid(currentDrugs,w);if(!f||f.totalMl<=0){$('fluidSummary').classList.add('hidden');return;}$('fluidTotal').textContent=f.totalMl;$('fluidPerKgDay').textContent=f.mlPerKgDay;$('fluidPerKgHr').textContent=f.mlPerKgHr;$('fluidSummary').classList.remove('hidden');};
         const fluidSummaryText=p=>{const w=parseFloat(p.weight)||0;if(w<=0)return'';const f=calcTotalFluid(p.drugs,w);if(!f||f.totalMl<=0)return'';return`💧 ${f.mlPerKgDay} ml/kg/day`;};
