@@ -490,7 +490,7 @@
                 const ab=ac>0?`<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400">${ac} alert${ac>1?'s':''}</span>`:'';
                 const room=p.room&&ROOMS.includes(p.room)?p.room:null;
                 const rb=room?`<span class="room-tag ${ROOM_STYLES[room].tag}">${ROOM_STYLES[room].label}</span>`:'<span class="room-tag un">--</span>';
-                const ft=fluidSummaryText(p);
+                const ft='';
                 return`<div class="patient-card bg-[var(--card)] rounded-2xl border ${isEdit?'border-amber-400 ring-2 ring-amber-400/30':'border-[var(--border)]'} shadow-sm overflow-hidden card-hover" style="animation-delay:${idx*40}ms">
                     <div class="px-4 py-3 flex items-center justify-between cursor-pointer select-none" onclick="toggleCard('${p.id}')">
                         <div class="flex items-center gap-3 min-w-0">
