@@ -356,7 +356,7 @@
         if(reconstitutedVol<1){displayVol=reconstitutedVol*100;unitStr=' units';}
         let displayStr=unitStr===' units'?Math.round(displayVol):fmt(displayVol,1);
         methodTemplate=methodTemplate.replace('**',`${displayStr}${unitStr}`);
-        if(methodTemplate.includes('##'))methodTemplate=methodTemplate.replace('##',`${fmt(Math.max(0,diluentVol),1)} ml`);
+        if(methodTemplate.includes('##'))methodTemplate=methodTemplate.replace('##',`${fmt(Math.max(0,diluentVol),0)} ml`);
         return methodTemplate;
     };
 
