@@ -230,7 +230,7 @@
         {id:5,name:'Colistin Loading',dosePerKg:150000,unit:'IU',factor:500000,methodIndex:2,defaultFreq:1,inputMode:'weightBased'},
         {id:6,name:'Colistin Maint.',dosePerKg:37500,unit:'IU',factor:500000,methodIndex:2,defaultFreq:2,inputMode:'weightBased'},
         {id:24,name:'Colistin neb.',dosePerKg:5,unit:'mg',factor:16.667,methodIndex:11,defaultFreq:2,inputMode:'weightBased',alert:'مهم: يعطى فنتلوين تبخير قبله ب١٠ دقائق'},
-        {id:25,name:'Decadron DART',dosePerKg:0.075,unit:'mg',factor:0.4,methodIndex:2,defaultFreq:2,inputMode:'weightBased',alert:'مهم: تخفف الامبولة الى ٢٠ مل مع NS قبل الاعطاء'},
+        {id:25,name:'Decadron DART',dosePerKg:0.075,unit:'mg',factor:0.4,methodIndex:2,defaultFreq:2,doseDecimals:3,inputMode:'weightBased',alert:'مهم: تخفف الامبولة الى ٢٠ مل مع NS قبل الاعطاء'},
         {id:28,name:'Decadron amp',dosePerKg:0.25,unit:'mg',factor:0.4,methodIndex:2,defaultFreq:2,inputMode:'weightBased',alert:'مهم: تخفف الامبولة الى ٢٠ مل مع NS قبل الاعطاء'},
         {id:7,name:'Tigecycline',dosePerKg:2,unit:'mg',factor:2,methodIndex:3,defaultFreq:2,inputMode:'weightBased'},
         {id:8,name:'Meropenem',dosePerKg:40,unit:'mg',factor:50,methodIndex:3,inputMode:'weightBased',getRecommendedFreq:(ga,pna)=>ga<32?(pna<14?'2':'3'):'3',warning_rule:(ga,age,freq)=>{const r=ga<32?(age<14?'2':'3'):'3';if(freq!==r)return`⚠️ تنبيه: التردد المقترح بناءً على GA و PNA هو ${r==='3'?'ثلاث مرات يومياً (كل ٨ ساعات)':'مرتان يومياً (كل ١٢ ساعة)'}!`;return null;}},
@@ -454,7 +454,7 @@
             case'infusion':$('dosePerKgContainer').classList.remove('hidden');$('inputDosePerKg').value=drug.defaultDosePerKg;if(w>0){let calc;if(drug.perMinute)calc=w*drug.defaultDosePerKg*1440;else if(drug.isDopamine)calc=(w*drug.defaultDosePerKg*1440)/1000;else calc=w*drug.defaultDosePerKg*24;$('inputDose').value=calc.toFixed(2);}break;
             case'fixed':$('inputDose').value=drug.fixedDose;break;
             case'volume':$('inputDose').value='';$('inputDose').placeholder='Total Volume (ml)';if(drug.isNutrient)updateMethodPreview(drug,0);break;
-            default:if(w>0&&drug.dosePerKg)$('inputDose').value=(w*drug.dosePerKg).toFixed(1);else $('inputDose').value='';break;
+            default:if(w>0&&drug.dosePerKg)$('inputDose').value=(w*drug.dosePerKg).toFixed(drug.doseDecimals||1);else $('inputDose').value='';break;
         }
         if(drug.getRecommendedFreq)$('inputFreq').value=drug.getRecommendedFreq(ga,pna,w);else $('inputFreq').value=drug.defaultFreq||1;
         checkClinicalAlerts(drug);updateMethodPreview(drug,parseFloat($('inputDose').value)||0);
