@@ -454,7 +454,7 @@
             case'infusion':$('dosePerKgContainer').classList.remove('hidden');$('inputDosePerKg').value=drug.defaultDosePerKg;if(w>0){let calc;if(drug.perMinute)calc=w*drug.defaultDosePerKg*1440;else if(drug.isDopamine)calc=(w*drug.defaultDosePerKg*1440)/1000;else calc=w*drug.defaultDosePerKg*24;$('inputDose').value=calc.toFixed(2);}break;
             case'fixed':$('inputDose').value=drug.fixedDose;break;
             case'volume':$('inputDose').value='';$('inputDose').placeholder='Total Volume (ml)';if(drug.isNutrient)updateMethodPreview(drug,0);break;
-            default:if(w>0&&drug.dosePerKg)$('inputDose').value=(w*drug.dosePerKg).toFixed(drug.doseDecimals||1);else $('inputDose').value='';break;
+            default:if(w>0&&drug.dosePerKg)$('inputDose').value=parseFloat((w*drug.dosePerKg).toFixed(drug.doseDecimals||1)).toString();else $('inputDose').value='';break;
         }
         if(drug.getRecommendedFreq)$('inputFreq').value=drug.getRecommendedFreq(ga,pna,w);else $('inputFreq').value=drug.defaultFreq||1;
         checkClinicalAlerts(drug);updateMethodPreview(drug,parseFloat($('inputDose').value)||0);
