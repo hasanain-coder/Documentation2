@@ -63,6 +63,12 @@
         body.dark-mode .room-tag.rec{color:#6EE7B7;background:rgba(110,231,183,.15)}
         body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);border-color:var(--muted)}
         @media(min-width:1024px){.patient-grid{grid-template-columns:repeat(3,1fr)!important}}
+        .dob-wrapper{position:relative}
+        .dob-wrapper input[type="date"]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;border:none;padding:0;margin:0}
+        .dob-fake{width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .2s;font-size:14px;display:flex;align-items:center;justify-content:space-between}
+        .dob-fake.has-date{color:var(--fg);font-weight:500}
+        .dob-fake:active{background:var(--accent);color:white;border-color:var(--accent)}
+        .dob-fake svg{width:18px;height:18px;flex-shrink:0;opacity:.5}
         @media(max-width:640px){.med-grid{grid-template-columns:1fr!important}.med-grid>div{min-width:0!important}}
         @media(min-width:641px)and(max-width:1023px){.med-grid{grid-template-columns:1fr 1fr!important}}
     </style>
@@ -108,7 +114,7 @@
                 <div class="patient-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-hidden">
                     <div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Patient Name</label><input type="text" id="inputName" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Full name"></div>
                     <div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Weight (kg)</label><input type="text" id="inputWeight" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 2.35"></div>
-                    <div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Date of Birth</label><input type="date" id="inputDOB" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"></div>
+                    <div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Date of Birth</label><div class="dob-wrapper"><div class="dob-fake" id="dobFake" onclick="document.getElementById('inputDOB').showPicker()"><span id="dobText">Select date...</span><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4v4M0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><input type="date" id="inputDOB"></div></div>
                 </div>
                 <div class="patient-grid grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-x-hidden">
                     <div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Gestational Age (weeks)</label><input type="text" id="inputGA" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 34"></div>
@@ -300,10 +306,14 @@
     // Update the PNA display badge below the DOB input
     const updatePnaDisplay=()=>{
         const dob=$('inputDOB').value;
-        if(!dob){$('pnaDisplay').classList.add('hidden');return;}
+        if(!dob){$('pnaDisplay').classList.add('hidden');$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';return;}
         const pna=daysDiff(dob,new Date());
+        const parts=dob.split('-');
+        const formatted=`${parts[2]}/${parts[1]}/${parts[0]}`;
+        $('dobText').textContent=formatted;
+        $('dobFake').classList.add('has-date');
         $('pnaDisplay').textContent=`Postnatal Age: Day ${pna}`;
-        $('pnaDisplay').classList.remove('hidden');
+         $('pnaDisplay').classList.add('hidden');$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('fluidSummary').classList.add('hidden');
     };
 
     const showToast=(message,type='success')=>{
@@ -597,6 +607,7 @@
         $('inputName').value=p.name;$('inputWeight').value=p.weight;$('inputGA').value=p.ga;
         // DOB: populate if available, leave empty for legacy patients
         $('inputDOB').value=p.dob||'';
+        if(p.dob){const parts=p.dob.split('-');$('dobText').textContent=`${parts[2]}/${parts[1]}/${parts[0]}`;$('dobFake').classList.add('has-date');}
         $('inputRoom').value=p.room||'';
         currentDrugs=[...p.drugs];renderDrugsList();updateFluidBar();updatePnaDisplay();
         $('editingBannerName').textContent=p.name;$('editingBanner').classList.remove('hidden');
