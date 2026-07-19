@@ -186,7 +186,7 @@
                 <div id="drugsList" class="mt-4 space-y-2"></div>
                 <div id="fluidSummary" class="hidden rounded-xl p-4 mb-4 flex items-center gap-3" style="background:rgba(15,118,110,.08);border:1px solid rgba(15,118,110,.2);">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(15,118,110,.15);"><svg class="w-5 h-5 text-[var(--accent)]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0L12 2.69z"/></svg></div>
-                    <div><p class="text-sm font-bold text-[var(--fg)]">Total IV Fluid: <span id="fluidTotal">0</span> ml / 24hr</p><p class="text-xs text-[var(--muted)]"><span id="fluidPerKgDay">0</span> ml/kg/day  |  <span id="fluidPerKgHr">0</span> ml/kg/hr</p></div>
+                    <div><p class="text-sm font-bold text-[var(--fg)]">Total Fluid: <span id="fluidTotal">0</span> ml / 24hr</p><p class="text-xs text-[var(--muted)]"><span id="fluidPerKgDay">0</span> ml/kg/day  |  <span id="fluidPerKgHr">0</span> ml/kg/hr</p></div>
                 </div>
                 <button id="btnSavePatient" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg mt-6">Save Patient to Queue</button>
             </div>
@@ -253,7 +253,7 @@
         {id:14,name:'10% GW',methodIndex:7,defaultFreq:1,hideDetails:true,isNutrient:true,inputMode:'volume'},
         {id:15,name:'5% GW',methodIndex:7,defaultFreq:1,hideDetails:true,isNutrient:true,inputMode:'volume'},
         {id:43,name:'GIR Fluid',methodIndex:7,defaultFreq:1,hideDetails:true,isNutrient:true,isGIR:true,inputMode:'gir'},
-        {id:44,name:'Feeding',methodIndex:7,defaultFreq:1,hideDetails:true,isNutrient:true,noPrint:true,inputMode:'volume'},
+        {id:44,name:'Feeding',methodIndex:7,defaultFreq:1,hideDetails:true,isNutrient:true,inputMode:'volume'},
         {id:30,name:'Vit D drop',dosePerKg:400,unit:'IU',factor:1,methodIndex:13,defaultFreq:1,inputMode:'fixed',fixedDose:400},
         {id:31,name:'HydroCHLOROthiazide cap',dosePerKg:1,unit:'mg',methodIndex:12,defaultFreq:2,inputMode:'weightBased'},
         {id:32,name:'Ventolin neb.',dosePerKg:1.25,unit:'mg',factor:5,methodIndex:11,defaultFreq:4,inputMode:'fixed',fixedDose:1.25},
@@ -629,7 +629,7 @@
             sel.forEach(p=>{let rem=[...p.drugs],chunks=[];while(rem.length>0){let chunk=[],hasDop=false;for(let i=0;i<rem.length;i++){if(rem[i].drugId===9)hasDop=true;chunk.push(rem[i]);let limit=hasDop?15:20;if(chunk.length===limit||i===rem.length-1){chunks.push(chunk);rem=rem.slice(i+1);break;}}}chunks.forEach((chunk,idx)=>{processed.push({...p,name:idx===0?p.name:p.name+' (تابع)',dr:chunk});});});
             let pages=[],cells=Array(6).fill(null);
             const place=patient=>{
-                const hasDop=patient.dr.some(d=>d.drugId===9);const count=patient.dr.filter(d=>d.drugId!==9&&!d.noPrint).length;
+                const hasDop=patient.dr.some(d=>d.drugId===9);const count=patient.dr.filter(d=>d.drugId!==9&&!d.noPrint&&d.drugId!==44).length;
                 let span=1;if(count>11||(hasDop&&count>8))span=3;else if(count>5||(hasDop&&count>1))span=2;
                 for(let i=0;i<6;i++){
                     if(cells[i]===null){
@@ -653,7 +653,7 @@
                     if(cellData.span>1)el.style.gridRow=`span ${cellData.span}`;
                     const ad=formatAgeDisplay(getLiveAge(p));
                     const dopTable=p.dr.some(d=>d.drugId===9)?`<table style="width:100%;margin-top:2mm;font-size:8.5pt;border-collapse:collapse;text-align:center;"><tr style="background:#f8f0f0;"><th style="border:1px solid #000;padding:4px;">Rate ml/24h</th><th style="border:1px solid #000;padding:4px;">mcg/kg/min</th></tr>${[2,5,7,10].map(ds=>`<tr><td style="border:1px solid #000;padding:3px 4px;font-weight:bold;">${((ds*(p.weight||0)*1440)/1000).toFixed(0)} ml</td><td style="border:1px solid #000;padding:3px 4px;">${ds}</td></tr>`).join('')}</table>`:'';
-                    el.innerHTML=`<div class="pdf-cell-header"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:10pt;color:#000;font-weight:bold;">${p.weight}kg | GA:${p.ga}w | D${ad}${p.room?' | '+p.room:''}</div><div style="font-weight:900;color:#000;direction:rtl;font-family:'Cairo'">${esc(p.name)}</div></div></div><div style="flex:1;">${p.drugs.filter(d=>!d.noPrint).map(d=>`<div class="pdf-drug-item"><div style="display:flex;justify-content:space-between;font-weight:bold;font-size:10pt;"><span>${d.isGIR?girSummary(d):esc(d.name)}</span>${d.isNutrient&&!d.isGIR?`<span>${d.dose} ml${d.addonVol?' (+ '+d.addonVol+' ml '+esc(d.addonType)+')':''}</span>`:(d.hideDetails?'':`<span>${d.dose}${d.unit?d.unit:''} ${d.freq}</span>`)}</div>${d.alert?`<div class="arabic-text" style="color:red;font-weight:bold;font-size:8.5pt;text-align:right;margin-top:1px;">${esc(d.alert)}</div>`:''}<div style="font-size:9.5pt;text-align:left;margin-top:1px;">${renderMethod(d)}</div>${d.drugId===9?dopTable:''}</div>`).join('')}</div>`;
+                    el.innerHTML=`<div class="pdf-cell-header"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:10pt;color:#000;font-weight:bold;">${p.weight}kg | GA:${p.ga}w | D${ad}${p.room?' | '+p.room:''}</div><div style="font-weight:900;color:#000;direction:rtl;font-family:'Cairo'">${esc(p.name)}</div></div></div><div style="flex:1;">${p.drugs.filter(d=>!d.noPrint && d.drugId!==44).map(d=>`<div class="pdf-drug-item"><div style="display:flex;justify-content:space-between;font-weight:bold;font-size:10pt;"><span>${d.isGIR?girSummary(d):esc(d.name)}</span>${d.isNutrient&&!d.isGIR?`<span>${d.dose} ml${d.addonVol?' (+ '+d.addonVol+' ml '+esc(d.addonType)+')':''}</span>`:(d.hideDetails?'':`<span>${d.dose}${d.unit?d.unit:''} ${d.freq}</span>`)}</div>${d.alert?`<div class="arabic-text" style="color:red;font-weight:bold;font-size:8.5pt;text-align:right;margin-top:1px;">${esc(d.alert)}</div>`:''}<div style="font-size:9.5pt;text-align:left;margin-top:1px;">${renderMethod(d)}</div>${d.drugId===9?dopTable:''}</div>`).join('')}</div>`;
                     grid.appendChild(el);
                 });
                 container.appendChild(pageDiv);await document.fonts.ready;await new Promise(r=>setTimeout(r,200));
