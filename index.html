@@ -237,7 +237,7 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <script type="module">
 const firebaseConfig={apiKey:"AIzaSyAaMqxvBAuTkOykYHF5w_xjS98bDOhZoPY",authDomain:"documentation2-dd1aa.firebaseapp.com",projectId:"documentation2-dd1aa",storageBucket:"documentation2-dd1aa.firebasestorage.app",messagingSenderId:"236681783643",appId:"1:236681783643:web:dc4d715258955b3413d27e",measurementId:"G-WRK2C3121X"};
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getFirestore,collection,addDoc,deleteDoc,doc,setDoc,onSnapshot,query,orderBy,where,writeBatch}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getFirestore,collection,addDoc,deleteDoc,doc,setDoc,onSnapshot,query,orderBy,where,writeBatch,getDocs}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp(firebaseConfig),db=getFirestore(app);
 const patientsRef=collection(db,"patients"),tpnStandRef=collection(db,"tpn_standalone"),tpnLogRef=collection(db,"tpn_log");
 
@@ -399,7 +399,7 @@ const calcTotalFluid=(drugs,w)=>{if(w<=0)return null;let t=0;drugs.forEach(d=>{t
 const updateFluidBar=()=>{const w=cleanN($('inputWeight').value);const f=calcTotalFluid(currentDrugs,w);if(!f||f.totalMl<=0){$('fluidSummary').classList.add('hidden');return;}$('fluidTotal').textContent=f.totalMl;$('fluidPerKgDay').textContent=f.mlKgD;$('fluidPerKgHr').textContent=f.mlKgH;$('fluidSummary').classList.remove('hidden');};
 const fluidTxt=p=>{const w=parseFloat(p.weight)||0;if(w<=0)return'';const f=calcTotalFluid(p.drugs,w);if(!f||f.totalMl<=0)return'';return`💧 ${f.mlKgD} ml/kg/day`;};
 
-const updateCounter=()=>{const t=patients.length,s=selectedPatientIds.size,f=getFiltered().length;$('pdfBtnText').textContent=s>0?`Generate PDF (${s})`:'Generate PDF';$('clearBtnText').textContent=s>0?`Clear Selected (${s})`:'Clear All';$('btnPdf').disabled=s===0;$('emptyState').classList.toggle('hidden',f>0);const cb=$('selectAllCheckbox');cb.checked=f>0&&s===f;cb.indeterminate=s>0&&s<f;};
+const updateCounter=()=>{const t=patients.length,s=selectedPatientIds.size,f=getFiltered().length;$('pdfBtnText').textContent=s>0?`Generate PDF (${s})`:'Generate PDF';$('clearBtnText').textContent=s>0?`Clear Selected (${s})`:'Clear All';$('btnPdf').disabled=s===0;$('emptyState').classList.toggle('hidden',f>0);const cb=$('selectAllCheckbox');if(cb){cb.checked=f>0&&s===f;cb.indeterminate=s>0&&s<f;}};
 window.toggleSel=id=>{if(selectedPatientIds.has(id))selectedPatientIds.delete(id);else selectedPatientIds.add(id);updateCounter();renderQueue();};
 
 const renderQueue=()=>{
@@ -436,10 +436,10 @@ if(!editingPatientId&&!dob){showToast('Select Date of Birth','error');return;}
 const sorted=[...currentDrugs].sort((a,b)=>{if(a.isNutrient&&!b.isNutrient)return 1;if(!a.isNutrient&&b.isNutrient)return-1;return 0;});
 const np={name,weight,dob:dob||null,ga:$('inputGA').value,room,drugs:sorted,saveDate:new Date().toISOString().split('T')[0]};
 showToast('Saving...','info');
-try{if(editingPatientId)await setDoc(doc(db,"patients",editingPatientId),np);else await addDoc(patientsRef,np);clearForm();showToast('Saved');}
+try{if(editingPatientId)await setDoc(doc(db,"patients",editingPatientId),np);else await addDoc(patientsRef,np);clearForm();renderQueue();renderFilterBar();showToast('Saved');}
 catch(e){showToast(`Save Failed: ${e.message}`,'error');}
 };
-window.deletePatient=async id=>{if(editingPatientId===id)return;const p=patients.find(x=>x.id===id);if(!p||!confirm(`Delete "${p.name}"?`))return;const pi=patients.findIndex(x=>x.id===id),bk=patients[pi];patients.splice(pi,1);selectedPatientIds.delete(id);renderQueue();renderFilterBar();try{await deleteDoc(doc(db,"patients",id));}catch(e){patients.splice(pi,0,bk);renderQueue();renderFilterBar();showToast(`Failed: ${e.message}`,'error');}};
+window.deletePatient=async id=>{if(editingPatientId===id)return;const p=patients.find(x=>x.id===id);if(!p||!confirm(`Delete "${p.name}"?`))return;const pi=patients.findIndex(x=>x.id===id),bk=patients[pi];patients.splice(pi,1);selectedPatientIds.delete(id);renderQueue();renderFilterBar();try{await deleteDoc(doc(db,"patients",id));renderQueue();renderFilterBar();}catch(e){patients.splice(pi,0,bk);renderQueue();renderFilterBar();showToast(`Failed: ${e.message}`,'error');}};
 window.editPatient=async id=>{const p=patients.find(x=>x.id===id);if(!p)return;editingPatientId=id;$('inputName').value=p.name;$('inputWeight').value=p.weight;$('inputGA').value=p.ga;$('inputDOB').value=p.dob||'';if(p.dob){const ps=p.dob.split('-');$('dobText').textContent=`${ps[2]}/${ps[1]}/${ps[0]}`;$('dobFake').classList.add('has-date');updatePna();}else{$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('pnaDisplay').classList.add('hidden');}$('inputRoom').value=p.room||'';currentDrugs=[...p.drugs];renderDrugList();updateFluidBar();$('editingBannerName').textContent=p.name;$('editingBanner').classList.remove('hidden');$('btnSavePatient').textContent='Update Patient';renderQueue();renderFilterBar();window.scrollTo({top:0,behavior:'smooth'});};
 
 /* ===== DOCUMENTATION PDF ===== */
@@ -588,12 +588,20 @@ dd.classList.add('show');
 async function exportCsv(){
 const from=$('csvFrom').value,to=$('csvTo').value;
 if(!from||!to){showToast('Select date range','error');return;}
-try{const snap=await new Promise((res,rej)=>{const q2=query(tpnLogRef,orderBy("timestamp","desc"));onSnapshot(q2,s=>{res(s.docs.map(d=>({id:d.id,...d.data()})));setTimeout(()=>rej(new Error('Timeout')),5000);},{includeMetadataChanges:false});});
-const rows=snap.filter(r=>r.date>=from&&r.date<=to);
+try{
+const snap=await getDocs(query(tpnLogRef,orderBy("date","desc")));
+const rows=snap.docs.map(d=>d.data()).filter(r=>r.date>=from&&r.date<=to);
 if(!rows.length){showToast('No data in this range','info');return;}
 let csv='Name,Age (days),Bag Volume (ml),No. of Bags,Date\n';
 rows.forEach(r=>{csv+=`"${r.patientName||''}",${r.age!=null?r.age:'—'},${r.bagVolume||0},${r.numBags||1},${r.date}\n`;});
-const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`TPN_Data_${from}_to_${to}.csv`;a.click();URL.revokeObjectURL(url);showToast(`Exported ${rows.length} records`);
+const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;
+a.download=`TPN_Data_${from}_to_${to}.csv`;
+a.click();
+URL.revokeObjectURL(url);
+showToast(`Exported ${rows.length} records`);
 }catch(e){showToast(`Export failed: ${e.message}`,'error');}
 }
 
