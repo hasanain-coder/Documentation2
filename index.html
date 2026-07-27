@@ -237,7 +237,7 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <script type="module">
 const firebaseConfig={apiKey:"AIzaSyAaMqxvBAuTkOykYHF5w_xjS98bDOhZoPY",authDomain:"documentation2-dd1aa.firebaseapp.com",projectId:"documentation2-dd1aa",storageBucket:"documentation2-dd1aa.firebasestorage.app",messagingSenderId:"236681783643",appId:"1:236681783643:web:dc4d715258955b3413d27e",measurementId:"G-WRK2C3121X"};
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getFirestore,collection,addDoc,deleteDoc,doc,setDoc,onSnapshot,query,orderBy,where,writeBatch,getDocs}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getFirestore,collection,addDoc,deleteDoc,doc,setDoc,deleteField,onSnapshot,query,orderBy,where,writeBatch,getDocs}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp(firebaseConfig),db=getFirestore(app);
 const patientsRef=collection(db,"patients"),tpnStandRef=collection(db,"tpn_standalone"),tpnLogRef=collection(db,"tpn_log");
 
