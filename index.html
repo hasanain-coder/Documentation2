@@ -690,7 +690,7 @@ standaloneTpn=snap.docs.map(d=>({id:d.id,...d.data()}));if(activeTab==='tpn')ren
  $('inputDOB').addEventListener('change',()=>{updatePna();handleDrugSel();});
  $('inputDose').addEventListener('input',()=>handleDoseChange('totalDose'));
  $('inputDosePerKg').addEventListener('input',()=>handleDoseChange('dosePerKg'));
- $('inputFreq').addEventListener('change,()=>handleDoseChange('freq'));
+ $('inputFreq').addEventListener('change',()=>handleDoseChange('freq'));
  $('inputTargetVol').addEventListener('change',()=>handleDoseChange('targetVol'));
  $('inputAddonVol').addEventListener('input',()=>handleDoseChange('addon'));
  $('inputAddonType').addEventListener('input',()=>handleDoseChange('addon'));
