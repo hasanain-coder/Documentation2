@@ -144,7 +144,7 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <div class="patient-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-hidden">
 <div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Patient Name</label><input type="text" id="inputName" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Full name"></div>
 <div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Weight (kg)</label><input type="text" id="inputWeight" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 2.35"></div>
-<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Date of Birth</label><div class="dob-wrapper"><div class="dob-fake" id="dobFake" onclick="document.getElementById('inputDOB').showPicker()"><span id="dobText">Select date...</span><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4v4M0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><input type="date" id="inputDOB"></div></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Date of Birth</label><div class="dob-wrapper"><div class="dob-fake" id="dobFake" onclick="document.getElementById('inputDOB').showPicker()"><span id="dobText">Select date...</span><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><input type="date" id="inputDOB"></div></div>
 </div>
 <div class="patient-grid grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-x-hidden">
 <div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Gestational Age (weeks)</label><input type="text" id="inputGA" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 34"></div>
@@ -211,15 +211,15 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <div class="relative"><div class="flex gap-2"><div class="relative flex-1"><svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="tpnSearch" class="tpn-inp" style="padding-left:32px" placeholder="Search patient name..." autocomplete="off"><div id="tpnSearchDropdown" class="search-dropdown"></div></div><button id="btnAddStandalone" class="btn-primary px-4 py-2 rounded-xl text-white text-xs font-semibold whitespace-nowrap">+ Standalone</button></div>
 <div id="tpnLinkedInfo" class="hidden mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(15,118,110,.08);color:var(--accent);display:none;"></div></div>
 <div class="tpn-sg">
-<div><label class="tpn-lbl">Weight</label><div class="relative"><input type="number" inputmode="decimal" class="tpn-inp" id="tpnWeight" step="0.01" min="0"><span class="tpn-unit">kg</span></div></div>
-<div><label class="tpn-lbl">Fluid Input</label><div class="relative"><input type="number" inputmode="numeric" class="tpn-inp" id="tpnFluidInput" step="1" min="0" value="0"><span class="tpn-unit">ml/kg</span></div></div>
-<div><label class="tpn-lbl">Treatment Vol</label><div class="relative"><input type="number" inputmode="numeric" class="tpn-inp" id="tpnTreatVol" step="1" min="0" value="0"><span class="tpn-unit">ml</span></div></div>
-<div><label class="tpn-lbl">Target GIR</label><div class="relative"><input type="number" inputmode="decimal" class="tpn-inp" id="tpnGIR" step="0.1" min="0" value="0"><span class="tpn-unit">mg/kg/min</span></div></div>
-<div><label class="tpn-lbl">Lipid Dose</label><div class="relative"><input type="number" inputmode="decimal" class="tpn-inp" id="tpnLipid" step="0.1" min="0" value="0"><span class="tpn-unit">g/kg</span></div></div>
-<div><label class="tpn-lbl">AA Dose</label><div class="relative"><input type="number" inputmode="decimal" class="tpn-inp" id="tpnAA" step="0.1" min="0" value="0"><span class="tpn-unit">g/kg</span></div></div>
+<div><label class="tpn-lbl">Weight</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnWeight" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">kg</span></div></div>
+<div><label class="tpn-lbl">Fluid Input</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnFluidInput" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">ml/kg</span></div></div>
+<div><label class="tpn-lbl">Treatment Vol</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnTreatVol" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">ml</span></div></div>
+<div><label class="tpn-lbl">Target GIR</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnGIR" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">mg/kg/min</span></div></div>
+<div><label class="tpn-lbl">Lipid Dose</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnLipid" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">g/kg</span></div></div>
+<div><label class="tpn-lbl">AA Dose</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnAA" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">g/kg</span></div></div>
 </div>
 <div class="flex gap-3 items-end">
-<div style="flex:1"><label class="tpn-lbl">Enteral Feeding</label><div class="relative"><input type="number" inputmode="numeric" class="tpn-inp" id="tpnEnteral" step="1" min="0" value="0"><span class="tpn-unit">ml</span></div></div>
+<div style="flex:1"><label class="tpn-lbl">Enteral Feeding</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnEnteral" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">ml</span></div></div>
 <div style="flex:1"><label class="tpn-lbl">Exp. Loss</label><div class="tpn-loss-sel" id="tpnLossSel"><button data-lv="10" class="on">10 ml</button><button data-lv="20">20 ml</button></div></div>
 </div>
 <div><div class="flex items-center justify-between mb-2"><span class="tpn-lbl" style="margin:0">Add-ons</span><button id="btnTpnAddAddon" class="text-[var(--accent)] text-xs font-semibold cursor-pointer hover:underline bg-transparent border-none font-[inherit] flex items-center gap-1"><i class="fas fa-plus" style="font-size:9px"></i> Add</button></div><div id="tpnAddons"></div></div>
@@ -227,7 +227,7 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <button id="btnSaveTpn" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg mt-4">Save TPN</button>
 </div></div>
 <div class="space-y-4">
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><h2 class="text-2xl font-bold text-[var(--fg)]">TPN Queue</h2><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="tpnSelectAll" class="w-5 h-5 rounded border border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]"><span class="text-sm font-medium text-[var(--fg)]">Select All</span></label></div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">   <h2 class="text-2xl font-bold text-[var(--fg)]">TPN Queue</h2>   <div class="flex items-center gap-3">     <label class="flex items-center gap-2 cursor-pointer">       <input type="checkbox" id="tpnSelectAll" class="w-5 h-5 rounded border border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]">       <span class="text-sm font-medium text-[var(--fg)]">Select All</span>     </label>     <button id="btnDeleteSelectedTpn" class="py-2.5 px-4 rounded-xl border border-[var(--danger)]/30 text-[var(--danger)] font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm whitespace-nowrap">       <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>       <span>Delete Selected</span>     </button>   </div> </div>
 <div id="tpnQueue" class="space-y-3"></div>
 <div id="tpnEmptyState" class="hidden text-center py-20 bg-[var(--card)] rounded-2xl border-2 border-dashed border-[var(--border)]"><svg class="w-20 h-20 mx-auto text-[var(--muted)]/30 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg><p class="text-[var(--muted)] text-lg font-medium">No TPN calculations</p><p class="text-[var(--muted)]/60 text-sm mt-1">Search a patient above or add standalone</p></div>
 </div></section>
@@ -495,7 +495,7 @@ h+='<div class="tpn-sec-t">Pharmacy Preparation</div><div style="background:rgba
 h+=tpnPr(`Lipid (${b.l} ${b.li}%)`,r.pl);h+=tpnPr(`AA (${b.l} ${b.a}%)`,r.pa);if(r.pb>0)h+=tpnPr(`Glucose (${b.l} ${b.g}%)`,r.pb);if(r.p5>0)h+=tpnPr('Glucose (D5W 5%)',r.p5);if(r.p50>0)h+=tpnPr('Glucose (D50W 50%)',r.p50);
 r.pao.forEach(a=>{if(a.v>0)h+=tpnPr(`Add-on: ${TPN_AT[a.t].l}`,a.v)});h+=`<div class="tpn-pr tpn-pr-t"><span class="tpn-pr-l">Total</span><span class="tpn-pr-v">${r.ptot} ml</span></div></div>`;
 if(r.split){const sv=v=>{const a=Math.floor(v/2);return[a,v-a]};const l=sv(r.pl),a=sv(r.pa),b=sv(r.pb),f=sv(r.p5),f2=sv(r.p50),ba=r.pao.map(x=>sv(x.v));
-const t1=l[0]+a[0]+b[0]+f[0]+f2[0]+ba.reduce((s,x)=>s+x[0],0),t2=l[1]+a[1]+b[1]+f[1]+f2[1]+ba.reduce((s,x)=>s+x[1],0);
+const t1=r.b1t,t2=r.b2t;
 h+=`<div class="tpn-split-box"><div class="flex items-center gap-2 text-xs font-bold text-[var(--accent)] mb-2"><i class="fas fa-layer-group"></i> Prepare as 2 Bags</div><div class="tpn-split-grid"><div class="tpn-split-bag"><div class="tpn-split-bag-t">Bag 1</div>`;h+=tpnSpr('Lipid',l[0]);h+=tpnSpr('AA',a[0]);if(b[0]>0)h+=tpnSpr(`Glu(${b.g}%)`,b[0]);if(f[0]>0)h+=tpnSpr('Glu(5%)',f[0]);if(f2[0]>0)h+=tpnSpr('Glu(50%)',f2[0]);ba.forEach((x,i)=>{if(x[0]>0)h+=tpnSpr(TPN_AT[r.pao[i].t].l,x[0])});h+=`<div class="tpn-split-tot"><span>Total</span><span>${t1} ml</span></div></div><div class="tpn-split-bag"><div class="tpn-split-bag-t">Bag 2</div>`;h+=tpnSpr('Lipid',l[1]);h+=tpnSpr('AA',a[1]);if(b[1]>0)h+=tpnSpr(`Glu(${b.g}%)`,b[1]);if(f[1]>0)h+=tpnSpr('Glu(5%)',f[1]);if(f2[1]>0)h+=tpnSpr('Glu(50%)',f2[1]);ba.forEach((x,i)=>{if(x[1]>0)h+=tpnSpr(TPN_AT[r.pao[i].t].l,x[1])});h+=`<div class="tpn-split-tot"><span>Total</span><span>${t2} ml</span></div></div></div></div>`}
 if(r.w.length)h+=r.w.map(w=>`<div class="tpn-wmsg"><i class="fas fa-exclamation-circle" style="margin-top:2px;flex-shrink:0"></i><span>${w}</span></div>`).join('');return h;
 }
@@ -506,13 +506,13 @@ function getTpnCards(){const linked=patients.filter(p=>p.tpn).map(p=>({id:p.id,t
 function readTpnForm(){const ao=[];document.querySelectorAll('#tpnAddons .tpn-addon-row').forEach(r=>{ao.push({t:r.querySelector('select').value,v:nn(r.querySelector('input').value)})});const lb=document.querySelector('#tpnLossSel button.on');return{w:nn($('tpnWeight').value),fi:nn($('tpnFluidInput').value),tv:nn($('tpnTreatVol').value),gir:nn($('tpnGIR').value),ld:nn($('tpnLipid').value),ad:nn($('tpnAA').value),tf:nn($('tpnEnteral').value),loss:lb?parseInt(lb.dataset.lv):10,ao};}
 
 function fillTpnForm(data,isLinked){
- $('tpnWeight').value=data.w||'';$('tpnFluidInput').value=data.fi||0;$('tpnTreatVol').value=data.tv||0;$('tpnGIR').value=data.gir||0;$('tpnLipid').value=data.ld||0;$('tpnAA').value=data.ad||0;$('tpnEnteral').value=data.tf||0;
+ $('tpnWeight').value=data.w||'';$('tpnFluidInput').value=data.fi||'';$('tpnTreatVol').value=data.tv||'';$('tpnGIR').value=data.gir||'';$('tpnLipid').value=data.ld||'';$('tpnAA').value=data.ad||'';$('tpnEnteral').value=data.tf||'';
 document.querySelectorAll('#tpnLossSel button').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.lv)===(data.loss||10)));
  $('tpnWeight').readOnly=!!isLinked;$('tpnAddons').innerHTML=(data.ao||[]).map((a,i)=>`<div class="tpn-addon-row"><select class="tpn-inp"><option value="na3"${a.t==='na3'?' selected':''}>Na 3%</option><option value="na09"${a.t==='na09'?' selected':''}>Na 0.9%</option><option value="k"${a.t==='k'?' selected':''}>K</option><option value="other"${a.t==='other'?' selected':''}>Other</option></select><input type="number" inputmode="numeric" class="tpn-inp" value="${a.v||''}" step="1" min="0"><span style="font-size:10px;color:#94A3B8;flex-shrink:0">ml</span><button class="tpn-addon-rm" data-idx="${i}"><i class="fas fa-times"></i></button></div>`).join('');
  $('tpnLinkedInfo').style.display=isLinked?'block':'none';updTpnPreview();
 }
 
-function clearTpnForm(){tpnEditId=null;tpnEditType=null;$('tpnSearch').value='';$('tpnWeight').value='';$('tpnWeight').readOnly=false;$('tpnFluidInput').value=0;$('tpnTreatVol').value=0;$('tpnGIR').value=0;$('tpnLipid').value=0;$('tpnAA').value=0;$('tpnEnteral').value=0;document.querySelectorAll('#tpnLossSel button').forEach((b,i)=>b.classList.toggle('on',i===0));$('tpnAddons').innerHTML='';$('tpnPreview').innerHTML='';$('tpnLinkedInfo').style.display='none';$('tpnEditingBanner').classList.add('hidden');$('btnSaveTpn').textContent='Save TPN';}
+function clearTpnForm(){tpnEditId=null;tpnEditType=null;$('tpnSearch').value='';$('tpnWeight').value='';$('tpnWeight').readOnly=false;$('tpnFluidInput').value='';$('tpnTreatVol').value='';$('tpnGIR').value='';$('tpnLipid').value='';$('tpnAA').value='';$('tpnEnteral').value='';document.querySelectorAll('#tpnLossSel button').forEach((b,i)=>b.classList.toggle('on',i===0));$('tpnAddons').innerHTML='';$('tpnPreview').innerHTML='';$('tpnLinkedInfo').style.display='none';$('tpnEditingBanner').classList.add('hidden');$('btnSaveTpn').textContent='Save TPN';}
 
 function updTpnPreview(){const d=readTpnForm();if(!d.w||!d.fi){$('tpnPreview').innerHTML='';return;}const r=tpnCalc(d,$('tpnBrand').value);$('tpnPreview').innerHTML=renderTpnRes(r,$('tpnBrand').value);}
 
@@ -533,16 +533,23 @@ const tpnData={w:d.w,fi:d.fi,tv:d.tv,gir:d.gir,ld:d.ld,ad:d.ad,tf:d.tf,loss:d.lo
 showToast('Saving...','info');
 try{
 if(tpnEditType==='linked'){
-const p=patients.find(x=>x.id===tpnEditId);if(!p)throw new Error('Patient not found');
-const drugs=[...p.drugs.filter(x=>x.drugId!==12),{id:genId(),drugId:12,name:'TPN',dose:r.ptot,unit:'ml',freq:'',method:'over 24 hr',hideDetails:false,isNutrient:false,isDopamine:false,isGIR:false,noPrint:false,alert:'',addonVol:0,addonType:'',methodIndex:6,targetVol:null,factor:null}];
-const upd={...p,drugs:drugs,tpn:tpnData,weight:d.w};
-await setDoc(doc(db,"patients",tpnEditId),upd);
-/* Log for CSV (linked only) */
-const age=p.dob?daysDiff(p.dob,new Date()):null;
-await addDoc(tpnLogRef,{patientDocId:tpnEditId,patientName:p.name,age,bagVolume:r.ptot,numBags:r.split?2:1,date:new Date().toISOString().split('T')[0],timestamp:new Date().toISOString()});
+    const p=patients.find(x=>x.id===tpnEditId);if(!p)throw new Error('Patient not found');
+    const drugs=[...p.drugs.filter(x=>x.drugId!==12),{id:genId(),drugId:12,name:'TPN',dose:r.ptot,unit:'ml',freq:'',method:'over 24 hr',hideDetails:false,isNutrient:false,isDopamine:false,isGIR:false,noPrint:false,alert:'',addonVol:0,addonType:'',methodIndex:6,targetVol:null,factor:null}];
+    await setDoc(doc(db,"patients",tpnEditId),{...p,drugs,tpn:tpnData,weight:d.w});
+    /* Upsert: one log entry per patient per day */
+    const today=new Date().toISOString().split('T')[0];
+    const existing=await getDocs(query(tpnLogRef,where('patientDocId','==',tpnEditId),where('date','==',today)));
+    const age=p.dob?daysDiff(p.dob,new Date()):null;
+    const logEntry={patientDocId:tpnEditId,patientName:p.name,age,bagVolume:r.ptot,numBags:r.split?2:1,date:today,timestamp:new Date().toISOString()};
+    if(existing.length>0){
+        await setDoc(doc(db,"tpn_log",existing[0].id),logEntry);
+    }else{
+        await addDoc(tpnLogRef,logEntry);
+    }
 }else if(tpnEditType==='standalone'){
-if(!tpnEditId){tpnEditId=genId();}
-const sa=standaloneTpn.find(x=>x.id===tpnEditId);await setDoc(doc(db,"tpn_standalone",tpnEditId),{name:sa?.name||$('tpnSearch').value||'Unnamed',weight:d.w,tpn:tpnData});
+    if(!tpnEditId)tpnEditId=genId();
+    const sa=standaloneTpn.find(x=>x.id===tpnEditId);
+    await setDoc(doc(db,"tpn_standalone",tpnEditId),{name:sa?.name||$('tpnSearch').value||'Unnamed',weight:d.w,tpn:tpnData});
 }else{showToast('Select a patient first','error');return;}
 clearTpnForm();renderTpnQueue();showToast('TPN Saved');
 }catch(e){showToast(`Failed: ${e.message}`,'error');}
@@ -589,8 +596,8 @@ async function exportCsv(){
 const from=$('csvFrom').value,to=$('csvTo').value;
 if(!from||!to){showToast('Select date range','error');return;}
 try{
-const snap=await getDocs(query(tpnLogRef,orderBy("date","desc")));
-const rows=snap.docs.map(d=>d.data()).filter(r=>r.date>=from&&r.date<=to);
+const snap=await getDocs(query(tpnLogRef,where('date','>=',from),where('date','<=',to),orderBy('date','desc')));
+const rows=snap.docs.map(d=>d.data());
 if(!rows.length){showToast('No data in this range','info');return;}
 let csv='Name,Age (days),Bag Volume (ml),No. of Bags,Date\n';
 rows.forEach(r=>{csv+=`"${r.patientName||''}",${r.age!=null?r.age:'—'},${r.bagVolume||0},${r.numBags||1},${r.date}\n`;});
@@ -607,23 +614,54 @@ showToast(`Exported ${rows.length} records`);
 
 /* ===== TPN ORDER PRINT ===== */
 function genTpnOrder(){
-const sel=getTpnCards().filter(c=>selectedTpnIds.has(c.id)&&c.tpn.results&&!c.tpn.results.errs.length);if(!sel.length){showToast('No valid TPN selected','error');return;}
-const brand=$('tpnBrand').value,b=TPN_B[brand],now=new Date(),ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});
-let h=`<div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px">TPN Preparation Sheet — ${b.l}</div><div style="font-size:10px;color:#64748B;margin-bottom:12px">Date: ${ds} | Patients: ${sel.length}</div>`;
-h+='<table style="width:100%;border-collapse:collapse;font-size:9px;font-family:sans-serif"><thead><tr style="background:#E2E8F0"><th style="border:1px solid #bbb;padding:3px 5px;text-align:left">Metric</th>';
-sel.forEach(p=>{h+=`<th style="border:1px solid #bbb;padding:3px 5px;text-align:center">${esc(p.name)}<br><span style="font-weight:400">${fmt(p.weight,1)} kg</span></th>`;});
-h+='</tr></thead><tbody>';
-h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Inputs</td></tr>';
-h+=prow('Weight (kg)',sel,p=>fmt(p.weight,1));h+=prow('TPN Vol (ml)',sel,p=>Math.round(p.tpn.results.tv));h+=prow('GIR',sel,p=>fmt(p.tpn.gir,1));h+=prow('Lipid (g/kg)',sel,p=>fmt(p.tpn.ld,1));h+=prow('AA (g/kg)',sel,p=>fmt(p.tpn.ad,1));
-h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Preparation</td></tr>';
-h+=prow('Lipid (ml)',sel,p=>p.tpn.results.pl);h+=prow('AA (ml)',sel,p=>p.tpn.results.pa);h+=prow(`Glucose ${b.g}% (ml)`,sel,p=>p.tpn.results.pb);h+=prow('D5W (ml)',sel,p=>p.tpn.results.p5);h+=prow('D50W (ml)',sel,p=>p.tpn.results.p50);
-h+=prow('Total (ml)',sel,p=>p.tpn.results.ptot,true);h+=prow('Bags',sel,p=>p.tpn.results.split?'2':'1');
-h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Electrolytes</td></tr>';
-h+=prow('Na',sel,p=>tpf(p.tpn.results.Na,2));h+=prow('K',sel,p=>tpf(p.tpn.results.K,2));h+=prow('Cl',sel,p=>tpf(p.tpn.results.Cl,2));h+=prow('Ca',sel,p=>tpf(p.tpn.results.Ca,2));
-h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Clinical</td></tr>';
-h+=prow('Osmolarity',sel,p=>Math.round(p.tpn.results.osm));h+=prow('Energy (kcal/kg)',sel,p=>tpf(p.tpn.results.en,1));h+=prow('Actual GIR',sel,p=>tpf(p.tpn.results.agir,2));h+=prow('Fluid/kg',sel,p=>tpf(p.tpn.results.tfkg,1));
-h+='</tbody></table>';
-const pw=window.open('','_blank');pw.document.write(`<!DOCTYPE html><html><head><title>TPN Order</title><style>@page{size:landscape;margin:10mm}body{margin:20px}</style></head><body>${h}</body></html>`);pw.document.close();pw.print();
+  const sel=getTpnCards().filter(c=>selectedTpnIds.has(c.id)&&c.tpn.results&&!c.tpn.results.errs.length);
+  if(!sel.length){showToast('No valid TPN selected','error');return;}
+  const brand=$('tpnBrand').value,b=TPN_B[brand],now=new Date(),ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});
+  let h=`<div style="font-family:Arial,sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;color:#000">TPN Preparation Sheet — ${b.l}</div><div style="font-size:10px;color:#64748B;margin-bottom:12px">Date: ${ds} | Patients: ${sel.length}</div>`;
+  h+='<table style="width:100%;border-collapse:collapse;font-size:9px;font-family:Arial,sans-serif;color:#000"><thead><tr style="background:#E2E8F0"><th style="border:1px solid #bbb;padding:3px 5px;text-align:left">Metric</th>';
+  sel.forEach(p=>{h+=`<th style="border:1px solid #bbb;padding:3px 5px;text-align:center">${esc(p.name)}<br><span style="font-weight:400">${fmt(p.weight,1)} kg</span></th>`;});
+  h+='</tr></thead><tbody>';
+  h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Inputs</td></tr>';
+  h+=prow('Weight (kg)',sel,p=>fmt(p.weight,1));h+=prow('TPN Vol (ml)',sel,p=>Math.round(p.tpn.results.tv));h+=prow('GIR',sel,p=>fmt(p.tpn.gir,1));h+=prow('Lipid (g/kg)',sel,p=>fmt(p.tpn.ld,1));h+=prow('AA (g/kg)',sel,p=>fmt(p.tpn.ad,1));
+  h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Preparation</td></tr>';
+  h+=prow('Lipid (ml)',sel,p=>p.tpn.results.pl);h+=prow('AA (ml)',sel,p=>p.tpn.results.pa);h+=prow(`Glucose ${b.g}% (ml)`,sel,p=>p.tpn.results.pb);h+=prow('D5W (ml)',sel,p=>p.tpn.results.p5);h+=prow('D50W (ml)',sel,p=>p.tpn.results.p50);
+  h+=prow('Total (ml)',sel,p=>p.tpn.results.ptot,true);h+=prow('Bags',sel,p=>p.tpn.results.split?'2':'1');
+  h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Electrolytes</td></tr>';
+  h+=prow('Na',sel,p=>tpf(p.tpn.results.Na,2));h+=prow('K',sel,p=>tpf(p.tpn.results.K,2));h+=prow('Cl',sel,p=>tpf(p.tpn.results.Cl,2));h+=prow('Ca',sel,p=>tpf(p.tpn.results.Ca,2));
+  h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Clinical</td></tr>';
+  h+=prow('Osmolarity',sel,p=>Math.round(p.tpn.results.osm));h+=prow('Energy (kcal/kg)',sel,p=>tpf(p.tpn.results.en,1));h+=prow('Actual GIR',sel,p=>tpf(p.tpn.results.agir,2));h+=prow('Fluid/kg',sel,p=>tpf(p.tpn.results.tfkg,1));
+  h+='</tbody></table>';
+
+  showToast('Generating order PDF...','info');
+  const container=$('pdf-render-container');
+  const wrapper=document.createElement('div');
+  wrapper.style.cssText='width:297mm;padding:8mm;box-sizing:border-box;background:#fff;font-family:Arial,sans-serif;';
+  wrapper.innerHTML=h;
+  container.appendChild(wrapper);
+  container.style.opacity='1';
+
+  requestAnimationFrame(async()=>{
+    try{
+      await document.fonts.ready;
+      await new Promise(r=>setTimeout(r,200));
+      const canvas=await html2canvas(wrapper,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});
+      const{jsPDF}=window.jspdf;
+      const doc=new jsPDF({orientation:'l',unit:'mm',format:'a4'});
+      const imgW=297,imgH=210;
+      const ratio=canvas.width/canvas.height;
+      let drawW=imgW,drawH=imgW/ratio;
+      if(drawH>imgH){drawH=imgH;drawW=imgH*ratio;}
+      doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',(imgW-drawW)/2,(imgH-drawH)/2,drawW,drawH);
+      doc.save('TPN_Order_'+ds.replace(/\//g,'-')+'.pdf');
+      showToast('Order PDF generated');
+    }catch(e){
+      showToast('Order PDF failed: '+e.message,'error');
+    }finally{
+      container.removeChild(wrapper);
+      container.style.opacity='0';
+      container.innerHTML='';
+    }
+  });
 }
 function prow(label,pts,fn,bold){let h=`<tr${bold?' style="font-weight:700;background:#F8FAFC"':''}><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">${label}</td>`;pts.forEach(p=>{const r=p.tpn.results;if(!r||r.errs.length)h+='<td style="border:1px solid #bbb;padding:3px 5px;text-align:center;color:#DC2626;font-style:italic">Error</td>';else h+=`<td style="border:1px solid #bbb;padding:3px 5px;text-align:center">${fn(p)}</td>`;});return h+'</tr>';}
 
@@ -655,7 +693,26 @@ renderNext();
 }
 
 /* ===== TPN LOG CLEANUP (60 days) ===== */
-async function cleanupTpnLogs(){try{const cutoff=new Date();cutoff.setDate(cutoff.getDate()-60);const cs=cutoff.toISOString().split('T')[0];const snap=await new Promise(res=>{const q2=query(tpnLogRef,where('date','<',cs));onSnapshot(q2,s=>{res(s.docs);},{includeMetadataChanges:false});});if(snap.length){const batch=writeBatch(db);snap.forEach(d=>batch.delete(d.ref));await batch.commit();console.log(`Cleaned ${snap.length} old TPN log entries`);}}catch(e){console.warn('TPN log cleanup failed:',e);}}
+async function cleanupTpnLogs(){
+  try{
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 60);
+    const cs = cutoff.toISOString().split('T')[0];
+    
+    // FIX: Use getDocs for a one-time fetch instead of a persistent onSnapshot listener
+    const snap = await getDocs(query(tpnLogRef, where('date', '<', cs)));
+    
+    // snap.empty and snap.size are native Firestore QuerySnapshot properties
+    if(!snap.empty){
+      const batch = writeBatch(db);
+      snap.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+      console.log(`Cleaned ${snap.size} old TPN log entries`);
+    }
+  }catch(e){
+    console.warn('TPN log cleanup failed:', e);
+  }
+}
 
 /* ===== TAB SWITCHING ===== */
 function switchTab(tab){
@@ -720,6 +777,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('#tpnSearch')&&!e.tar
  $('tpnAddons').addEventListener('input',updTpnPreview);
  $('btnSaveTpn').addEventListener('click',saveTpn);
  $('btnTpnCancelEdit').addEventListener('click',()=>{clearTpnForm();renderTpnQueue();showToast('Cancelled','info');});
+  $('btnDeleteSelectedTpn').addEventListener('click', deleteSelectedTpn);
  $('tpnSelectAll').addEventListener('change',e=>{const cards=getTpnCards();if(e.target.checked)cards.forEach(c=>selectedTpnIds.add(c.id));else selectedTpnIds.clear();renderTpnQueue();});
  $('btnExportCsv').addEventListener('click',exportCsv);
  $('btnTpnOrder').addEventListener('click',genTpnOrder);
