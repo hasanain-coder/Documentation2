@@ -721,9 +721,9 @@ function genTpnLabels(){
     document.body.removeChild(ra);
     if(!canvases.length){if(overlay.parentNode)document.body.removeChild(overlay);showToast('Failed to render labels','error');return;}
     try{
-      const jsPDF=window.jspdf.jsPDF,doc=new jsPDF('l','mm','a4');
+      const jsPDF=window.jspdf.jsPDF,doc=new jsPDF('p','mm','a4');
       const lw=100,lh=90; // rotated label: 10cm wide × 9cm tall
-      const x=(297-lw)/2,y=(210-lh)/2;
+      const x=(210-lw)/2,y=(297-lh)/2;
       canvases.forEach((c,i)=>{
         if(i>0)doc.addPage();
         doc.addImage(c.toDataURL('image/jpeg',.95),'JPEG',x,y,lw,lh);
