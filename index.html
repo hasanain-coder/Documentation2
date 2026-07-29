@@ -722,7 +722,7 @@ function genTpnLabels(){
     if(!canvases.length){if(overlay.parentNode)document.body.removeChild(overlay);showToast('Failed to render labels','error');return;}
     try{
       const jsPDF=window.jspdf.jsPDF,doc=new jsPDF('p','mm','a4');
-      const lw=110,lh=90;
+      const lw=120,lh=90;
       const x=(210-lw)/2,y=(297-lh)/2;
       canvases.forEach((c,i)=>{
         if(i>0)doc.addPage();
