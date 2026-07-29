@@ -707,7 +707,7 @@ function genTpnLabels(){
     }
   });
   const canvases=[];let bi=0;
-      function renderNext(){
+        function renderNext(){
     if(bi>=bags.length){assemblePDF();return;}
     const d=bags[bi],el=document.createElement('div');
     el.style.cssText='width:270px;height:300px;overflow:hidden;border:1px solid #000;padding:6px;font-family:Arial,sans-serif;direction:rtl;background:#fff;box-sizing:border-box';
@@ -717,12 +717,12 @@ function genTpnLabels(){
       ra.removeChild(el);const rot=document.createElement('canvas');rot.width=canvas.height;rot.height=canvas.width;const ctx=rot.getContext('2d');ctx.translate(rot.width/2,rot.height/2);ctx.rotate(Math.PI/2);ctx.drawImage(canvas,-canvas.width/2,-canvas.height/2);canvases.push(rot);renderNext();
     }).catch(()=>{if(el.parentNode)ra.removeChild(el);renderNext();});
   }
-        function assemblePDF(){
+  function assemblePDF(){
     document.body.removeChild(ra);
     if(!canvases.length){if(overlay.parentNode)document.body.removeChild(overlay);showToast('Failed to render labels','error');return;}
     try{
       const jsPDF=window.jspdf.jsPDF,doc=new jsPDF('l','mm','a4');
-      const lw=90,lh=100;
+      const lw=100,lh=90; // rotated label: 10cm wide × 9cm tall
       const x=(297-lw)/2,y=(210-lh)/2;
       canvases.forEach((c,i)=>{
         if(i>0)doc.addPage();
