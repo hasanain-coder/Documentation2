@@ -436,7 +436,7 @@ if(!editingPatientId&&!dob){showToast('Select Date of Birth','error');return;}
 const sorted=[...currentDrugs].sort((a,b)=>{if(a.isNutrient&&!b.isNutrient)return 1;if(!a.isNutrient&&b.isNutrient)return-1;return 0;});
 const np={name,weight,dob:dob||null,ga:$('inputGA').value,room,drugs:sorted,saveDate:new Date().toISOString().split('T')[0]};
 showToast('Saving...','info');
-try{if(editingPatientId)await setDoc(doc(db,"patients",editingPatientId),np);else await addDoc(patientsRef,np);clearForm();renderQueue();renderFilterBar();showToast('Saved');}
+try{if(editingPatientId)await setDoc(doc(db,"patients",editingPatientId),np,{merge:true});else await addDoc(patientsRef,np);clearForm();renderQueue();renderFilterBar();showToast('Saved');}
 catch(e){showToast(`Save Failed: ${e.message}`,'error');}
 };
 window.deletePatient=async id=>{if(editingPatientId===id)return;const p=patients.find(x=>x.id===id);if(!p||!confirm(`Delete "${p.name}"?`))return;const pi=patients.findIndex(x=>x.id===id),bk=patients[pi];patients.splice(pi,1);selectedPatientIds.delete(id);renderQueue();renderFilterBar();try{await deleteDoc(doc(db,"patients",id));renderQueue();renderFilterBar();}catch(e){patients.splice(pi,0,bk);renderQueue();renderFilterBar();showToast(`Failed: ${e.message}`,'error');}};
