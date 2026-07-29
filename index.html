@@ -682,6 +682,7 @@ function genTpnLabels(){
   const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;justify-content:center';overlay.innerHTML='<div style="background:#fff;border-radius:10px;padding:20px 32px;font-size:14px;font-weight:600;color:#333;box-shadow:0 8px 30px rgba(0,0,0,.18);display:flex;align-items:center;gap:10px"><i class="fas fa-spinner fa-spin" style="color:#0F766E;font-size:18px"></i> Generating labels...</div>';document.body.appendChild(overlay);
   const ra=document.createElement('div');ra.style.cssText='position:fixed;top:0;left:0;z-index:-1;pointer-events:none';document.body.appendChild(ra);
   const brand=$('tpnBrand').value;
+  const cd=new Date().toISOString().split('T')[0].split('-').slice(1).reverse().join('/');
   const bags=[];
   sel.forEach(p=>{
     const r=p.tpn.results,nb=r.split?2:1;
@@ -690,13 +691,12 @@ function genTpnLabels(){
       bvs=[r.b1t,r.b2t];bna=['\u0643\u064A\u0633 \u0661 \u0645\u0646 \u0662','\u0643\u064A\u0633 \u0662 \u0645\u0646 \u0662'];durs=[12,12];baoArr=[[],[]];
       r.b1ao.forEach((ba,i)=>{if(ba[0]>0)baoArr[0].push({t:r.pao[i].t,v:ba[0]});if(ba[1]>0)baoArr[1].push({t:r.pao[i].t,v:ba[1]});});
     }else{bvs=[r.ptot];bna=[''];durs=[24];baoArr=[r.pao.filter(a=>a.v>0)];}
-    const route=r.osm>999?'\u0645\u0631\u0643\u0632\u064A':'\u0645\u062D\u064A\u0637\u064A';
     for(let i=0;i<nb;i++){
       const adds=[];baoArr[i].forEach(a=>adds.push(TPN_AT[a.t].l+': '+smartN(a.v,1)+' ml'));
-            bags.push({
+      bags.push({
         name:esc(p.name),
         vol:smartN(bvs[i],0)+' ml',
-        date:r.date?r.date.split('-').slice(1).reverse().join('/'):'—',
+        date:cd,
         gir:smartN(r.agir,1)+' mg/kg/min',
         osm:smartN(r.osm,0)+' mOsm/L',
         additives:adds.length?adds.join(', '):'\u2014',
@@ -707,11 +707,11 @@ function genTpnLabels(){
     }
   });
   const canvases=[];let bi=0;
-        function renderNext(){
+  function renderNext(){
     if(bi>=bags.length){assemblePDF();return;}
     const d=bags[bi],el=document.createElement('div');
     el.style.cssText='width:270px;height:300px;overflow:hidden;border:1px solid #000;padding:6px;font-family:Arial,sans-serif;direction:rtl;background:#fff;box-sizing:border-box';
-    el.innerHTML=`<div style="text-align:center;margin-bottom:4px"><div style="font-weight:800;font-size:22px;letter-spacing:4px">TPN</div>${d.sub?`<div style="font-size:9px;font-weight:700;margin-top:1px">${d.sub}</div>`:''}</div><table style="width:100%;border-collapse:collapse;font-size:11px;font-weight:700;vertical-align:middle"><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0;vertical-align:top;width:48%">اسم المريض</td><td style="padding:4px 5px;text-align:left;direction:ltr;overflow-wrap:break-word">${d.name}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0">الحجم الكلي</td><td style="padding:4px 5px;text-align:left;direction:ltr">${d.vol}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0">التاريخ</td><td style="paddin<table style="width:100%;border-collapse:collapse;font-size:11px;font-weight:700;vertical-align:middle"><tr style="border-bottom:.4mm solid #000"><td style="padding:5px 0;width:48%">اسم المريض</td><td style="padding:5px 5px;text-align:left;direction:ltr;overflow-wrap:break-word">${d.name}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:5px 0">الحجم الكلي</td><td style="padding:5px 5px;text-align:left;direction:ltr">${d.vol}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:5px 0">التاريخ</td><td style="padding:5px 5px;text-align:left;direction:ltr">${d.date}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:5px 0">وقت التحضير</td><td style="padding:5px 5px;text-align:left;direction:ltr">12:00 PM</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:5px 0">GIR</td><td style="padding:5px 5px;text-align:left;direction:ltr">${d.gir}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:5px 0">Osmolarity</td><td style="padding:5px 5px;text-align:left;direction:ltr">${d.osm}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:5px 0">الإضافات</td><td style="padding:5px 5px;text-align:left;direction:ltr;overflow-wrap:break-word">${d.additives}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:5px 0">طريقة الإعطاء</td><td style="padding:5px 5px;text-align:left;direction:ltr">${d.route}</td></tr><tr><td colspan="2" style="padding:7px 0;text-align:center;font-size:10px;font-weight:700">${d.instr}</td></tr></table>`;
+    el.innerHTML=`<div style="text-align:center;margin-bottom:3px"><div style="font-weight:800;font-size:22px;letter-spacing:4px">TPN</div>${d.sub?`<div style="font-size:9px;font-weight:700;margin-top:1px">${d.sub}</div>`:''}</div><table style="width:100%;border-collapse:collapse;font-size:11px;font-weight:700;vertical-align:middle"><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0;width:48%">اسم المريض</td><td style="padding:4px 5px;text-align:left;direction:ltr;overflow-wrap:break-word">${d.name}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0">الحجم الكلي</td><td style="padding:4px 5px;text-align:left;direction:ltr">${d.vol}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0">التاريخ</td><td style="padding:4px 5px;text-align:left;direction:ltr">${d.date}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0">وقت التحضير</td><td style="padding:4px 5px;text-align:left;direction:ltr">12:00 PM</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0">GIR</td><td style="padding:4px 5px;text-align:left;direction:ltr">${d.gir}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0">Osmolarity</td><td style="padding:4px 5px;text-align:left;direction:ltr">${d.osm}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0">الإضافات</td><td style="padding:4px 5px;text-align:left;direction:ltr;overflow-wrap:break-word">${d.additives}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:4px 0">طريقة الإعطاء</td><td style="padding:4px 5px;text-align:left;direction:ltr">${d.route}</td></tr><tr><td colspan="2" style="padding:6px 0;text-align:center;font-size:11px;font-weight:700">${d.instr}</td></tr></table>`;
     ra.appendChild(el);bi++;
     html2canvas(el,{scale:3,backgroundColor:'#fff',useCORS:true,logging:false}).then(canvas=>{
       ra.removeChild(el);const rot=document.createElement('canvas');rot.width=canvas.height;rot.height=canvas.width;const ctx=rot.getContext('2d');ctx.translate(rot.width/2,rot.height/2);ctx.rotate(Math.PI/2);ctx.drawImage(canvas,-canvas.width/2,-canvas.height/2);canvases.push(rot);renderNext();
@@ -722,7 +722,7 @@ function genTpnLabels(){
     if(!canvases.length){if(overlay.parentNode)document.body.removeChild(overlay);showToast('Failed to render labels','error');return;}
     try{
       const jsPDF=window.jspdf.jsPDF,doc=new jsPDF('p','mm','a4');
-      const lw=100,lh=90; // rotated label: 10cm wide × 9cm tall
+      const lw=100,lh=90;
       const x=(210-lw)/2,y=(297-lh)/2;
       canvases.forEach((c,i)=>{
         if(i>0)doc.addPage();
