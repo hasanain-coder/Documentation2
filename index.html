@@ -489,7 +489,7 @@ function tpnSpr(l,v){return`<div class="tpn-split-row"><span>${l}</span><span cl
 function renderTpnRes(r,brand){
 if(!r)return'';if(r.errs.length)return r.errs.map(e=>`<div class="tpn-emsg"><i class="fas fa-triangle-exclamation" style="margin-top:2px;flex-shrink:0"></i><span>${e}</span></div>`).join('');
 const b=TPN_B[brand];let h='<div class="tpn-sec-t">Clinical Summary</div><div class="tpn-sg">';
-h+=tpnSr('Actual GIR',tpf(r.agir,2),'mg/kg/min');h+=tpnSr('Glucose %',tpf(r.gpt,2),'%');h+=tpnSr('Energy',tpf(r.en,1),'kcal/kg');h+=tpnSr('Lipid:Carb',tpf(r.lcr,1),'%');h+=tpnSr('AA %',tpf(r.ap,2),'%');h+=tpnSr('NPC:N',tpf(r.npc,1),'kcal:N');h+=tpnSr('Osmolarity',tpf(r.osm,0),'mOsm/L');h+=tpnSr('Total Fluid/kg',tpf(r.tfkg,1),'ml/kg');
+h+=tpnSr('Actual GIR',tpf(r.agir,2),'mg/kg/min');h+=tpnSr('Glucose %',tpf(r.gpt,2),'%');h+=tpnSr('Energy',tpf(r.en,1),'kcal/kg');h+=tpnSr('Lipid:Carb',tpf(r.lcr,1),'%');h+=tpnSr('AA %',tpf(r.ap,2),'%');h+=tpnSr('NPC:N',tpf(r.npc,1),'kcal:N');h+=tpnSr('Osmolarity',tpf(r.osm,0),'mOsm/L');h+=tpnSr('Total Fluid/kg',smartN(r.tfkg,1),'ml/kg');
 h+='</div><div class="tpn-sec-t">Electrolytes</div><div class="tpn-elec-row">';h+=tpnEc('Na',r.Na,'#0F766E');h+=tpnEc('K',r.K,'#7C3AED');h+=tpnEc('Cl',r.Cl,'#0284C7');h+=tpnEc('Ca',r.Ca,'#D97706');h+='</div>';
 h+='<div class="tpn-sec-t">Pharmacy Preparation</div><div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:8px">';
 h+=tpnPr(`Lipid (${b.l} ${b.li}%)`,r.pl);h+=tpnPr(`AA (${b.l} ${b.a}%)`,r.pa);if(r.pb>0)h+=tpnPr(`Glucose (${b.l} ${b.g}%)`,r.pb);if(r.p5>0)h+=tpnPr('Glucose (D5W 5%)',r.p5);if(r.p50>0)h+=tpnPr('Glucose (D50W 50%)',r.p50);
@@ -614,6 +614,7 @@ showToast(`Exported ${rows.length} records`);
 
 /* ===== TPN ORDER PRINT ===== */
 function genTpnOrder(){
+  function smartN(v,d){if(v==null||isNaN(v))return '—';let s=Number(v).toFixed(d);if(s.includes('.')){s=s.replace(/0+$/,'').replace(/\.$/,'');}return s;}
   const sel=getTpnCards().filter(c=>selectedTpnIds.has(c.id)&&c.tpn.results&&!c.tpn.results.errs.length);
   if(!sel.length){showToast('No valid TPN selected','error');return;}
   const brand=$('tpnBrand').value,b=TPN_B[brand],now=new Date(),ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});
@@ -627,9 +628,9 @@ function genTpnOrder(){
   h+=prow('Lipid (ml)',sel,p=>p.tpn.results.pl);h+=prow('AA (ml)',sel,p=>p.tpn.results.pa);h+=prow(`Glucose ${b.g}% (ml)`,sel,p=>p.tpn.results.pb);h+=prow('D5W (ml)',sel,p=>p.tpn.results.p5);h+=prow('D50W (ml)',sel,p=>p.tpn.results.p50);
   h+=prow('Total (ml)',sel,p=>p.tpn.results.ptot,true);h+=prow('Bags',sel,p=>p.tpn.results.split?'2':'1');
   h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Electrolytes</td></tr>';
-  h+=prow('Na',sel,p=>tpf(p.tpn.results.Na,2));h+=prow('K',sel,p=>tpf(p.tpn.results.K,2));h+=prow('Cl',sel,p=>tpf(p.tpn.results.Cl,2));h+=prow('Ca',sel,p=>tpf(p.tpn.results.Ca,2));
+  h+=prow('Na',sel,p=>smartN(p.tpn.results.Na,2));h+=prow('K',sel,p=>smartN(p.tpn.results.K,2));h+=prow('Cl',sel,p=>smartN(p.tpn.results.Cl,2));h+=prow('Ca',sel,p=>smartN(p.tpn.results.Ca,2));
   h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Clinical</td></tr>';
-  h+=prow('Osmolarity',sel,p=>Math.round(p.tpn.results.osm));h+=prow('Energy (kcal/kg)',sel,p=>tpf(p.tpn.results.en,1));h+=prow('Actual GIR',sel,p=>tpf(p.tpn.results.agir,2));h+=prow('Fluid/kg',sel,p=>tpf(p.tpn.results.tfkg,1));
+  h+=prow('Osmolarity',sel,p=>Math.round(p.tpn.results.osm));h+=prow('Energy (kcal/kg)',sel,p=>smartN(p.tpn.results.en,1));h+=prow('Actual GIR',sel,p=>smartN(p.tpn.results.agir,2));h+=prow('Fluid/kg',sel,p=>smartN(p.tpn.results.tfkg,1));
   h+='</tbody></table>';
 
   showToast('Generating order PDF...','info');
@@ -666,30 +667,73 @@ function genTpnOrder(){
 function prow(label,pts,fn,bold){let h=`<tr${bold?' style="font-weight:700;background:#F8FAFC"':''}><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">${label}</td>`;pts.forEach(p=>{const r=p.tpn.results;if(!r||r.errs.length)h+='<td style="border:1px solid #bbb;padding:3px 5px;text-align:center;color:#DC2626;font-style:italic">Error</td>';else h+=`<td style="border:1px solid #bbb;padding:3px 5px;text-align:center">${fn(p)}</td>`;});return h+'</tr>';}
 
 /* ===== TPN LABELS ===== */
+function smartN(v, d) {
+  if (v == null || isNaN(v)) return '—';
+  let s = Number(v).toFixed(d);
+  if (s.includes('.')) { s = s.replace(/0+$/, '').replace(/\.$/, ''); }
+  return s;
+}
+
 function genTpnLabels(){
-const sel=getTpnCards().filter(c=>selectedTpnIds.has(c.id)&&c.tpn.results&&!c.tpn.results.errs.length&&c.tpn.results.ptot>0);
-if(!sel.length){showToast('No valid TPN selected','error');return;}
-if(!window.html2canvas||!window.jspdf){showToast('Libraries not loaded','error');return;}
-showToast('Generating labels...','info');
-const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;justify-content:center';overlay.innerHTML='<div style="background:#fff;border-radius:10px;padding:20px 32px;font-size:14px;font-weight:600;color:#333;box-shadow:0 8px 30px rgba(0,0,0,.18);display:flex;align-items:center;gap:10px"><i class="fas fa-spinner fa-spin" style="color:#0F766E;font-size:18px"></i> Generating labels...</div>';document.body.appendChild(overlay);
-const ra=document.createElement('div');ra.style.cssText='position:fixed;top:0;left:0;z-index:-1;pointer-events:none';document.body.appendChild(ra);
-const brand=$('tpnBrand').value,b=TPN_B[brand],now=new Date(),ts=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-const bags=[];sel.forEach(p=>{const r=p.tpn.results,nb=r.split?2:1;let bvs,bna,durs,baoArr;
-if(nb===2){bvs=[r.b1t,r.b2t];bna=['\u0643\u064A\u0633 \u0661 \u0645\u0646 \u0662','\u0643\u064A\u0633 \u0662 \u0645\u0646 \u0662'];durs=[12,12];baoArr=[[],[]];r.b1ao.forEach((ba,i)=>{if(ba[0]>0)baoArr[0].push({t:r.pao[i].t,v:ba[0]});if(ba[1]>0)baoArr[1].push({t:r.pao[i].t,v:ba[1]});});}
-else{bvs=[r.ptot];bna=[''];durs=[24];baoArr=[r.pao.filter(a=>a.v>0)];}
-const route=r.osm>900?'\u0645\u0631\u0643\u0632\u064A':'\u0645\u062D\u064A\u0637\u064A';
-for(let i=0;i<nb;i++){const rate=(bvs[i]/durs[i]).toFixed(1);let instr='\u064A\u064F\u0633\u0631\u0628 \u0639\u0628\u0631 \u0645\u0636\u062E\u0629 \u062A\u0633\u0631\u064A\u0628 \u0628\u0645\u0639\u062F\u0644 '+rate+' \u0645\u0644/\u0633\u0627\u0639\u0629';if(nb===2)instr+='\u0020\u2014\u0020'+bna[i]+('\u0020\u2014\u0020'+durs[i]+' \u0633\u0627\u0639\u0629');else instr+='\u0020\u0644\u0645\u062F\u0629 24 \u0633\u0627\u0639\u0629';
-const adds=[];baoArr[i].forEach(a=>adds.push(TPN_AT[a.t].l+': '+a.v+' ml'));
-bags.push({name:esc(p.name),vol:bvs[i]+' ml',date:new Date().toISOString().split('T')[0],time:ts,gir:tpf(r.agir,1)+' mg/kg/min',osm:Math.round(r.osm)+' mOsm/L',additives:adds.length?adds.join(', '):'\u2014',route,instr,sub:bna[i]||''});}
-});
-const canvases=[];let bi=0;
-function renderNext(){if(bi>=bags.length){assemblePDF();return;}const d=bags[bi],el=document.createElement('div');el.style.cssText='width:227px;border:1px solid #000;padding:6px;font-family:Arial,sans-serif;direction:rtl;background:#fff';
-el.innerHTML=`<div style="text-align:center;margin-bottom:4px"><div style="font-weight:800;font-size:20px;letter-spacing:4px">TPN</div>${d.sub?`<div style="font-size:9px;font-weight:600;margin-top:1px">${d.sub}</div>`:''}</div><table style="width:100%;border-collapse:collapse"><tr style="border-bottom:.3mm solid #000"><td style="padding:2px 0;vertical-align:top;width:48%;font-size:9px;line-height:1.3">\u0627\u0633\u0645 \u0627\u0644\u0645\u0631\u064A\u0636</td><td style="padding:2px 3px;vertical-align:top;text-align:left;font-size:10px;font-weight:700;direction:ltr;overflow-wrap:break-word">${d.name}</td></tr><tr style="border-bottom:.3mm solid #000"><td style="padding:2px 0;font-size:9px">\u0627\u0644\u062D\u062C\u0645 \u0627\u0644\u0643\u0644\u064A</td><td style="padding:2px 3px;text-align:left;font-size:10px;font-weight:700;direction:ltr">${d.vol}</td></tr><tr style="border-bottom:.3mm solid #000"><td style="padding:2px 0;font-size:9px">\u0627\u0644\u062A\u0627\u0631\u064A\u062E</td><td style="padding:2px 3px;text-align:left;font-size:10px;font-weight:700;direction:ltr">${d.date}</td></tr><tr style="border-bottom:.3mm solid #000"><td style="padding:2px 0;font-size:9px">\u0648\u0642\u062A \u0627\u0644\u062A\u062D\u0636\u064A\u0631</td><td style="padding:2px 3px;text-align:left;font-size:10px;font-weight:700;direction:ltr">${d.time}</td></tr><tr style="border-bottom:.3mm solid #000"><td style="padding:2px 0;font-size:9px">\u0645\u0639\u062F\u0644 \u0636\u062E \u0627\u0644\u062C\u0644\u0648\u0643\u0648\u0632</td><td style="padding:2px 3px;text-align:left;font-size:10px;font-weight:700;direction:ltr">${d.gir}</td></tr><tr style="border-bottom:.3mm solid #000"><td style="padding:2px 0;font-size:9px">\u0627\u0644\u062A\u0646\u0627\u0636\u062D</td><td style="padding:2px 3px;text-align:left;font-size:10px;font-weight:700;direction:ltr">${d.osm}</td></tr><tr style="border-bottom:.3mm solid #000"><td style="padding:2px 0;font-size:9px">\u0627\u0644\u0625\u0636\u0627\u0641\u0627\u062A</td><td style="padding:2px 3px;text-align:left;font-size:10px;font-weight:700;direction:ltr;overflow-wrap:break-word">${d.additives}</td></tr><tr style="border-bottom:.3mm solid #000"><td style="padding:2px 0;font-size:9px">\u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u0625\u0639\u0637\u0627\u0621</td><td style="padding:2px 3px;text-align:left;font-size:10px;font-weight:700;direction:ltr;overflow-wrap:break-word">${d.route}</td></tr><tr><td style="padding:2px 0;font-size:9px">\u062A\u0639\u0644\u064A\u0645\u0627\u062A \u0627\u0644\u062A\u0633\u0631\u064A\u0628</td><td style="padding:2px 3px;text-align:left;font-size:10px;font-weight:700;direction:ltr;overflow-wrap:break-word">${d.instr}</td></tr></table>`;
-ra.appendChild(el);bi++;
-html2canvas(el,{scale:4,backgroundColor:'#fff',useCORS:true,logging:false}).then(canvas=>{ra.removeChild(el);const rot=document.createElement('canvas');rot.width=canvas.height;rot.height=canvas.width;const ctx=rot.getContext('2d');ctx.translate(rot.width/2,rot.height/2);ctx.rotate(Math.PI/2);ctx.drawImage(canvas,-canvas.width/2,-canvas.height/2);canvases.push(rot);renderNext();}).catch(()=>{if(el.parentNode)ra.removeChild(el);renderNext();});}
-function assemblePDF(){document.body.removeChild(ra);if(!canvases.length){const ol=document.getElementById('lbl-loading')||overlay;if(ol)document.body.removeChild(ol);showToast('Failed to render labels','error');return;}
-try{const jsPDF=window.jspdf.jsPDF,doc=new jsPDF('p','mm','a4');canvases.forEach((c,i)=>{if(i>0)doc.addPage();let iw=60*(c.width/c.height),ih=60;const mw=297-16,mh=210-16;if(iw>mw){const s=mw/iw;iw=mw;ih*=s;}if(ih>mh){const s2=mh/ih;ih=mh;iw*=s2;}doc.addImage(c.toDataURL('image/jpeg',.95),'JPEG',(210-iw)/2,(297-ih)/2,iw,ih);});doc.save('TPN-Labels-'+new Date().toISOString().split('T')[0]+'.pdf');showToast('Labels generated');}catch(e){showToast('Label PDF failed: '+e.message,'error');}if(overlay.parentNode)document.body.removeChild(overlay);}
-renderNext();
+  const sel=getTpnCards().filter(c=>selectedTpnIds.has(c.id)&&c.tpn.results&&!c.tpn.results.errs.length&&c.tpn.results.ptot>0);
+  if(!sel.length){showToast('No valid TPN selected','error');return;}
+  if(!window.html2canvas||!window.jspdf){showToast('Libraries not loaded','error');return;}
+  showToast('Generating labels...','info');
+  const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;justify-content:center';overlay.innerHTML='<div style="background:#fff;border-radius:10px;padding:20px 32px;font-size:14px;font-weight:600;color:#333;box-shadow:0 8px 30px rgba(0,0,0,.18);display:flex;align-items:center;gap:10px"><i class="fas fa-spinner fa-spin" style="color:#0F766E;font-size:18px"></i> Generating labels...</div>';document.body.appendChild(overlay);
+  const ra=document.createElement('div');ra.style.cssText='position:fixed;top:0;left:0;z-index:-1;pointer-events:none';document.body.appendChild(ra);
+  const brand=$('tpnBrand').value;
+  const bags=[];
+  sel.forEach(p=>{
+    const r=p.tpn.results,nb=r.split?2:1;
+    let bvs,bna,durs,baoArr;
+    if(nb===2){
+      bvs=[r.b1t,r.b2t];bna=['\u0643\u064A\u0633 \u0661 \u0645\u0646 \u0662','\u0643\u064A\u0633 \u0662 \u0645\u0646 \u0662'];durs=[12,12];baoArr=[[],[]];
+      r.b1ao.forEach((ba,i)=>{if(ba[0]>0)baoArr[0].push({t:r.pao[i].t,v:ba[0]});if(ba[1]>0)baoArr[1].push({t:r.pao[i].t,v:ba[1]});});
+    }else{bvs=[r.ptot];bna=[''];durs=[24];baoArr=[r.pao.filter(a=>a.v>0)];}
+    const route=r.osm>999?'\u0645\u0631\u0643\u0632\u064A':'\u0645\u062D\u064A\u0637\u064A';
+    for(let i=0;i<nb;i++){
+      const adds=[];baoArr[i].forEach(a=>adds.push(TPN_AT[a.t].l+': '+smartN(a.v,1)+' ml'));
+            bags.push({
+        name:esc(p.name),
+        vol:smartN(bvs[i],0)+' ml',
+        date:r.date?r.date.split('-').slice(1).reverse().join('/'):'—',
+        gir:smartN(r.agir,1)+' mg/kg/min',
+        osm:smartN(r.osm,0)+' mOsm/L',
+        additives:adds.length?adds.join(', '):'\u2014',
+        route:r.osm>999?'\u0645\u0631\u0643\u0632\u064A':'\u0645\u062D\u064A\u0637\u064A',
+        instr:'\u064A\u0636\u0628\u0637 \u0627\u0644\u062C\u0647\u0627\u0632 \u0639\u0644\u0649 '+smartN(bvs[i],0)+' \u0645\u0644 \u062E\u0644\u0627\u0644 '+durs[i]+' \u0633\u0627\u0639\u0629',
+        sub:bna[i]||''
+      });
+    }
+  });
+  const canvases=[];let bi=0;
+  function renderNext(){
+    if(bi>=bags.length){assemblePDF();return;}
+    const d=bags[bi],el=document.createElement('div');
+    el.style.cssText='width:454px;border:1px solid #000;padding:12px;font-family:Arial,sans-serif;direction:rtl;background:#fff';
+    el.innerHTML=`<div style="text-align:center;margin-bottom:8px"><div style="font-weight:800;font-size:36px;letter-spacing:6px">TPN</div>${d.sub?`<div style="font-size:13px;font-weight:600;margin-top:2px">${d.sub}</div>`:''}</div><table style="width:100%;border-collapse:collapse;font-size:15px"><tr style="border-bottom:.5mm solid #000"><td style="padding:5px 0;vertical-align:top;width:48%">اسم المريض</td><td style="padding:5px 8px;text-align:left;font-weight:700;direction:ltr;overflow-wrap:break-word">${d.name}</td></tr><tr style="border-bottom:.5mm solid #000"><td style="padding:5px 0">الحجم الكلي</td><td style="padding:5px 8px;text-align:left;font-weight:700;direction:ltr">${d.vol}</td></tr><tr style="border-bottom:.5mm solid #000"><td style="padding:5px 0">التاريخ</td><td style="padding:5px 8px;text-align:left;font-weight:700;direction:ltr">${d.date}</td></tr><tr style="border-bottom:.5mm solid #000"><td style="padding:5px 0">وقت التحضير</td><td style="padding:5px 8px;text-align:left;font-weight:700;direction:ltr">12:00 PM</td></tr><tr style="border-bottom:.5mm solid #000"><td style="padding:5px 0">GIR</td><td style="padding:5px 8px;text-align:left;font-weight:700;direction:ltr">${d.gir}</td></tr><tr style="border-bottom:.5mm solid #000"><td style="padding:5px 0">Osmolarity</td><td style="padding:5px 8px;text-align:left;font-weight:700;direction:ltr">${d.osm}</td></tr><tr style="border-bottom:.5mm solid #000"><td style="padding:5px 0">الإضافات</td><td style="padding:5px 8px;text-align:left;font-weight:700;direction:ltr;overflow-wrap:break-word">${d.additives}</td></tr><tr style="border-bottom:.5mm solid #000"><td style="padding:5px 0">طريقة الإعطاء</td><td style="padding:5px 8px;text-align:left;font-weight:700;direction:ltr">${d.route}</td></tr><tr><td colspan="2" style="padding:8px 0;text-align:center;font-weight:700;font-size:14px">${d.instr}</td></tr></table>`;
+    ra.appendChild(el);bi++;
+    html2canvas(el,{scale:3,backgroundColor:'#fff',useCORS:true,logging:false}).then(canvas=>{
+      ra.removeChild(el);const rot=document.createElement('canvas');rot.width=canvas.height;rot.height=canvas.width;const ctx=rot.getContext('2d');ctx.translate(rot.width/2,rot.height/2);ctx.rotate(Math.PI/2);ctx.drawImage(canvas,-canvas.width/2,-canvas.height/2);canvases.push(rot);renderNext();
+    }).catch(()=>{if(el.parentNode)ra.removeChild(el);renderNext();});
+  }
+  function assemblePDF(){
+    document.body.removeChild(ra);
+    if(!canvases.length){if(overlay.parentNode)document.body.removeChild(overlay);showToast('Failed to render labels','error');return;}
+    try{
+      const jsPDF=window.jspdf.jsPDF,doc=new jsPDF('p','mm','a4');
+      const mw=297-16,mh=210-16;let x=8,y=8;
+      canvases.forEach((c,i)=>{
+        if(i>0){let iw=mw*(c.width/c.height),ih=mw;if(ih+y>mh+8){x+=ih+8;if(x+mw>297){doc.addPage();x=8;y=8;}y=8;}else{y+=ih+8;}}
+        let iw=mw*(c.width/c.height),ih=mw;
+        if(ih+y>mh+8){x+=ih+8;if(x+mw>297){doc.addPage();x=8;y=8;}y=8;}
+        doc.addImage(c.toDataURL('image/jpeg',.95),'JPEG',x,y,iw,ih);y+=ih+8;
+      });
+      doc.save('TPN-Labels-'+new Date().toISOString().split('T')[0]+'.pdf');showToast('Labels generated');
+    }catch(e){showToast('Label PDF failed: '+e.message,'error');}
+    if(overlay.parentNode)document.body.removeChild(overlay);
+  }
+  renderNext();
 }
 
 /* ===== TPN LOG CLEANUP (60 days) ===== */
