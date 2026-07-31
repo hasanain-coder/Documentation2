@@ -535,7 +535,7 @@ try{
 if(tpnEditType==='linked'){
     const p=patients.find(x=>x.id===tpnEditId);if(!p)throw new Error('Patient not found');
     const drugs=[...p.drugs.filter(x=>x.drugId!==12),{id:genId(),drugId:12,name:'TPN',dose:r.ptot,unit:'ml',freq:'',method:'over 24 hr',hideDetails:false,isNutrient:false,isDopamine:false,isGIR:false,noPrint:false,alert:'',addonVol:0,addonType:'',methodIndex:6,targetVol:null,factor:null}];
-    await setDoc(doc(db,"patients",tpnEditId),{...p,drugs,tpn:tpnData,weight:d.w});
+    await setDoc(doc(db,"patients",tpnEditId),{drugs,tpn:tpnData,weight:d.w},{merge:true});
     /* Upsert: one log entry per patient per day */
     const today=new Date().toISOString().split('T')[0];
     const existing=await getDocs(query(tpnLogRef,where('patientDocId','==',tpnEditId),where('date','==',today)));
@@ -566,7 +566,13 @@ fillTpnForm(card.tpn,type==='linked');$('tpnEditingBanner').classList.remove('hi
 window.deleteTpnCard=async(id,type)=>{
 if(tpnEditId===id)return;if(!confirm('Delete this TPN?'))return;
 try{
-if(type==='linked'){const p=patients.find(x=>x.id===id);if(p){const drugs=p.drugs.filter(x=>x.drugId!==12);await setDoc(doc(db,"patients",id),{...p,drugs,tpn:deleteField()});}}
+if(type==='linked'){
+    const p=patients.find(x=>x.id===id);
+    if(p){
+        const drugs=p.drugs.filter(x=>x.drugId!==12);
+        await setDoc(doc(db,"patients",id),{drugs,tpn:deleteField()},{merge:true});
+    }
+}
 else{await deleteDoc(doc(db,"tpn_standalone",id));standaloneTpn=standaloneTpn.filter(x=>x.id!==id);}
 if(tpnEditId===id)clearTpnForm();selectedTpnIds.delete(id);renderTpnQueue();showToast('TPN Deleted');
 }catch(e){showToast(`Failed: ${e.message}`,'error');}
@@ -575,7 +581,12 @@ if(tpnEditId===id)clearTpnForm();selectedTpnIds.delete(id);renderTpnQueue();show
 async function deleteSelectedTpn(){
 const cards=getTpnCards().filter(c=>selectedTpnIds.has(c.id));if(!cards.length)return;if(!confirm(`Delete ${cards.length} TPN(s)?`))return;
 try{
-for(const c of cards){if(c.type==='linked'){const p=patients.find(x=>x.id===c.id);if(p)await setDoc(doc(db,"patients",c.id),{...p,drugs:p.drugs.filter(x=>x.drugId!==12),tpn:deleteField()});}else await deleteDoc(doc(db,"tpn_standalone",c.id));}
+for(const c of cards){
+    if(c.type==='linked'){
+        const p=patients.find(x=>x.id===c.id);
+        if(p)await setDoc(doc(db,"patients",c.id),{drugs:p.drugs.filter(x=>x.drugId!==12),tpn:deleteField()},{merge:true});
+    }else await deleteDoc(doc(db,"tpn_standalone",c.id));
+}
 if(cards.some(c=>c.id===tpnEditId))clearTpnForm();
 selectedTpnIds.clear();renderTpnQueue();showToast(`${cards.length} TPN(s) deleted`);
 }catch(e){showToast(`Failed: ${e.message}`,'error');renderTpnQueue();}
