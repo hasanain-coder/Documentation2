@@ -495,7 +495,7 @@ h+='</div><div class="tpn-sec-t">Electrolytes</div><div class="tpn-elec-row">';h
 h+='<div class="tpn-sec-t">Pharmacy Preparation</div><div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:8px">';
 h+=tpnPr(`Lipid (${b.l} ${b.li}%)`,r.pl);h+=tpnPr(`AA (${b.l} ${b.a}%)`,r.pa);if(r.pb>0)h+=tpnPr(`Glucose (${b.l} ${b.g}%)`,r.pb);if(r.p5>0)h+=tpnPr('Glucose (D5W 5%)',r.p5);if(r.p50>0)h+=tpnPr('Glucose (D50W 50%)',r.p50);
 r.pao.forEach(a=>{if(a.v>0)h+=tpnPr(`Add-on: ${TPN_AT[a.t].l}`,a.v)});h+=`<div class="tpn-pr tpn-pr-t"><span class="tpn-pr-l">Total</span><span class="tpn-pr-v">${r.ptot} ml</span></div></div>`;
-if(r.split){h+=`<div class="tpn-split-box"><div class="flex items-center gap-2 text-xs font-bold text-[var(--accent)] mb-2"><i class="fas fa-layer-group"></i> Prepare as 2 Bags</div><div class="tpn-split-grid"><div class="tpn-split-bag"><div class="tpn-split-bag-t">Bag 1</div>`;h+=tpnSpr('Lipid',r.bag1.pl);h+=tpnSpr('AA',r.bag1.pa);if(r.bag1.pb>0)h+=tpnSpr(`Glu(${b.g}%)`,r.bag1.pb);if(r.bag1.p5>0)h+=tpnSpr('Glu(5%)',r.bag1.p5);if(r.bag1.p50>0)h+=tpnSpr('Glu(50%)',r.bag1.p50);r.bag1.ao.forEach((v,i)=>{if(v>0)h+=tpnSpr(TPN_AT[r.pao[i].t].l,v)});h+=`<div class="tpn-split-tot"><span>Total</span><span>${r.bag1.total} ml</span></div></div><div class="tpn-split-bag"><div class="tpn-split-bag-t">Bag 2</div>`;h+=tpnSpr('Lipid',r.bag2.pl);h+=tpnSpr('AA',r.bag2.pa);if(r.bag2.pb>0)h+=tpnSpr(`Glu(${b.g}%)`,r.bag2.pb);if(r.bag2.p5>0)h+=tpnSpr('Glu(5%)',r.bag2.p5);if(r.bag2.p50>0)h+=tpnSpr('Glu(50%)',r.bag2.p50);r.bag2.ao.forEach((v,i)=>{if(v>0)h+=tpnSpr(TPN_AT[r.pao[i].t].l,v)});h+=`<div class="tpn-split-tot"><span>Total</span><span>${r.bag2.total} ml</span></div></div></div></div>`}
+if(r.split&&r.bag1){h+=`<div class="tpn-split-box"><div class="flex items-center gap-2 text-xs font-bold text-[var(--accent)] mb-2"><i class="fas fa-layer-group"></i> Prepare as 2 Bags</div><div class="tpn-split-grid"><div class="tpn-split-bag"><div class="tpn-split-bag-t">Bag 1</div>`;h+=tpnSpr('Lipid',r.bag1.pl);h+=tpnSpr('AA',r.bag1.pa);if(r.bag1.pb>0)h+=tpnSpr(`Glu(${b.g}%)`,r.bag1.pb);if(r.bag1.p5>0)h+=tpnSpr('Glu(5%)',r.bag1.p5);if(r.bag1.p50>0)h+=tpnSpr('Glu(50%)',r.bag1.p50);r.bag1.ao.forEach((v,i)=>{if(v>0)h+=tpnSpr(TPN_AT[r.pao[i].t].l,v)});h+=`<div class="tpn-split-tot"><span>Total</span><span>${r.bag1.total} ml</span></div></div><div class="tpn-split-bag"><div class="tpn-split-bag-t">Bag 2</div>`;h+=tpnSpr('Lipid',r.bag2.pl);h+=tpnSpr('AA',r.bag2.pa);if(r.bag2.pb>0)h+=tpnSpr(`Glu(${b.g}%)`,r.bag2.pb);if(r.bag2.p5>0)h+=tpnSpr('Glu(5%)',r.bag2.p5);if(r.bag2.p50>0)h+=tpnSpr('Glu(50%)',r.bag2.p50);r.bag2.ao.forEach((v,i)=>{if(v>0)h+=tpnSpr(TPN_AT[r.pao[i].t].l,v)});h+=`<div class="tpn-split-tot"><span>Total</span><span>${r.bag2.total} ml</span></div></div></div></div>`}
 if(r.w.length)h+=r.w.map(w=>`<div class="tpn-wmsg"><i class="fas fa-exclamation-circle" style="margin-top:2px;flex-shrink:0"></i><span>${w}</span></div>`).join('');return h;
 }
 
@@ -628,7 +628,7 @@ function genTpnOrder(){
   h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Inputs</td></tr>';
   h+=prow('Weight (kg)',sel,p=>fmt(p.weight,1));h+=prow('TPN Vol (ml)',sel,p=>Math.round(p.tpn.results.tv));h+=prow('GIR',sel,p=>fmt(p.tpn.gir,1));h+=prow('Lipid (g/kg)',sel,p=>fmt(p.tpn.ld,1));h+=prow('AA (g/kg)',sel,p=>fmt(p.tpn.ad,1));
   h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Preparation</td></tr>';
-  h+=prow('Lipid (ml)',sel,p=>p.tpn.results.bag1?p.tpn.results.bag1.pl:p.tpn.results.pl);h+=prow('AA (ml)',sel,p=>p.tpn.results.bag1?p.tpn.results.bag1.pa:p.tpn.results.pa);h+=prow(`Glucose ${b.g}% (ml)`,sel,p=>p.tpn.results.bag1?(p.tpn.results.bag1.pb||0):p.tpn.results.pb);h+=prow('D5W (ml)',sel,p=>p.tpn.results.bag1?(p.tpn.results.bag1.p5||0):p.tpn.results.p5);h+=prow('D50W (ml)',sel,p=>p.tpn.results.bag1?(p.tpn.results.bag1.p50||0):p.tpn.results.p50);h+=prow('Total/Bag (ml)',sel,p=>p.tpn.results.bag1?p.tpn.results.bag1.total:p.tpn.results.ptot,true);h+=prow('Bags',sel,p=>p.tpn.results.split?'<span style="color:#DC2626;font-weight:800">x2 (Prepare Twice)</span>':'1');
+  h+=prow('Lipid (ml)',sel,p=>(p.tpn.results.bag1||p.tpn.results).pl);h+=prow('AA (ml)',sel,p=>(p.tpn.results.bag1||p.tpn.results).pa);h+=prow(`Glucose ${b.g}% (ml)`,sel,p=>(p.tpn.results.bag1||p.tpn.results).pb||0);h+=prow('D5W (ml)',sel,p=>(p.tpn.results.bag1||p.tpn.results).p5||0);h+=prow('D50W (ml)',sel,p=>(p.tpn.results.bag1||p.tpn.results).p50||0);h+=prow('Total/Bag (ml)',sel,p=>(p.tpn.results.bag1||p.tpn.results).total,true);h+=prow('Bags',sel,p=>p.tpn.results.split?'<span style="color:#DC2626;font-weight:800">x2 (Prepare Twice)</span>':'1');
   h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Electrolytes</td></tr>';
   h+=prow('Na',sel,p=>smartN(p.tpn.results.Na,2));h+=prow('K',sel,p=>smartN(p.tpn.results.K,2));h+=prow('Cl',sel,p=>smartN(p.tpn.results.Cl,2));h+=prow('Ca',sel,p=>smartN(p.tpn.results.Ca,2));
   h+='<tr style="background:#F1F5F9;font-weight:700;font-size:8px;text-transform:uppercase"><td style="border:1px solid #bbb;padding:3px 5px;text-align:left">Clinical</td></tr>';
@@ -687,14 +687,15 @@ function genTpnLabels(){
   const cd=new Date().toISOString().split('T')[0].split('-').slice(1).reverse().join('/');
   const bags=[];
   sel.forEach(p=>{
-    const r=p.tpn.results,nb=r.split?2:1;
+    const r=p.tpn.results,nb=(r.split&&r.bag1)?2:1;
     const lossRatio=r.ptot>0?r.tv/r.ptot:1;
     let bvs,bna,durs,baoArr;
     if(nb===2){
         const half=Math.round(r.tv/2);
         bvs=[half,r.tv-half];
         bna=['\u0643\u064A\u0633 \u0661 \u0645\u0646 \u0662','\u0643\u064A\u0633 \u0662 \u0645\u0646 \u0662'];durs=[12,12];baoArr=[[],[]];
-        r.b1ao.forEach((ba,i)=>{const v0=Math.round(ba[0]*lossRatio),v1=Math.round(ba[1]*lossRatio);if(v0>0)baoArr[0].push({t:r.pao[i].t,v:v0});if(v1>0)baoArr[1].push({t:r.pao[i].t,v:v1});});
+        r.bag1.ao.forEach((v,i)=>{if(v>0)baoArr[0].push({t:r.pao[i].t,v:Math.round(v*lossRatio)})});
+        r.bag2.ao.forEach((v,i)=>{if(v>0)baoArr[1].push({t:r.pao[i].t,v:Math.round(v*lossRatio)})});
     }else{
         bvs=[Math.round(r.tv)];
         bna=[''];durs=[24];baoArr=[r.pao.map(a=>({...a,v:Math.round(a.v*lossRatio)})).filter(a=>a.v>0)];
