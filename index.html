@@ -467,9 +467,9 @@ const gg=p.gir*1440*p.w/1000,tgp=(gg/gv)*100;let vb=0,v5=0,v50=0;
 if(tgp>=b.g&&tgp<=50){vb=Math.abs(tgp-50)/(50-b.g)*gv;v50=Math.abs(tgp-b.g)/(50-b.g)*gv}else if(tgp>=5&&tgp<b.g){v5=Math.abs(tgp-50)/45*gv;v50=Math.abs(tgp-5)/45*gv}else if(tgp<5)v5=gv;else v50=gv;
 const actualGG=(vb*b.g+v5*5+v50*50)/100;let Na=b.na*av,K=b.k*av,Cl=b.cl*av,Ca=b.ca*av,aNa=0,aK=0;
 p.ao.forEach(a=>{const v=parseFloat(a.v)||0,t=TPN_AT[a.t];if(t){aNa+=t.na*v;aK+=t.k*v}});Na+=aNa;K+=aK;
-const agir=actualGG*1000/(1440*p.w),gpt=(actualGG*100)/tv,ce=actualGG*3.4,le=p.ld*p.w*9,en=(le+(p.ad*p.w*4)+ce)/p.w;
-const lcr=(ce+le)>0?(le/(ce+le))*100:0,ap=(p.ad*p.w)/tv*100,ng=(p.ad*p.w)/6.25,npc=ng>0?(le+ce)/ng:0;
-const osm=((p.ad*p.w*10)+(actualGG*5)+((Na+K)*2)+(Ca*2*1.4))/(tv/1000),tfkg=(tv+p.tv+p.tf)/p.w;
+const bagVol=tv+aoV,agir=actualGG*1000/(1440*p.w),gpt=(actualGG*100)/bagVol,ce=actualGG*3.4,le=p.ld*p.w*9,en=(le+(p.ad*p.w*4)+ce)/p.w;
+const lcr=(ce+le)>0?(le/(ce+le))*100:0,ap=(p.ad*p.w)/bagVol*100,ng=(p.ad*p.w)/6.25,npc=ng>0?(le+ce)/ng:0;
+const osm=((p.ad*p.w*10)+(actualGG*5)+((Na+K)*2)+(Ca*2*1.4))/(bagVol/1000),tfkg=(bagVol+p.tv+p.tf)/p.w;
 const lm=1+(el/tv);let rawTot=(lv+av+vb+v5+v50)*lm;rawTot+=p.ao.reduce((s,a)=>s+(parseFloat(a.v)||0)*lm,0);const targetTot=Math.round(rawTot);
 let pl=Math.round(lv*lm),pa=Math.round(av*lm),pb=Math.round(vb*lm),p5=Math.round(v5*lm),p50=Math.round(v50*lm);
 const pao=p.ao.map(a=>({t:a.t,v:Math.round((parseFloat(a.v)||0)*lm)}));let paot=pao.reduce((s,a)=>s+a.v,0),ptot=pl+pa+pb+p5+p50+paot;
@@ -536,16 +536,10 @@ if(tpnEditType==='linked'){
     const p=patients.find(x=>x.id===tpnEditId);if(!p)throw new Error('Patient not found');
     const drugs=[...p.drugs.filter(x=>x.drugId!==12),{id:genId(),drugId:12,name:'TPN',dose:r.ptot,unit:'ml',freq:'',method:'over 24 hr',hideDetails:false,isNutrient:false,isDopamine:false,isGIR:false,noPrint:false,alert:'',addonVol:0,addonType:'',methodIndex:6,targetVol:null,factor:null}];
     await setDoc(doc(db,"patients",tpnEditId),{drugs,tpn:tpnData,weight:d.w},{merge:true});
-    /* Upsert: one log entry per patient per day */
     const today=new Date().toISOString().split('T')[0];
-    const existing=await getDocs(query(tpnLogRef,where('patientDocId','==',tpnEditId),where('date','==',today)));
     const age=p.dob?daysDiff(p.dob,new Date()):null;
-    const logEntry={patientDocId:tpnEditId,patientName:p.name,age,bagVolume:r.ptot,numBags:r.split?2:1,date:today,timestamp:new Date().toISOString()};
-    if(existing.length>0){
-        await setDoc(doc(db,"tpn_log",existing[0].id),logEntry);
-    }else{
-        await addDoc(tpnLogRef,logEntry);
-    }
+    await setDoc(doc(db,"tpn_log",`${tpnEditId}_${today}`),{patientDocId:tpnEditId,patientName:p.name,age,bagVolume:r.ptot,numBags:r.split?2:1,date:today,timestamp:new Date().toISOString()});
+}
 }else if(tpnEditType==='standalone'){
     if(!tpnEditId)tpnEditId=genId();
     const sa=standaloneTpn.find(x=>x.id===tpnEditId);
