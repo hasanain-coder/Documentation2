@@ -539,7 +539,6 @@ if(tpnEditType==='linked'){
     const today=new Date().toISOString().split('T')[0];
     const age=p.dob?daysDiff(p.dob,new Date()):null;
     await setDoc(doc(db,"tpn_log",`${tpnEditId}_${today}`),{patientDocId:tpnEditId,patientName:p.name,age,bagVolume:r.ptot,numBags:r.split?2:1,date:today,timestamp:new Date().toISOString()});
-}
 }else if(tpnEditType==='standalone'){
     if(!tpnEditId)tpnEditId=genId();
     const sa=standaloneTpn.find(x=>x.id===tpnEditId);
