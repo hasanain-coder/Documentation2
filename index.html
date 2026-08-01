@@ -530,7 +530,7 @@ window.toggleTpnSel=id=>{if(selectedTpnIds.has(id))selectedTpnIds.delete(id);els
 async function saveTpn(){
 const d=readTpnForm(),brand=$('tpnBrand').value,r=tpnCalc(d,brand);
 if(r.errs.length){showToast('Fix errors before saving','error');return;}
-const tpnData={w:d.w,fi:d.fi,tv:d.tv,gir:d.gir,ld:d.ld,ad:d.ad,tf:d.tf,loss:d.loss,ao:d.ao,brand,results:r};
+const tpnData={w:d.w,fi:d.fi,tv:d.tv,gir:d.gir,ld:d.ld,ad:d.ad,tf:d.tf,rbs:d.rbs,loss:d.loss,ao:d.ao,brand,results:r};
 showToast('Saving...','info');
 try{
 if(tpnEditType==='linked'){
