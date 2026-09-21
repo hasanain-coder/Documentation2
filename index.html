@@ -138,7 +138,7 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
 <!-- ===== DOCUMENTATION ===== -->
 <section id="docSection">
-<section id="inputSection" class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
+<section class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
 <div id="editingBanner" class="hidden editing-banner px-6 py-3 flex items-center justify-between"><div class="flex items-center gap-2"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span class="text-white font-semibold text-sm">Editing: <span id="editingBannerName" class="font-bold"></span></span></div><button id="btnCancelEdit" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors">Cancel</button></div>
 <div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">Patient Information</h2><p class="text-white/75 text-sm mt-1">Enter details to calculate precise dosages</p></div>
 <div class="p-6 space-y-6">
@@ -158,10 +158,10 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <div class="med-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 items-start">
 <div class="space-y-2 lg:col-span-1"><label class="block text-sm font-semibold text-[var(--fg)]">Category</label><select id="selectCategory" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select></div>
 <div class="space-y-2 lg:col-span-1"><label class="block text-sm font-semibold text-[var(--fg)]">Drug</label><select id="selectDrug" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select><input type="text" id="inputCustomDrug" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)] mt-2" placeholder="اسم العلاج"></div>
-<div class="lg:col-span-2 space-y-2" id="doseWrapper">
+<div class="lg:col-span-2 space-y-2">
 <div class="grid grid-cols-2 gap-2 sm:gap-3">
 <div class="space-y-2 hidden min-w-0" id="dosePerKgContainer"><label class="block text-sm font-semibold text-[var(--accent)]">Dose/kg</label><input type="text" id="inputDosePerKg" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-3 py-3 rounded-xl border border-[var(--accent)]/30 font-bold" placeholder="Dose/kg"></div>
-<div class="space-y-2 min-w-0" id="totalDoseContainer"><label class="block text-sm font-semibold text-[var(--fg)]" id="labelTotalDose">Total Dose</label><div class="flex gap-1"><input type="text" id="inputDose" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="flex-1 px-3 py-3 rounded-xl border border-[var(--border)] min-w-0" placeholder="Dose"><input type="text" id="inputCustomUnit" oninput="this.value=this.value.replace(/[^0-9a-zA-Z\/]/g,'')" class="hidden w-14 sm:w-20 px-1 py-3 rounded-xl border border-[var(--border)] opacity-60" placeholder="mg"></div></div>
+<div class="space-y-2 min-w-0" id="totalDoseContainer"><label class="block text-sm font-semibold text-[var(--fg)]">Total Dose</label><div class="flex gap-1"><input type="text" id="inputDose" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="flex-1 px-3 py-3 rounded-xl border border-[var(--border)] min-w-0" placeholder="Dose"><input type="text" id="inputCustomUnit" oninput="this.value=this.value.replace(/[^0-9a-zA-Z\/]/g,'')" class="hidden w-14 sm:w-20 px-1 py-3 rounded-xl border border-[var(--border)] opacity-60" placeholder="mg"></div></div>
 </div>
 <div class="hidden" id="girContainer"><div class="grid grid-cols-2 gap-2"><div class="space-y-1"><label class="block text-sm font-semibold text-[var(--accent)]">GIR (mg/kg/min)</label><input type="text" id="inputGIR" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-3 py-3 rounded-xl border border-[var(--accent)]/30 font-bold" placeholder="e.g., 6"></div><div class="space-y-1"><label class="block text-sm font-semibold text-[var(--accent)]">Bag Volume (ml)</label><input type="text" id="inputBagVol" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-3 py-3 rounded-xl border border-[var(--accent)]/30 font-bold" placeholder="e.g., 100"></div></div></div>
 <select id="selectCustomMethod" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select>
@@ -200,16 +200,14 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <div class="p-4 flex flex-wrap items-center gap-3">
 <div class="flex items-center gap-2 flex-1 min-w-[200px]"><span class="text-sm font-semibold text-[var(--fg)]">Brand:</span><select id="tpnBrand" class="tpn-inp" style="width:auto;min-width:140px;padding:6px 10px;font-size:12px"><option value="Smofkabiven">Smofkabiven</option><option value="Kabiven">Kabiven</option><option value="Periolimel">Periolimel</option></select></div>
 <div class="flex items-center gap-2 flex-wrap">
-<input type="date" id="csvFrom" class="tpn-inp" style="width:130px;padding:6px 8px;font-size:11px"><span class="text-xs text-[var(--muted)]">to</span><input type="date" id="csvTo" class="tpn-inp" style="width:130px;padding:6px 8px;font-size:11px">
-<button id="btnExportCsv" class="btn-primary px-3 py-2 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5"><i class="fas fa-file-csv"></i> Export</button>
 <button id="btnTpnOrder" class="px-3 py-2 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5 bg-[#475569] hover:bg-[#334155] transition-colors border-0 cursor-pointer font-[inherit]"><i class="fas fa-print"></i> Order</button>
 <button id="btnTpnLabels" class="px-3 py-2 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5 bg-[#334155] hover:bg-[#1e293b] transition-colors border-0 cursor-pointer font-[inherit]"><i class="fas fa-tag"></i> Labels</button>
 </div></div></div>
-<div id="tpnInputSection" class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden mb-6 animate-fade-up">
-<div id="tpnEditingBanner" class="hidden editing-banner px-6 py-3 flex items-center justify-between"><div class="flex items-center gap-2"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span class="text-white font-semibold text-sm">Editing TPN: <span id="tpnEditingName" class="font-bold"></span></span></div><button id="btnTpnCancelEdit" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors">Cancel</button></div>
+<div class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden mb-6 animate-fade-up">
+<div id="tpnEditingBanner" class="hidden editing-banner px-6 py-3 flex items-center justify-between"><div class="flex items-center gap-2"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span class="text-white font-semibold text-sm"><span id="tpnEditMode">Editing</span> TPN: <span id="tpnEditingName" class="font-bold"></span></span></div><button id="btnTpnCancelEdit" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors">Cancel</button></div>
 <div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">TPN Calculator</h2><p class="text-white/75 text-sm mt-1">Search patient or add standalone</p></div>
 <div class="p-6 space-y-5">
-<div class="relative"><div class="flex gap-2"><div class="relative flex-1"><svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="tpnSearch" class="tpn-inp" style="padding-left:32px" placeholder="Search patient name..." autocomplete="off"><div id="tpnSearchDropdown" class="search-dropdown"></div></div><button id="btnAddStandalone" class="btn-primary px-4 py-2 rounded-xl text-white text-xs font-semibold whitespace-nowrap">+ Standalone</button></div>
+<div class="relative"><div class="relative flex-1"><svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="tpnSearch" class="tpn-inp" style="padding-left:32px" placeholder="Patient name — search or type new…" autocomplete="off"><div id="tpnSearchDropdown" class="search-dropdown"></div></div>
 <div id="tpnLinkedInfo" class="hidden mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(15,118,110,.08);color:var(--accent);display:none;"></div></div>
 <div class="tpn-sg">
 <div><label class="tpn-lbl">Weight</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnWeight" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">kg</span></div></div>
@@ -240,9 +238,9 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <script type="module">
 const firebaseConfig={apiKey:"AIzaSyAaMqxvBAuTkOykYHF5w_xjS98bDOhZoPY",authDomain:"documentation2-dd1aa.firebaseapp.com",projectId:"documentation2-dd1aa",storageBucket:"documentation2-dd1aa.firebasestorage.app",messagingSenderId:"236681783643",appId:"1:236681783643:web:dc4d715258955b3413d27e",measurementId:"G-WRK2C3121X"};
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getFirestore,collection,addDoc,deleteDoc,doc,setDoc,deleteField,onSnapshot,query,orderBy,where,writeBatch,getDocs}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getFirestore,collection,addDoc,deleteDoc,doc,setDoc,deleteField,onSnapshot,query,orderBy}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp(firebaseConfig),db=getFirestore(app);
-const patientsRef=collection(db,"patients"),tpnStandRef=collection(db,"tpn_standalone"),tpnLogRef=collection(db,"tpn_log");
+const patientsRef=collection(db,"patients"),tpnStandRef=collection(db,"tpn_standalone");
 
 /* ===== DOCUMENTATION CONSTANTS ===== */
 const METHODS={1:'** / 5min',2:'** + 5 ml GW / 10 min',3:'** + ## ml GW >> <span class="arabic-text" style="display:inline-block;direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /30 min',4:'** + 3 ml GW / 3 min',5:'** / 60 min',6:'over 24 hr',7:'Special Nutrients',9:'كل اثنين وخميس',8:'** <span class="arabic-text" style="display:inline-block;direction:rtl;">مع المغذي</span> ',10:'** + ## ml GW >> <span class="arabic-text" style="display:inline-block;direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /24 hr',11:' ** + 3ml NS / 15 min <span class="arabic-text" style="display:inline-block;direction:rtl;">تبخير</span>',12:'تحل الكبسولة ب ٢ سي سي كلوكوز وتر ثم يدفع عن طريق ال OG ثم يدفع ٢ سي سي كلوكوز وتر عن طريق ال OG',13:'بالفم',14:' 3ml NS / 15 min <span class="arabic-text" style="display:inline-block;direction:rtl;">تبخير</span>',15:'<span class="arabic-text" style="display:inline-block;direction:rtl;">قطرة واحدة بالعين المصابة</span>',16:'** + ## ml GW >> <span class="arabic-text" style="display:inline-block;direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /2 hr'};
@@ -305,7 +303,7 @@ const TPN_AT={na3:{l:'Na 3%',na:.513,k:0},na09:{l:'Na 0.9%',na:.154,k:0},k:{l:'K
 
 /* ===== STATE ===== */
 let patients=[],currentDrugs=[],selectedPatientIds=new Set(),editingPatientId=null,activeFilter='all';
-let standaloneTpn=[],selectedTpnIds=new Set(),tpnEditId=null,tpnEditType=null,activeTab='doc';
+let standaloneTpn=[],selectedTpnIds=new Set(),tpnEditId=null,tpnEditType=null,activeTab='doc',linkedPatientId=null;
 
 /* ===== UTILITIES ===== */
 const $=id=>document.getElementById(id);
@@ -319,6 +317,7 @@ const daysDiff=(d1,d2)=>Math.max(0,Math.round((d2-new Date(d1))/86400000));
 const debounce=(fn,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
 const nn=v=>{const n=parseFloat(v);return(isNaN(n)||n<0)?0:n;};
 const tpf=(v,d)=>(v==null||isNaN(v))?'—':Number(v).toFixed(d);
+const getNextEmptyName=()=>{let max=0;const re=/^empty\s+(\d+)$/i;standaloneTpn.forEach(p=>{const m=re.exec((p.name||'').trim());if(m)max=Math.max(max,parseInt(m[1]));});return`empty ${max+1}`;};
 
 /* ===== AGE ===== */
 const isOver30=v=>v==='>30'||parseInt(v)>=999;
@@ -516,7 +515,7 @@ document.querySelectorAll('#tpnLossSel button').forEach(b=>b.classList.toggle('o
  $('tpnLinkedInfo').style.display=isLinked?'block':'none';updTpnPreview();
 }
 
-function clearTpnForm(){tpnEditId=null;tpnEditType=null;$('tpnSearch').value='';$('tpnWeight').value='';$('tpnWeight').readOnly=false;$('tpnFluidInput').value='';$('tpnTreatVol').value='';$('tpnGIR').value='';$('tpnLipid').value='';$('tpnAA').value='';$('tpnEnteral').value='';$('tpnRBS').value='';document.querySelectorAll('#tpnLossSel button').forEach((b,i)=>b.classList.toggle('on',i===0));$('tpnAddons').innerHTML='';$('tpnPreview').innerHTML='';$('tpnLinkedInfo').style.display='none';$('tpnEditingBanner').classList.add('hidden');$('btnSaveTpn').textContent='Save TPN';}
+function clearTpnForm(){tpnEditId=null;tpnEditType=null;linkedPatientId=null;$('tpnSearch').value='';$('tpnSearch').readOnly=false;$('tpnWeight').value='';$('tpnWeight').readOnly=false;$('tpnFluidInput').value='';$('tpnTreatVol').value='';$('tpnGIR').value='';$('tpnLipid').value='';$('tpnAA').value='';$('tpnEnteral').value='';$('tpnRBS').value='';document.querySelectorAll('#tpnLossSel button').forEach((b,i)=>b.classList.toggle('on',i===0));$('tpnAddons').innerHTML='';$('tpnPreview').innerHTML='';$('tpnLinkedInfo').style.display='none';$('tpnEditingBanner').classList.add('hidden');$('btnSaveTpn').textContent='Save TPN';}
 
 function updTpnPreview(){const d=readTpnForm();const fs=$('tpnFluidsSummary');if(!d.w||!d.fi){$('tpnPreview').innerHTML='';fs.classList.add('hidden');return;}const aoV=d.ao.reduce((s,a)=>s+(parseFloat(a.v)||0),0);const targetLoss=((d.fi*d.w)-d.tv-aoV)>150?20:10;d.loss=targetLoss;document.querySelectorAll('#tpnLossSel button').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.lv)===targetLoss));fs.classList.remove('hidden');const tfml=d.tf,totF=((d.fi*d.w)+d.tf),totFkg=totF/d.w;fs.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center"><div><div style="font-size:10px;color:var(--muted);font-weight:600">TOTAL FEEDINGS</div><div style="font-size:16px;font-weight:900;font-family:'Crimson Pro',serif">${Math.round(tfml)} ml</div></div><div><div style="font-size:10px;color:var(--muted);font-weight:600">FEEDING /kg</div><div style="font-size:16px;font-weight:900;font-family:'Crimson Pro',serif">${smartN(tfml/d.w,1)} ml</div></div><div><div style="font-size:10px;color:var(--muted);font-weight:600">TOTAL FLUID /kg</div><div style="font-size:16px;font-weight:900;font-family:'Crimson Pro',serif;color:var(--accent)">${smartN(totFkg,1)} ml</div></div></div>`;const r=tpnCalc(d,$('tpnBrand').value);$('tpnPreview').innerHTML=renderTpnRes(r,$('tpnBrand').value);}
 
@@ -536,18 +535,16 @@ if(r.errs.length){showToast('Fix errors before saving','error');return;}
 const tpnData={w:d.w,fi:d.fi,tv:d.tv,gir:d.gir,ld:d.ld,ad:d.ad,tf:d.tf,rbs:d.rbs,loss:d.loss,ao:d.ao,brand,results:r};
 showToast('Saving...','info');
 try{
-if(tpnEditType==='linked'){
-    const p=patients.find(x=>x.id===tpnEditId);if(!p)throw new Error('Patient not found');
+if(linkedPatientId){
+    const p=patients.find(x=>x.id===linkedPatientId);if(!p)throw new Error('Patient not found');
     const drugs=[...p.drugs.filter(x=>x.drugId!==12),{id:genId(),drugId:12,name:'TPN',dose:r.ptot,unit:'ml',freq:'',method:'over 24 hr',hideDetails:false,isNutrient:false,isDopamine:false,isGIR:false,noPrint:false,alert:'',addonVol:0,addonType:'',methodIndex:6,targetVol:null,factor:null}];
-    await setDoc(doc(db,"patients",tpnEditId),{drugs,tpn:tpnData,weight:d.w},{merge:true});
-    const today=new Date().toISOString().split('T')[0];
-    const age=p.dob?daysDiff(p.dob,new Date()):null;
-    await setDoc(doc(db,"tpn_log",`${tpnEditId}_${today}`),{patientDocId:tpnEditId,patientName:p.name,age,bagVolume:r.ptot,numBags:r.split?2:1,date:today,timestamp:new Date().toISOString()});
-}else if(tpnEditType==='standalone'){
+    await setDoc(doc(db,"patients",linkedPatientId),{drugs,tpn:tpnData},{merge:true});
+}else{
+    const searchName=$('tpnSearch').value.trim();
+    const name=searchName||getNextEmptyName();
     if(!tpnEditId)tpnEditId=genId();
-    const sa=standaloneTpn.find(x=>x.id===tpnEditId);
-    await setDoc(doc(db,"tpn_standalone",tpnEditId),{name:sa?.name||$('tpnSearch').value||'Unnamed',weight:d.w,tpn:tpnData});
-}else{showToast('Select a patient first','error');return;}
+    await setDoc(doc(db,"tpn_standalone",tpnEditId),{name,weight:d.w,tpn:tpnData});
+}
 clearTpnForm();renderTpnQueue();showToast('TPN Saved');
 }catch(e){showToast(`Failed: ${e.message}`,'error');}
 }
@@ -555,9 +552,26 @@ clearTpnForm();renderTpnQueue();showToast('TPN Saved');
 window.editTpnCard=async(id,type)=>{
 const card=getTpnCards().find(c=>c.id===id);if(!card)return;
 tpnEditId=id;tpnEditType=type;
-if(type==='linked'){const p=patients.find(x=>x.id===id);$('tpnSearch').value=p?p.name:'';$('tpnEditingName').textContent=p?p.name:'';}
-else{const sa=standaloneTpn.find(x=>x.id===id);$('tpnSearch').value=sa?sa.name:'';$('tpnEditingName').textContent=sa?sa.name:'';}
-fillTpnForm(card.tpn,type==='linked');$('tpnEditingBanner').classList.remove('hidden');$('btnSaveTpn').textContent='Update TPN';renderTpnQueue();window.scrollTo({top:0,behavior:'smooth'});
+if(type==='linked'){
+    linkedPatientId=id;
+    const p=patients.find(x=>x.id===id);
+    $('tpnSearch').value=p?p.name:'';
+    $('tpnSearch').readOnly=true;
+    $('tpnLinkedInfo').style.display='block';
+    $('tpnLinkedInfo').textContent='🔗 Linked — name and weight locked';
+    $('tpnEditingName').textContent=p?p.name:'';
+}else{
+    linkedPatientId=null;
+    const sa=standaloneTpn.find(x=>x.id===id);
+    $('tpnSearch').value=sa?sa.name:'';
+    $('tpnSearch').readOnly=false;
+    $('tpnLinkedInfo').style.display='none';
+    $('tpnEditingName').textContent=sa?sa.name:'';
+}
+$('tpnEditMode').textContent='Editing';
+fillTpnForm(card.tpn,type==='linked');
+if(type==='linked'){const lp=patients.find(x=>x.id===id);if(lp&&lp.weight)$('tpnWeight').value=lp.weight;}
+$('tpnEditingBanner').classList.remove('hidden');$('btnSaveTpn').textContent='Update TPN';renderTpnQueue();window.scrollTo({top:0,behavior:'smooth'});
 };
 
 window.deleteTpnCard=async(id,type)=>{
@@ -591,33 +605,14 @@ selectedTpnIds.clear();renderTpnQueue();showToast(`${cards.length} TPN(s) delete
 
 /* ===== TPN SEARCH ===== */
 function handleTpnSearch(q){
-const dd=$('tpnSearchDropdown');if(!q||q.length<1){dd.classList.remove('show');dd.innerHTML='';return;}
+const dd=$('tpnSearchDropdown');
+if(linkedPatientId){dd.classList.remove('show');dd.innerHTML='';return;}
+if(!q||q.length<1){dd.classList.remove('show');dd.innerHTML='';return;}
 const lq=q.toLowerCase();
 const matches=patients.filter(p=>p.name&&p.name.toLowerCase().includes(lq)).slice(0,8);
 if(!matches.length){dd.classList.remove('show');dd.innerHTML='';return;}
 dd.innerHTML=matches.map(p=>{const w=p.weight?fmt(p.weight,1)+' kg':'—';const hasTpn=p.tpn?'<span style="font-size:9px;color:var(--accent);margin-left:4px">has TPN</span>':'';return`<div class="search-item" data-pid="${p.id}"><span class="si-name">${esc(p.name)}</span><span class="si-info">${w}</span>${hasTpn}</div>`;}).join('');
 dd.classList.add('show');
-}
-
-/* ===== TPN CSV EXPORT ===== */
-async function exportCsv(){
-const from=$('csvFrom').value,to=$('csvTo').value;
-if(!from||!to){showToast('Select date range','error');return;}
-try{
-const snap=await getDocs(query(tpnLogRef,where('date','>=',from),where('date','<=',to),orderBy('date','desc')));
-const rows=snap.docs.map(d=>d.data());
-if(!rows.length){showToast('No data in this range','info');return;}
-let csv='Name,Age (days),Bag Volume (ml),No. of Bags,Date\n';
-rows.forEach(r=>{csv+=`"${r.patientName||''}",${r.age!=null?r.age:'—'},${r.bagVolume||0},${r.numBags||1},${r.date}\n`;});
-const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-const url=URL.createObjectURL(blob);
-const a=document.createElement('a');
-a.href=url;
-a.download=`TPN_Data_${from}_to_${to}.csv`;
-a.click();
-URL.revokeObjectURL(url);
-showToast(`Exported ${rows.length} records`);
-}catch(e){showToast(`Export failed: ${e.message}`,'error');}
 }
 
 /* ===== TPN ORDER PRINT ===== */
@@ -752,31 +747,6 @@ function genTpnLabels(){
   renderNext();
 }
 
-/* ===== TPN LOG CLEANUP (60 days) ===== */
-async function cleanupTpnLogs(){
-  try{
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 60);
-    const cs = cutoff.toISOString().split('T')[0];
-    
-    // FIX: Use getDocs for a one-time fetch instead of a persistent onSnapshot listener
-    const snap = await getDocs(query(tpnLogRef, where('date', '<', cs)));
-    
-    // snap.empty and snap.size are native Firestore QuerySnapshot properties
-    if(!snap.empty){
-      const refs=[];snap.forEach(d=>refs.push(d.ref));
-      for(let i=0;i<refs.length;i+=400){
-        const b=writeBatch(db);
-        refs.slice(i,i+400).forEach(r=>b.delete(r));
-        await b.commit();
-      }
-      console.log(`Cleaned ${snap.size} old TPN log entries`);
-    }
-  }catch(e){
-    console.warn('TPN log cleanup failed:', e);
-  }
-}
-
 /* ===== TAB SWITCHING ===== */
 function switchTab(tab){
 activeTab=tab;$('docSection').style.display=tab==='doc'?'':'none';$('tpnSection').style.display=tab==='tpn'?'':'none';$('tabDoc').classList.toggle('active',tab==='doc');$('tabTpn').classList.toggle('active',tab==='tpn');if(tab==='tpn')renderTpnQueue();
@@ -826,7 +796,7 @@ window.addEventListener('beforeunload',e=>{if(editingPatientId||tpnEditId){e.pre
  $('tpnBrand').addEventListener('change',()=>{updTpnPreview();renderTpnQueue();});
  $('tpnSearch').addEventListener('input',e=>handleTpnSearch(e.target.value));
  $('tpnSearch').addEventListener('focus',e=>handleTpnSearch(e.target.value));
- $('tpnSearchDropdown').addEventListener('click',e=>{const item=e.target.closest('.search-item');if(!item)return;const pid=item.dataset.pid,p=patients.find(x=>x.id===pid);if(!p)return;$('tpnSearchDropdown').classList.remove('show');$('tpnSearch').value=p.name;tpnEditId=pid;tpnEditType='linked';$('tpnLinkedInfo').style.display='block';$('tpnLinkedInfo').textContent='Linked to documentation — weight synced';if(p.tpn){fillTpnForm(p.tpn,true);$('tpnEditingName').textContent=p.name;$('tpnEditingBanner').classList.remove('hidden');$('btnSaveTpn').textContent='Update TPN';}else{$('tpnWeight').value=p.weight;$('tpnWeight').readOnly=true;updTpnPreview();}});
+ $('tpnSearchDropdown').addEventListener('click',e=>{const item=e.target.closest('.search-item');if(!item)return;const pid=item.dataset.pid,p=patients.find(x=>x.id===pid);if(!p)return;$('tpnSearchDropdown').classList.remove('show');$('tpnSearch').value=p.name;$('tpnSearch').readOnly=true;linkedPatientId=pid;tpnEditId=pid;tpnEditType='linked';$('tpnLinkedInfo').style.display='block';$('tpnLinkedInfo').textContent='🔗 Linked — name and weight locked';$('tpnEditingName').textContent=p.name;$('tpnEditingBanner').classList.remove('hidden');if(p.tpn){fillTpnForm(p.tpn,true);$('tpnEditMode').textContent='Editing';$('btnSaveTpn').textContent='Update TPN';}else{$('tpnWeight').value=p.weight;$('tpnWeight').readOnly=true;$('tpnEditMode').textContent='New';$('btnSaveTpn').textContent='Save TPN';updTpnPreview();}});
 document.addEventListener('click',e=>{if(!e.target.closest('#tpnSearch')&&!e.target.closest('#tpnSearchDropdown'))$('tpnSearchDropdown').classList.remove('show');});
  const debouncedTpn=debounce(updTpnPreview,150);
  $('tpnWeight').addEventListener('input',debouncedTpn);
@@ -844,15 +814,12 @@ document.addEventListener('click',e=>{if(!e.target.closest('#tpnSearch')&&!e.tar
  $('btnTpnCancelEdit').addEventListener('click',()=>{clearTpnForm();renderTpnQueue();showToast('Cancelled','info');});
   $('btnDeleteSelectedTpn').addEventListener('click', deleteSelectedTpn);
  $('tpnSelectAll').addEventListener('change',e=>{const cards=getTpnCards();if(e.target.checked)cards.forEach(c=>selectedTpnIds.add(c.id));else selectedTpnIds.clear();renderTpnQueue();});
- $('btnExportCsv').addEventListener('click',exportCsv);
  $('btnTpnOrder').addEventListener('click',genTpnOrder);
  $('btnTpnLabels').addEventListener('click',genTpnLabels);
- $('btnAddStandalone').addEventListener('click',()=>{clearTpnForm();tpnEditType='standalone';$('tpnSearch').value='';$('tpnWeight').readOnly=false;$('tpnLinkedInfo').style.display='none';showToast('Enter standalone patient data','info');$('tpnWeight').focus();});
 
 /* ===== INIT ===== */
 popDropdowns();
 initDark();
-cleanupTpnLogs();
 </script>
 </body>
 </html>
