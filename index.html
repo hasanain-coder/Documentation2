@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>NICU Documentation Tool | Baghdad Teaching Hospital</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config={darkMode:['class','.dark-mode']}</script>
@@ -21,7 +21,6 @@ body{background:var(--bg);background-image:radial-gradient(ellipse at 0% 0%,rgba
 @keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
 .animate-fade-up{animation:fadeUp .5s cubic-bezier(.22,1,.36,1) forwards}
 .animate-slide-in{animation:slideIn .4s cubic-bezier(.22,1,.36,1) forwards}
-.patient-card{opacity:1}
 input,select,textarea{background:var(--surface);color:var(--fg);border-color:var(--border);transition:all .2s ease}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,118,110,.12);background:var(--card)}
 body.dark-mode input,body.dark-mode select,body.dark-mode textarea{color:#E5E7EB!important;caret-color:#E5E7EB}
@@ -50,7 +49,7 @@ body.dark-mode input:-webkit-autofill,body.dark-mode input:-webkit-autofill:hove
 .connection-badge.offline{background:#EF4444}
 .editing-banner{background:linear-gradient(135deg,#F59E0B 0%,#D97706 100%)}
 .card-body{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.22,1,.36,1),padding .35s cubic-bezier(.22,1,.36,1);padding-top:0;padding-bottom:0}
-.card-body.expanded{max-height:2000px;padding-top:1rem;padding-bottom:1rem}
+.card-body.expanded{max-height:5000px;padding-top:1rem;padding-bottom:1rem}
 .chevron-icon{transition:transform .3s ease}
 .chevron-icon.rotated{transform:rotate(180deg)}
 .filter-pill{transition:all .2s ease;cursor:pointer;user-select:none}
@@ -123,14 +122,14 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 </style>
 </head>
 <body class="min-h-screen">
-<header class="sticky top-0 z-50 bg-[var(--card)]/95 backdrop-blur-md border-b border-[var(--border)] shadow-sm">
+<header class="sticky top-0 z-50 backdrop-blur-md border-b border-[var(--border)] shadow-sm" style="background-color:color-mix(in srgb, var(--card) 95%, transparent)">
 <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
 <div class="flex items-center gap-3">
 <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] flex items-center justify-center shadow-md"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg></div>
 <div><h1 class="text-xl md:text-2xl font-bold text-[var(--fg)] tracking-tight">NICU Pharmacist Tool</h1><div class="flex items-center gap-1.5 mt-0.5"><button id="tabDoc" class="tab-btn active">Documentation</button><button id="tabTpn" class="tab-btn">TPN Calculator</button></div></div>
 </div>
 <div class="flex items-center gap-3">
-<div id="connectionStatus" class="connection-badge hidden sm:inline-block">Connecting...</div>
+<div id="connectionStatus" class="connection-badge inline-block">Connecting...</div>
 <button id="darkModeToggle" class="dark-toggle p-2.5 rounded-xl" aria-label="Toggle Dark Mode"><svg class="w-5 h-5 sun-icon hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg><svg class="w-5 h-5 moon-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg></button>
 </div>
 </div>
@@ -191,7 +190,7 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <button id="btnClearAll" class="flex-1 min-w-0 py-2.5 px-3 rounded-xl border border-[var(--danger)]/30 text-[var(--danger)] font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm whitespace-normal"><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg><span id="clearBtnText">Clear All</span></button>
 </div>
 <div id="patientQueue" class="space-y-3"></div>
-<div id="emptyState" class="hidden text-center py-20 bg-[var(--card)] rounded-2xl border-2 border-dashed border-[var(--border)]"><svg class="w-20 h-20 mx-auto text-[var(--muted)]/30 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/></svg><p class="text-[var(--muted)] text-lg font-medium">No patients in queue</p><p class="text-[var(--muted)]/60 text-sm mt-1">Add patient information above to begin</p></div>
+<div id="emptyState" class="hidden text-center py-20 bg-[var(--card)] rounded-2xl border-2 border-dashed border-[var(--border)]"><svg class="w-20 h-20 mx-auto text-[var(--muted)]/30 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/></svg><p id="emptyStateMsg" class="text-[var(--muted)] text-lg font-medium">No patients in queue</p><p class="text-[var(--muted)]/60 text-sm mt-1">Add patient information above to begin</p></div>
 </section></section>
 
 <!-- ===== TPN ===== -->
@@ -208,7 +207,7 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">TPN Calculator</h2><p class="text-white/75 text-sm mt-1">Search patient or add standalone</p></div>
 <div class="p-6 space-y-5">
 <div class="relative"><div class="relative flex-1"><svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="tpnSearch" class="tpn-inp" style="padding-left:32px" placeholder="Patient name — search or type new…" autocomplete="off"><div id="tpnSearchDropdown" class="search-dropdown"></div></div>
-<div id="tpnLinkedInfo" class="hidden mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(15,118,110,.08);color:var(--accent);display:none;"></div></div>
+<div id="tpnLinkedInfo" class="mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(15,118,110,.08);color:var(--accent);display:none;"></div></div>
 <div class="tpn-sg">
 <div><label class="tpn-lbl">Weight</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnWeight" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">kg</span></div></div>
 <div><label class="tpn-lbl">Fluid Input</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnFluidInput" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">ml/kg</span></div></div>
@@ -234,7 +233,7 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 </div></section>
 </main>
 <div id="pdf-render-container"></div>
-<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl font-medium shadow-xl z-50 opacity-0 translate-y-4 transition-all duration-300 pointer-events-none"><span id="toastMsg">Message</span></div>
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl font-medium shadow-xl z-50 opacity-0 translate-y-4 transition-all duration-300 pointer-events-none" style="bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px))"><span id="toastMsg">Message</span></div>
 <script type="module">
 const firebaseConfig={apiKey:"AIzaSyAaMqxvBAuTkOykYHF5w_xjS98bDOhZoPY",authDomain:"documentation2-dd1aa.firebaseapp.com",projectId:"documentation2-dd1aa",storageBucket:"documentation2-dd1aa.firebasestorage.app",messagingSenderId:"236681783643",appId:"1:236681783643:web:dc4d715258955b3413d27e",measurementId:"G-WRK2C3121X"};
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -303,16 +302,16 @@ const TPN_AT={na3:{l:'Na 3%',na:.513,k:0},na09:{l:'Na 0.9%',na:.154,k:0},k:{l:'K
 
 /* ===== STATE ===== */
 let patients=[],currentDrugs=[],selectedPatientIds=new Set(),editingPatientId=null,activeFilter='all';
-let standaloneTpn=[],selectedTpnIds=new Set(),tpnEditId=null,tpnEditType=null,activeTab='doc',linkedPatientId=null,dirty=false;
+let standaloneTpn=[],selectedTpnIds=new Set(),tpnEditId=null,tpnEditType=null,activeTab='doc',linkedPatientId=null,dirty=false,initialLoaded=false;
 
 /* ===== UTILITIES ===== */
 const $=id=>document.getElementById(id);
 const cleanN=s=>{if(!s)return 0;let c=s.toString().replace(/[،,٫]/g,'.');['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'].forEach((n,i)=>c=c.replace(new RegExp(n,'g'),i));return parseFloat(c.replace(/[^0-9.]/g,''))||0;};
-const esc=s=>{if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;};
+const esc=s=>{if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML.replace(/"/g,'&quot;').replace(/'/g,'&#39;');};
 const fmt=(n,d)=>{const x=parseFloat(n);return isNaN(x)?'—':x.toFixed(d);};
 const safeBN=t=>!t?'':esc(t).toString().replace(/\d+(\.\d+)?/g,'<strong style="font-weight:900">$&</strong>');
 const boldN=t=>!t?'':t.toString().replace(/\d+(\.\d+)?/g,'<strong style="font-weight:900">$&</strong>');
-const genId=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,9);
+const genId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,11);
 const daysDiff=(d1,d2)=>{const t=(new Date(d2)-new Date(d1))/86400000;return isNaN(t)?0:Math.max(0,Math.round(t));};
 const ageDay=(d1,d2)=>daysDiff(d1,d2)+1;
 const debounce=(fn,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
@@ -329,7 +328,9 @@ const fmtAge=a=>a>=999?'30+':a;
 const updatePna=()=>{const d=$('inputDOB').value;if(!d){$('pnaDisplay').classList.add('hidden');$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';return;}const p=ageDay(d,new Date()),ps=d.split('-');$('dobText').textContent=`${ps[2]}/${ps[1]}/${ps[0]}`;$('dobFake').classList.add('has-date');$('pnaDisplay').textContent=`Postnatal Age: Day ${p}`;$('pnaDisplay').classList.remove('hidden');};
 
 const showToast=(m,t='success')=>{const c={success:'bg-[#047857] text-white',error:'bg-[#B91C1C] text-white',info:'bg-[#334155] text-white'};const toast=$('toast');$('toastMsg').textContent=m;toast.className=`fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl font-medium shadow-xl z-50 transition-all duration-300 ${c[t]}`;toast.style.opacity='1';toast.style.transform='translateX(-50%) translateY(0)';setTimeout(()=>{toast.style.opacity='0';toast.style.transform='translateX(-50%) translateY(16px)';},3000);};
-const initDark=()=>{const d=localStorage.getItem('theme')==='dark';document.body.classList.toggle('dark-mode',d);$('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!d);$('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',d);};
+const safeGet=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
+const safeSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
+const initDark=()=>{const d=safeGet('theme')==='dark';document.body.classList.toggle('dark-mode',d);$('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!d);$('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',d);};
 const validateClin=()=>{const w=cleanN($('inputWeight').value),ga=cleanN($('inputGA').value),ws=[];if(w>0&&(w<.4||w>6))ws.push(`Weight ${w}kg outside NICU range (0.4–6 kg)`);if(ga>0&&(ga<22||ga>44))ws.push(`GA ${ga}w outside range (22–44 weeks)`);if(ws.length){$('clinicalWarningText').innerHTML=ws.join('<br>');$('clinicalWarning').classList.remove('hidden');}else $('clinicalWarning').classList.add('hidden');};
 const checkAlerts=drug=>{const ga=cleanN($('inputGA').value),a=getFormPna(),f=$('inputFreq').value,w=cleanN($('inputWeight').value);$('warningMessage').classList.add('hidden');if(drug&&drug.warning_rule){const r=drug.warning_rule(ga,a,f,w);if(r){$('warningMessage').innerHTML=r;$('warningMessage').classList.remove('hidden');}}};
 const calcGIR=(w,g,v)=>{if(w<=0||g<=0||v<=0)return null;let ht=Math.round(((w*g*1440/50)-v)/9),gw=v-ht,ws=[];if(ht<0){ht=0;gw=v;ws.push("تنبيه: 5% GW يوفر تركيزاً أعلى من GIR المطلوب.");}else if(ht>v){ht=v;gw=0;ws.push("خطأ: الحجم غير كافٍ.");}const td=gw*50+ht*500,c=td/v/10,ag=td/w/1440;if(c>12.5)ws.push("تحذير: التركيز أعلى من 12.5%");return{gw,ht,conc:c,actualGIR:ag,warnings:ws};};
@@ -404,7 +405,7 @@ const calcTotalFluid=(drugs,w)=>{if(w<=0)return null;let t=0;drugs.forEach(d=>{t
 const updateFluidBar=()=>{const w=cleanN($('inputWeight').value);const f=calcTotalFluid(currentDrugs,w);if(!f||f.totalMl<=0){$('fluidSummary').classList.add('hidden');return;}$('fluidTotal').textContent=f.totalMl;$('fluidPerKgDay').textContent=f.mlKgD;$('fluidPerKgHr').textContent=f.mlKgH;$('fluidSummary').classList.remove('hidden');};
 const fluidTxt=p=>{const w=parseFloat(p.weight)||0;if(w<=0)return'';const f=calcTotalFluid(p.drugs,w);if(!f||f.totalMl<=0)return'';return`💧 ${f.mlKgD} ml/kg/day`;};
 
-const updateCounter=()=>{const t=patients.length,s=selectedPatientIds.size,fl=getFiltered(),f=fl.length,sf=fl.filter(p=>selectedPatientIds.has(p.id)).length;$('pdfBtnText').textContent=s>0?`Generate PDF (${s})`:'Generate PDF';$('clearBtnText').textContent=s>0?`Clear Selected (${s})`:'Clear All';$('btnPdf').disabled=s===0;$('emptyState').classList.toggle('hidden',f>0);const cb=$('selectAllCheckbox');if(cb){cb.checked=f>0&&sf===f;cb.indeterminate=sf>0&&sf<f;}};
+const updateCounter=()=>{const t=patients.length,s=selectedPatientIds.size,fl=getFiltered(),f=fl.length,sf=fl.filter(p=>selectedPatientIds.has(p.id)).length;$('pdfBtnText').textContent=s>0?`Generate PDF (${s})`:'Generate PDF';$('clearBtnText').textContent=s>0?`Clear Selected (${s})`:'Clear All';$('btnPdf').disabled=s===0;if(!initialLoaded){$('emptyState').classList.remove('hidden');$('emptyStateMsg').innerHTML='<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Loading patients...';}else{$('emptyState').classList.toggle('hidden',f>0);$('emptyStateMsg').textContent='No patients in queue';}const cb=$('selectAllCheckbox');if(cb){cb.checked=f>0&&sf===f;cb.indeterminate=sf>0&&sf<f;}};
 window.toggleSel=id=>{if(selectedPatientIds.has(id))selectedPatientIds.delete(id);else selectedPatientIds.add(id);updateCounter();renderQueue();};
 
 const renderQueue=()=>{
@@ -593,12 +594,7 @@ if(tpnEditId===id)clearTpnForm();selectedTpnIds.delete(id);renderTpnQueue();show
 async function deleteSelectedTpn(){
 const cards=getTpnCards().filter(c=>selectedTpnIds.has(c.id));if(!cards.length)return;if(!confirm(`Delete ${cards.length} TPN(s)?`))return;
 try{
-for(const c of cards){
-    if(c.type==='linked'){
-        const p=patients.find(x=>x.id===c.id);
-        if(p)await setDoc(doc(db,"patients",c.id),{drugs:p.drugs.filter(x=>x.drugId!==12),tpn:deleteField()},{merge:true});
-    }else await deleteDoc(doc(db,"tpn_standalone",c.id));
-}
+await Promise.all(cards.map(c=>{if(c.type==='linked'){const p=patients.find(x=>x.id===c.id);if(p)return setDoc(doc(db,"patients",c.id),{drugs:p.drugs.filter(x=>x.drugId!==12),tpn:deleteField()},{merge:true});return Promise.resolve();}return deleteDoc(doc(db,"tpn_standalone",c.id));}));
 if(cards.some(c=>c.id===tpnEditId))clearTpnForm();
 selectedTpnIds.clear();renderTpnQueue();showToast(`${cards.length} TPN(s) deleted`);
 }catch(e){showToast(`Failed: ${e.message}`,'error');renderTpnQueue();}
@@ -764,7 +760,7 @@ activeTab=tab;$('docSection').style.display=tab==='doc'?'':'none';$('tpnSection'
 
 /* ===== FIREBASE LISTENERS ===== */
 const unsub=onSnapshot(query(patientsRef,orderBy("saveDate","desc")),snap=>{
-setConn(true);patients=snap.docs.map(d=>({drugs:[],...d.data(),id:d.id}));
+setConn(true);initialLoaded=true;patients=snap.docs.map(d=>({drugs:[],...d.data(),id:d.id}));
 if(editingPatientId&&!patients.find(p=>p.id===editingPatientId)){clearForm();showToast('Patient deleted by another user','error');}
 renderQueue();renderFilterBar();if(activeTab==='tpn')renderTpnQueue();
 },err=>{console.error("Firestore error:",err);setConn(false);if(!patients.length){showToast('Connection failed. Retrying...','error');}else{showToast(`Connection lost — showing cached data (${patients.length} patients).`,'error');}renderQueue();renderFilterBar();if(activeTab==='tpn')renderTpnQueue();});
@@ -799,7 +795,7 @@ standaloneTpn=snap.docs.map(d=>({id:d.id,...d.data()}));if(activeTab==='tpn')ren
  $('inputConcentration').addEventListener('input',()=>{if($('selectDrug').value==='other')updateOtherPreview();});
  $('inputCustomUnit').addEventListener('input',()=>{updateConcLabel();if($('selectDrug').value==='other')updateOtherPreview();});
  $('inputCustomMethod').addEventListener('input',()=>{const ct=$('inputCustomMethod').value.trim();if(ct){$('methodPreviewContainer').classList.remove('hidden');$('previewMethod').innerHTML=`<span class="arabic-text">${safeBN(ct)}</span>`;}else $('methodPreviewContainer').classList.add('hidden');});
- $('darkModeToggle').addEventListener('click',()=>{const d=localStorage.getItem('theme')==='dark',n=!d;document.body.classList.toggle('dark-mode',n);localStorage.setItem('theme',n?'dark':'light');$('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!n);$('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',n);});
+ $('darkModeToggle').addEventListener('click',()=>{const d=safeGet('theme')==='dark',n=!d;document.body.classList.toggle('dark-mode',n);safeSet('theme',n?'dark':'light');$('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!n);$('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',n);});
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
 $('docSection').addEventListener('input',()=>{if(editingPatientId)dirty=true;});
 $('tpnSection').addEventListener('input',()=>{if(tpnEditId)dirty=true;});
