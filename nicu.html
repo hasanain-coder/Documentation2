@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>NICU Documentation Tool | Baghdad Teaching Hospital</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={darkMode:['class','.dark-mode']}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@400;600;800&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--bg:#F0F4F3;--fg:#1C2526;--muted:#5A6872;--accent:#0F766E;--accent-light:#14B8A6;--card:#FFFFFF;--border:#D1DEDD;--danger:#B91C1C;--surface:#E8EFEE}
+body.dark-mode{--bg:#0f1115;--fg:#E5E7EB;--muted:#9CA3AF;--accent:#2A9D8F;--accent-light:#40E0D0;--card:#1a1d21;--border:#2d3139;--danger:#F87171;--surface:#16191d}
+*{font-family:'Inter','Cairo','Noto Sans Arabic',sans-serif;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Crimson Pro',serif}
+body{background:var(--bg);background-image:radial-gradient(ellipse at 0% 0%,rgba(15,118,110,.06) 0%,transparent 50%),radial-gradient(ellipse at 100% 100%,rgba(20,184,166,.04) 0%,transparent 50%);transition:background .3s ease,color .3s ease}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--accent);border-radius:4px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+.animate-fade-up{animation:fadeUp .5s cubic-bezier(.22,1,.36,1) forwards}
+.animate-slide-in{animation:slideIn .4s cubic-bezier(.22,1,.36,1) forwards}
+input,select,textarea{background:var(--surface);color:var(--fg);border-color:var(--border);transition:all .2s ease}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,118,110,.12);background:var(--card)}
+body.dark-mode input,body.dark-mode select,body.dark-mode textarea{color:#E5E7EB!important;caret-color:#E5E7EB}
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px var(--surface) inset!important;-webkit-text-fill-color:var(--fg)!important}
+body.dark-mode input:-webkit-autofill,body.dark-mode input:-webkit-autofill:hover,body.dark-mode input:-webkit-autofill:focus{-webkit-text-fill-color:#E5E7EB!important}
+.btn-primary{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);transition:all .25s ease}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,118,110,.25)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.card-hover{transition:all .3s ease}
+.card-hover:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.arabic-text{font-family:'Cairo','Noto Sans Arabic',sans-serif;direction:rtl;text-align:right;unicode-bidi:isolate}
+.dark-toggle{background:var(--surface);border:1px solid var(--border);color:var(--fg);transition:all .3s ease;cursor:pointer}
+.dark-toggle:hover{background:var(--accent);color:white}
+.live-badge{font-size:9px;padding:1px 5px;border-radius:4px;background:var(--accent);color:white;vertical-align:middle;margin-left:4px}
+#pdf-render-container{position:absolute;top:0;left:0;z-index:-1000;opacity:0;pointer-events:none;background:white}
+.pdf-page{width:210mm;height:297mm;padding:8mm;background:white;box-sizing:border-box;page-break-after:always}
+.pdf-page-header{text-align:center;margin-bottom:4mm;padding-bottom:3mm;border-bottom:2px solid #000}
+.pdf-page-header h2{font-size:14pt;font-weight:900;margin:0;color:#000;font-family:'Crimson Pro',serif}
+.pdf-page-header p{font-size:8pt;margin:1mm 0 0 0;color:#333}
+.pdf-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr);gap:3mm;height:calc(100% - 14mm)}
+.pdf-cell{border:2px solid #000;border-radius:2mm;padding:3mm;background:#FFF;display:flex;flex-direction:column;overflow:hidden}
+.pdf-cell-header{background:#FFF;margin:-3mm -3mm 2mm -3mm;padding:2mm 3mm;border-radius:2mm 2mm 0 0;border-bottom:2px solid #000}
+.pdf-drug-item{margin-bottom:1.5mm;padding-bottom:1.5mm;border-bottom:1px dashed #999;color:#000}
+.pdf-drug-item:last-child{border-bottom:none}
+.connection-badge{font-size:10px;padding:2px 6px;border-radius:4px;background:#10B981;color:white}
+.connection-badge.offline{background:#EF4444}
+.editing-banner{background:linear-gradient(135deg,#F59E0B 0%,#D97706 100%)}
+.card-body{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.22,1,.36,1),padding .35s cubic-bezier(.22,1,.36,1);padding-top:0;padding-bottom:0}
+.card-body.expanded{max-height:5000px;padding-top:1rem;padding-bottom:1rem}
+.chevron-icon{transition:transform .3s ease}
+.chevron-icon.rotated{transform:rotate(180deg)}
+.filter-pill{transition:all .2s ease;cursor:pointer;user-select:none}
+.filter-pill:hover{transform:translateY(-1px)}
+.filter-pill.active{background:var(--accent)!important;color:white!important;border-color:var(--accent)!important;box-shadow:0 2px 8px rgba(15,118,110,.3)}
+.room-tag{font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600}
+.room-tag.r1{background:rgba(99,102,241,.15);color:#6366F1}.room-tag.r2{background:rgba(245,158,11,.15);color:#D97706}.room-tag.rec{background:rgba(16,185,129,.15);color:#059669}.room-tag.un{background:rgba(90,104,114,.12);color:var(--muted);border:1px dashed var(--muted)}
+body.dark-mode .room-tag.r1{color:#A5B4FC;background:rgba(165,180,252,.15)}
+body.dark-mode .room-tag.r2{color:#FCD34D;background:rgba(252,211,77,.15)}
+body.dark-mode .room-tag.rec{color:#6EE7B7;background:rgba(110,231,183,.15)}
+body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);border-color:var(--muted)}
+@media(min-width:1024px){.patient-grid{grid-template-columns:repeat(3,1fr)!important}}
+.dob-wrapper{position:relative}
+.dob-wrapper input[type="date"]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;border:none;padding:0;margin:0}
+.dob-fake{width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .2s;font-size:14px;display:flex;align-items:center;justify-content:space-between}
+.dob-fake.has-date{color:var(--fg);font-weight:500}
+.dob-fake:active{background:var(--accent);color:white;border-color:var(--accent)}
+.dob-fake svg{width:18px;height:18px;flex-shrink:0;opacity:.5}
+@media(max-width:640px){.med-grid{grid-template-columns:1fr!important}.med-grid>div{min-width:0!important}}
+@media(min-width:641px)and(max-width:1023px){.med-grid{grid-template-columns:1fr 1fr!important}}
+.tab-btn{padding:4px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);transition:all .2s;font-family:inherit}
+.tab-btn.active{background:var(--accent);color:white;border-color:var(--accent);box-shadow:0 2px 8px rgba(15,118,110,.25)}
+.tab-btn:hover:not(.active){border-color:var(--accent);color:var(--accent)}
+#tpnSection .tpn-inp{width:100%;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;color:var(--fg);background:var(--surface);transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield}
+#tpnSection .tpn-inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2.5px rgba(15,118,110,.1)}
+#tpnSection .tpn-inp::-webkit-outer-spin-button,#tpnSection .tpn-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+#tpnSection .tpn-unit{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;color:#94A3B8;pointer-events:none;font-weight:500}
+#tpnSection .tpn-lbl{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:2px;line-height:1.2}
+#tpnSection .tpn-sg{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px}
+#tpnSection .tpn-sr{display:flex;justify-content:space-between;align-items:baseline;padding:2px 0}
+#tpnSection .tpn-sl{font-size:11px;color:var(--muted)}
+#tpnSection .tpn-sv{font-family:'Crimson Pro',serif;font-weight:700;font-size:13px;color:var(--fg)}
+#tpnSection .tpn-su{font-size:9px;color:#94A3B8;margin-left:2px;font-weight:400}
+#tpnSection .tpn-elec-row{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:4px 0}
+#tpnSection .tpn-elec-c{text-align:center;padding:4px 2px;border-radius:6px;background:var(--surface);border:1px solid var(--border)}
+#tpnSection .tpn-el{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:1px}
+#tpnSection .tpn-ev{font-family:'Crimson Pro',serif;font-size:14px;font-weight:700;line-height:1.2}
+#tpnSection .tpn-eu{font-size:9px;color:var(--muted)}
+#tpnSection .tpn-pr{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(16,185,129,.2);font-size:12px}
+#tpnSection .tpn-pr:last-child{border-bottom:none}
+#tpnSection .tpn-pr-l{color:#065F46;font-size:11px}
+#tpnSection .tpn-pr-v{font-family:'Crimson Pro',serif;font-weight:700;font-size:13px;color:var(--fg)}
+#tpnSection .tpn-pr-t{font-weight:800;border-top:2px solid rgba(16,185,129,.4);border-bottom:none;margin-top:2px;padding-top:4px}
+#tpnSection .tpn-split-box{background:rgba(15,118,110,.05);border:2px solid rgba(15,118,110,.2);border-radius:8px;padding:8px;margin-top:6px}
+#tpnSection .tpn-split-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#tpnSection .tpn-split-bag{background:var(--card);border:1px solid rgba(15,118,110,.15);border-radius:6px;padding:6px}
+#tpnSection .tpn-split-bag-t{font-size:10px;font-weight:700;color:var(--accent);text-align:center;margin-bottom:4px}
+#tpnSection .tpn-split-row{display:flex;justify-content:space-between;font-size:10px;padding:1px 0;color:var(--fg)}
+#tpnSection .tpn-split-row .fd{font-weight:600}
+#tpnSection .tpn-split-tot{display:flex;justify-content:space-between;font-size:10px;font-weight:700;padding-top:3px;margin-top:2px;border-top:1px solid rgba(15,118,110,.15);color:var(--accent)}
+#tpnSection .tpn-wmsg{background:#FFFBEB;border:1px solid #FDE68A;border-left:3px solid #D97706;border-radius:6px;padding:6px 8px;margin-top:6px;font-size:11px;color:#92400E;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+#tpnSection .tpn-emsg{background:#FEF2F2;border:1px solid #FECACA;border-left:3px solid #DC2626;border-radius:6px;padding:6px 8px;margin-top:6px;font-size:11px;color:#991B1B;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+#tpnSection .tpn-sec-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;margin:8px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--border)}
+#tpnSection .tpn-loss-sel{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+#tpnSection .tpn-loss-sel button{border:none;padding:4px 0;font-size:11px;font-weight:600;cursor:default;font-family:inherit;transition:all .15s;flex:1;background:var(--surface);color:var(--muted)}
+#tpnSection .tpn-loss-sel button.on{background:var(--accent);color:#fff}
+#tpnSection .tpn-addon-row{display:flex;gap:4px;align-items:center;margin-bottom:4px}
+#tpnSection .tpn-addon-row select{flex:1;min-width:0}
+#tpnSection .tpn-addon-row .tpn-inp{width:52px;flex-shrink:0;text-align:center;padding:5px 4px}
+#tpnSection .tpn-addon-rm{width:22px;height:22px;border:none;background:transparent;color:#CBD5E1;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;flex-shrink:0}
+#tpnSection .tpn-addon-rm:hover{background:#FEE2E2;color:#EF4444}
+.search-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:30;max-height:200px;overflow-y:auto;display:none}
+.search-dropdown.show{display:block}
+.search-item{padding:8px 12px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;transition:background .1s}
+.search-item:hover{background:var(--surface)}
+.search-item .si-name{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.search-item .si-info{font-size:11px;color:var(--muted);flex-shrink:0}
+.linked-badge{font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(15,118,110,.1);color:var(--accent);font-weight:700}
+.standalone-badge{font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(100,116,139,.1);color:var(--muted);font-weight:700}
+/* ===== v2: doc search + census + toolbar ===== */
+.doc-search-wrap{position:relative;flex:1;min-width:0}
+.doc-search-wrap>input{padding-left:36px;padding-right:30px}
+.ds-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;width:16px;height:16px}
+.ds-clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--muted);cursor:pointer;width:24px;height:24px;border-radius:6px;display:none;align-items:center;justify-content:center}
+.ds-clear.show{display:flex}
+.ds-clear:hover{background:var(--surface);color:var(--danger)}
+.queue-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+
+/* ===== v3: accessibility + sort + drug toggle ===== */
+:where(button,select,input,[role="button"],a,label):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sort-select{background:var(--surface);border:1px solid var(--border);color:var(--fg);padding:7px 28px 7px 11px;border-radius:10px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5'%3E%3Cpath d='M3 6h18M6 12h12M10 18h4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:all .2s;flex-shrink:0}
+.sort-select:hover{border-color:var(--accent)}
+.sort-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2.5px rgba(15,118,110,.1)}
+.drug-toggle{width:30px;height:30px;border:1px solid var(--border);background:var(--surface);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;color:var(--accent)}
+.drug-toggle:hover{border-color:var(--accent);background:rgba(15,118,110,.08)}
+.drug-toggle.paused{color:#D97706;border-color:rgba(217,119,6,.3)}
+.drug-toggle.paused:hover{color:#D97706;border-color:#D97706;background:rgba(217,119,6,.08)}
+.drug-row{transition:opacity .2s}
+.drug-row.paused{opacity:.5}
+.drug-row.paused .drug-name{text-decoration:line-through;text-decoration-color:var(--muted)}
+.drug-badge.paused-badge{background:rgba(217,119,6,.12);color:#D97706}
+body.dark-mode .drug-badge.paused-badge{background:rgba(252,211,77,.12);color:#FCD34D}
+body.dark-mode .drug-toggle.paused{color:#FCD34D;border-color:rgba(252,211,77,.3)}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.55}}
+.live-badge{animation:livePulse 2.2s ease-in-out infinite}
+</style>
+</head>
+<body class="min-h-screen">
+<header class="sticky top-0 z-50 backdrop-blur-md border-b border-[var(--border)] shadow-sm" style="background-color:color-mix(in srgb, var(--card) 95%, transparent)">
+<div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] flex items-center justify-center shadow-md"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg></div>
+<div><h1 class="text-xl md:text-2xl font-bold text-[var(--fg)] tracking-tight">NICU Pharmacist Tool</h1><div class="flex items-center gap-1.5 mt-0.5"><button id="tabDoc" class="tab-btn active">Documentation</button><button id="tabTpn" class="tab-btn">TPN Calculator</button></div></div>
+</div>
+<div class="flex items-center gap-3">
+<div id="connectionStatus" class="connection-badge inline-block">Connecting...</div>
+<button id="darkModeToggle" class="dark-toggle p-2.5 rounded-xl" aria-label="Toggle Dark Mode"><svg class="w-5 h-5 sun-icon hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg><svg class="w-5 h-5 moon-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg></button>
+</div>
+</div>
+</header>
+<main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+<!-- ===== DOCUMENTATION ===== -->
+<section id="docSection">
+<section class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
+<div id="editingBanner" class="hidden editing-banner px-6 py-3 flex items-center justify-between"><div class="flex items-center gap-2"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span class="text-white font-semibold text-sm">Editing: <span id="editingBannerName" class="font-bold"></span></span></div><button id="btnCancelEdit" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors">Cancel</button></div>
+<div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">Patient Information</h2><p class="text-white/75 text-sm mt-1">Enter details to calculate precise dosages</p></div>
+<div class="p-6 space-y-6">
+<div class="patient-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-hidden">
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Patient Name</label><input type="text" id="inputName" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Full name"></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Weight (kg)</label><input type="text" id="inputWeight" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 2.35"></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Date of Birth</label><div class="dob-wrapper"><div class="dob-fake" id="dobFake" onclick="document.getElementById('inputDOB').showPicker()"><span id="dobText">Select date...</span><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><input type="date" id="inputDOB"></div></div>
+</div>
+<div class="patient-grid grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-x-hidden">
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Gestational Age (weeks)</label><input type="text" id="inputGA" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.').replace(/[^0-9.]/g,'')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 34"></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Room</label><select id="inputRoom" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"><option value="">-- Optional --</option><option value="Room 1">Room 1</option><option value="Room 2">Room 2</option><option value="Reception">Reception</option></select></div>
+</div>
+<div id="pnaDisplay" class="hidden text-sm font-semibold px-4 py-2 rounded-xl" style="background:rgba(15,118,110,.08);border:1px solid rgba(15,118,110,.15);color:var(--accent);"></div>
+<div id="clinicalWarning" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2"><svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><p id="clinicalWarningText" class="text-sm text-amber-700 font-semibold"></p></div>
+<div class="border-t border-[var(--border)] pt-6">
+<div class="flex items-center gap-2 mb-4"><svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg><h3 class="text-lg font-semibold text-[var(--fg)]">Medication & Dosage</h3></div>
+<div class="med-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 items-start">
+<div class="space-y-2 lg:col-span-1"><label class="block text-sm font-semibold text-[var(--fg)]">Category</label><select id="selectCategory" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select></div>
+<div class="space-y-2 lg:col-span-1"><label class="block text-sm font-semibold text-[var(--fg)]">Drug</label><select id="selectDrug" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select><input type="text" id="inputCustomDrug" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)] mt-2" placeholder="اسم العلاج"></div>
+<div class="lg:col-span-2 space-y-2">
+<div class="grid grid-cols-2 gap-2 sm:gap-3">
+<div class="space-y-2 hidden min-w-0" id="dosePerKgContainer"><label class="block text-sm font-semibold text-[var(--accent)]">Dose/kg</label><input type="text" id="inputDosePerKg" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-3 py-3 rounded-xl border border-[var(--accent)]/30 font-bold" placeholder="Dose/kg"></div>
+<div class="space-y-2 min-w-0" id="totalDoseContainer"><label class="block text-sm font-semibold text-[var(--fg)]">Total Dose</label><div class="flex gap-1"><input type="text" id="inputDose" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="flex-1 px-3 py-3 rounded-xl border border-[var(--border)] min-w-0" placeholder="Dose"><input type="text" id="inputCustomUnit" oninput="this.value=this.value.replace(/[^0-9a-zA-Z\/]/g,'')" class="hidden w-14 sm:w-20 px-1 py-3 rounded-xl border border-[var(--border)] opacity-60" placeholder="mg"></div></div>
+</div>
+<div class="hidden" id="girContainer"><div class="grid grid-cols-2 gap-2"><div class="space-y-1"><label class="block text-sm font-semibold text-[var(--accent)]">GIR (mg/kg/min)</label><input type="text" id="inputGIR" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-3 py-3 rounded-xl border border-[var(--accent)]/30 font-bold" placeholder="e.g., 6"></div><div class="space-y-1"><label class="block text-sm font-semibold text-[var(--accent)]">Bag Volume (ml)</label><input type="text" id="inputBagVol" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-3 py-3 rounded-xl border border-[var(--accent)]/30 font-bold" placeholder="e.g., 100"></div></div></div>
+<select id="selectCustomMethod" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select>
+<input type="text" id="inputCustomMethod" class="hidden w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="طريقة الإعطاء المخصصة" style="direction:rtl;text-align:right;font-family:'Cairo','Noto Sans Arabic',sans-serif;">
+<div class="space-y-2 hidden" id="concentrationContainer"><label class="block text-sm font-semibold text-[var(--accent)]" id="concentrationLabel">Concentration (/ml)</label><input type="text" id="inputConcentration" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-3 py-3 rounded-xl border border-[var(--accent)]/30 font-bold" placeholder="e.g., 50"></div>
+</div>
+<div class="space-y-2 lg:col-span-1" id="freqContainer"><label class="block text-sm font-semibold text-[var(--fg)]">Frequency</label><select id="inputFreq" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"><option value="1">Once daily (x 1)</option><option value="2">Twice daily (x 2)</option><option value="3">Three times (x 3)</option><option value="4">Four times (x 4)</option><option value="q36hr">q36hr</option><option value="q48hr">q48hr</option></select></div>
+<div class="space-y-2 lg:col-span-1 hidden" id="targetVolContainer"><label class="block text-sm font-semibold text-[var(--accent)]">Target Volume</label><select id="inputTargetVol" class="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--accent)]/5"><option value="10">10 ml (x2)</option><option value="5">5 ml (x3)</option></select></div>
+<div class="lg:col-span-1 flex flex-col gap-2">
+<div id="addonContainer" class="hidden grid grid-cols-2 gap-2"><div class="space-y-1"><label class="block text-[10px] font-bold text-[var(--accent)] uppercase">Vol</label><input type="text" id="inputAddonVol" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-2 py-2 rounded-lg border border-[var(--border)] text-sm" placeholder="ml"></div><div class="space-y-1"><label class="block text-[10px] font-bold text-[var(--accent)] uppercase">Type</label><input type="text" id="inputAddonType" class="w-full px-2 py-2 rounded-lg border border-[var(--border)] text-sm" placeholder="KCL"></div></div>
+<button id="btnAddDrug" class="btn-primary w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2 h-[50px]"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>Add</button>
+</div>
+</div>
+<div id="methodPreviewContainer" class="hidden bg-[var(--surface)] border border-[var(--accent)]/20 rounded-xl p-4 mb-4"><div class="flex items-start gap-3"><div class="p-2 rounded-lg bg-[var(--accent)]/10"><svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></div><div class="flex-1"><p class="text-xs font-semibold text-[var(--accent)] uppercase tracking-wide mb-1">Method of Administration</p><p id="previewMethod" class="text-[var(--fg)] text-sm leading-relaxed font-bold" style="direction:ltr;text-align:left;">-</p><p id="warningMessage" class="hidden text-sm text-[var(--danger)] font-bold mt-2 arabic-text"></p></div></div></div>
+<div id="alertMessage" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 flex items-center gap-2"><svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><p id="alertText" class="text-sm text-amber-700 font-semibold arabic-text"></p></div>
+</div>
+<div id="dopamineTableContainer" class="hidden mt-6 overflow-x-auto"><h4 class="text-lg font-bold text-[var(--accent)] mb-3">Dopamine Infusion Table</h4><table class="w-full text-sm border-collapse border border-[var(--border)] rounded-xl overflow-hidden"><thead class="bg-[var(--accent)] text-white"><tr><th class="p-2 border border-[#0F766E]">Rate (ml/24hr)</th><th class="p-2 border border-[#0F766E]">Dose (mcg/kg/min)</th></tr></thead><tbody id="dopamineTableBody" class="bg-[var(--card)]"></tbody></table></div>
+<div id="drugsList" class="mt-4 space-y-2"></div>
+<div id="fluidSummary" class="hidden rounded-xl p-4 mb-4 flex items-center gap-3" style="background:rgba(15,118,110,.08);border:1px solid rgba(15,118,110,.2);"><div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink:0" style="background:rgba(15,118,110,.15);"><svg class="w-5 h-5 text-[var(--accent)]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0L12 2.69z"/></svg></div><div><p class="text-sm font-bold text-[var(--fg)]">Total Fluid: <span id="fluidTotal">0</span> ml / 24hr</p><p class="text-xs text-[var(--muted)]"><span id="fluidPerKgDay">0</span> ml/kg/day  |  <span id="fluidPerKgHr">0</span> ml/kg/hr</p></div></div>
+<button id="btnSavePatient" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg mt-6">Save Patient to Queue</button>
+</div></section>
+<section class="space-y-4">
+<h2 class="text-2xl font-bold text-[var(--fg)]">Patient Queue</h2>
+<div class="queue-toolbar">
+<div class="doc-search-wrap">
+<svg class="ds-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+<input type="text" id="docSearch" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] text-sm" placeholder="Search patients by name…" autocomplete="off" aria-label="Search patients by name">
+<button class="ds-clear" id="docSearchClear" title="Clear search" aria-label="Clear search"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+</div>
+<select id="docSort" class="sort-select" aria-label="Sort patients by">
+<option value="newest">Newest</option>
+<option value="name">Name A-Z</option>
+<option value="wAsc">Weight ↑</option>
+<option value="wDesc">Weight ↓</option>
+<option value="room">Room</option>
+</select>
+<label class="flex items-center gap-2 cursor-pointer whitespace-nowrap"><input type="checkbox" id="selectAllCheckbox" class="w-5 h-5 rounded border border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]"><span class="text-sm font-medium text-[var(--fg)]">Select All</span></label>
+</div>
+<div id="filterBar" class="flex gap-2 flex-wrap"></div>
+<div class="flex gap-2 flex-nowrap">
+<button id="btnPdf" disabled class="btn-primary flex-1 min-w-0 py-2.5 px-3 rounded-xl text-white font-medium flex items-center justify-center gap-2 text-xs sm:text-sm whitespace-normal"><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span id="pdfBtnText">Generate PDF</span></button>
+<button id="btnClearAll" class="flex-1 min-w-0 py-2.5 px-3 rounded-xl border border-[var(--danger)]/30 text-[var(--danger)] font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm whitespace-normal"><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg><span id="clearBtnText">Clear All</span></button>
+</div>
+<div id="patientQueue" class="space-y-3"></div>
+<div id="emptyState" class="hidden text-center py-20 bg-[var(--card)] rounded-2xl border-2 border-dashed border-[var(--border)]"><svg class="w-20 h-20 mx-auto text-[var(--muted)]/30 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/></svg><p id="emptyStateMsg" class="text-[var(--muted)] text-lg font-medium">No patients in queue</p><p id="emptyStateHint" class="text-[var(--muted)]/60 text-sm mt-1">Add patient information above to begin</p></div>
+</section></section>
+
+<!-- ===== TPN ===== -->
+<section id="tpnSection" style="display:none">
+<div class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden mb-6 animate-fade-up">
+<div class="p-4 flex flex-wrap items-center gap-3">
+<div class="flex items-center gap-2 flex-1 min-w-[200px]"><span class="text-sm font-semibold text-[var(--fg)]">Brand:</span><select id="tpnBrand" class="tpn-inp" style="width:auto;min-width:140px;padding:6px 10px;font-size:12px"><option value="Smofkabiven">Smofkabiven</option><option value="Kabiven">Kabiven</option><option value="Periolimel">Periolimel</option></select></div>
+<div class="flex items-center gap-2 flex-wrap">
+<button id="btnTpnOrder" class="px-3 py-2 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5 bg-[#475569] hover:bg-[#334155] transition-colors border-0 cursor-pointer font-[inherit]"><i class="fas fa-print"></i> Order</button>
+<button id="btnTpnLabels" class="px-3 py-2 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5 bg-[#334155] hover:bg-[#1e293b] transition-colors border-0 cursor-pointer font-[inherit]"><i class="fas fa-tag"></i> Labels</button>
+</div></div></div>
+<div class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden mb-6 animate-fade-up">
+<div id="tpnEditingBanner" class="hidden editing-banner px-6 py-3 flex items-center justify-between"><div class="flex items-center gap-2"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span class="text-white font-semibold text-sm"><span id="tpnEditMode">Editing</span> TPN: <span id="tpnEditingName" class="font-bold"></span></span></div><button id="btnTpnCancelEdit" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors">Cancel</button></div>
+<div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">TPN Calculator</h2><p class="text-white/75 text-sm mt-1">Search patient or add standalone</p></div>
+<div class="p-6 space-y-5">
+<div class="relative"><div class="relative flex-1"><svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="tpnSearch" class="tpn-inp" style="padding-left:32px" placeholder="Patient name — search or type new…" autocomplete="off"><div id="tpnSearchDropdown" class="search-dropdown"></div></div>
+<div id="tpnLinkedInfo" class="mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(15,118,110,.08);color:var(--accent);display:none;"></div></div>
+<div class="tpn-sg">
+<div><label class="tpn-lbl">Weight</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnWeight" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">kg</span></div></div>
+<div><label class="tpn-lbl">Fluid Input</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnFluidInput" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">ml/kg</span></div></div>
+<div><label class="tpn-lbl">Treatment Vol</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnTreatVol" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">ml</span></div></div>
+<div><label class="tpn-lbl">Target GIR</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnGIR" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">mg/kg/min</span></div></div>
+<div><label class="tpn-lbl">Lipid Dose</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnLipid" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">g/kg</span></div></div>
+<div><label class="tpn-lbl">AA Dose</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnAA" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">g/kg</span></div></div>
+</div>
+<div class="flex gap-3 items-end">
+<div style="flex:1"><label class="tpn-lbl">Enteral Feeding</label><div class="relative"><input type="text" inputmode="decimal" class="tpn-inp" id="tpnEnteral" placeholder="0" oninput="this.value=this.value.replace(/[،,٫]/g,'.')"><span class="tpn-unit">ml</span></div></div>
+<div style="flex:1"><label class="tpn-lbl" title="Auto rule: TPN volume >150 ml → 20 ml loss, otherwise 10 ml">Exp. Loss (auto)</label><div class="tpn-loss-sel" id="tpnLossSel"><button data-lv="10" class="on" disabled>10 ml</button><button data-lv="20" disabled>20 ml</button></div></div>
+<div style="flex:1"><label class="tpn-lbl">RBS (mg/dl)</label><div class="relative"><input type="text" inputmode="numeric" class="tpn-inp" id="tpnRBS" placeholder="—" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div></div>
+</div>
+<div id="tpnFluidsSummary" class="hidden" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;margin-top:4px"></div>
+<div><div class="flex items-center justify-between mb-2"><span class="tpn-lbl" style="margin:0">Add-ons</span><button id="btnTpnAddAddon" class="text-[var(--accent)] text-xs font-semibold cursor-pointer hover:underline bg-transparent border-none font-[inherit] flex items-center gap-1"><i class="fas fa-plus" style="font-size:9px"></i> Add</button></div><div id="tpnAddons"></div></div>
+<div id="tpnPreview"></div>
+<button id="btnSaveTpn" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg mt-4">Save TPN</button>
+</div></div>
+<div class="space-y-4">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">   <h2 class="text-2xl font-bold text-[var(--fg)]">TPN Queue</h2>   <div class="flex items-center gap-3">     <label class="flex items-center gap-2 cursor-pointer">       <input type="checkbox" id="tpnSelectAll" class="w-5 h-5 rounded border border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]">       <span class="text-sm font-medium text-[var(--fg)]">Select All</span>     </label>     <button id="btnDeleteSelectedTpn" class="py-2.5 px-4 rounded-xl border border-[var(--danger)]/30 text-[var(--danger)] font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm whitespace-nowrap">       <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>       <span>Delete Selected</span>     </button>   </div> </div>
+<div id="tpnQueue" class="space-y-3"></div>
+<div id="tpnEmptyState" class="hidden text-center py-20 bg-[var(--card)] rounded-2xl border-2 border-dashed border-[var(--border)]"><svg class="w-20 h-20 mx-auto text-[var(--muted)]/30 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg><p class="text-[var(--muted)] text-lg font-medium">No TPN calculations</p><p class="text-[var(--muted)]/60 text-sm mt-1">Search a patient above or add standalone</p></div>
+</div></section>
+</main>
+<div id="pdf-render-container"></div>
+<div id="toast" role="status" aria-live="polite" class="fixed left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl font-medium shadow-xl z-50 opacity-0 translate-y-4 transition-all duration-300 pointer-events-none" style="bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px))"><span id="toastMsg">Message</span></div>
+<script type="module">
+const firebaseConfig={apiKey:"AIzaSyAaMqxvBAuTkOykYHF5w_xjS98bDOhZoPY",authDomain:"documentation2-dd1aa.firebaseapp.com",projectId:"documentation2-dd1aa",storageBucket:"documentation2-dd1aa.firebasestorage.app",messagingSenderId:"236681783643",appId:"1:236681783643:web:dc4d715258955b3413d27e",measurementId:"G-WRK2C3121X"};
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getFirestore,collection,addDoc,deleteDoc,doc,setDoc,deleteField,onSnapshot,query,orderBy}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const app=initializeApp(firebaseConfig),db=getFirestore(app);
+const patientsRef=collection(db,"patients"),tpnStandRef=collection(db,"tpn_standalone");
+
+/* ===== DOCUMENTATION CONSTANTS ===== */
+const METHODS={1:'** / 5min',2:'** + 5 ml GW / 10 min',3:'** + ## ml GW >> <span class="arabic-text" style="display:inline-block;direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /30 min',4:'** + 3 ml GW / 3 min',5:'** / 60 min',6:'over 24 hr',7:'Special Nutrients',9:'كل اثنين وخميس',8:'** <span class="arabic-text" style="display:inline-block;direction:rtl;">مع المغذي</span> ',10:'** + ## ml GW >> <span class="arabic-text" style="display:inline-block;direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /24 hr',11:' ** + 3ml NS / 15 min <span class="arabic-text" style="display:inline-block;direction:rtl;">تبخير</span>',12:'تحل الكبسولة ب ٢ سي سي كلوكوز وتر ثم يدفع عن طريق ال OG ثم يدفع ٢ سي سي كلوكوز وتر عن طريق ال OG',13:'بالفم',14:' 3ml NS / 15 min <span class="arabic-text" style="display:inline-block;direction:rtl;">تبخير</span>',15:'<span class="arabic-text" style="display:inline-block;direction:rtl;">قطرة واحدة بالعين المصابة</span>',16:'** + ## ml GW >> <span class="arabic-text" style="display:inline-block;direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /2 hr'};
+const METHOD_OPTIONS=[{value:1,label:'IV push / 5 min'},{value:2,label:'+ 5ml GW / 10 min'},{value:3,label:'+ GW >> flush 10cc >> / 30 min'},{value:4,label:'+ 3ml GW / 3 min (rapid)'},{value:5,label:'IV infusion / 60 min'},{value:6,label:'Continuous / 24 hr'},{value:7,label:'Special Nutrients'},{value:8,label:'مع المغذي (with TPN)'},{value:9,label:'كل اثنين وخميس (Mon & Thu)'},{value:10,label:'+ GW >> flush 10cc >> / 24 hr'},{value:11,label:'+ 3ml NS / 15 min تبخير (neb)'},{value:12,label:'بال OG (capsule via OG tube)'},{value:13,label:'بالفم (oral)'},{value:14,label:'3ml NS / 15 min تبخير (neb)'},{value:15,label:'قطرة بالعين (eye drops)'},{value:16,label:'+ GW >> flush 10cc >> / 2 hr'},{value:'other',label:'Other (custom) / مخصص'}];
+const METHODS_WITH_CALC=[1,2,3,4,5,8,10,11,16];
+const DRUG_CONFIG=[
+{id:1,name:'Amoxicillin',dosePerKg:50,unit:'mg',factor:50,methodIndex:1,inputMode:'weightBased',getRecommendedFreq:(ga,pna)=>ga<45?(pna<8?'2':'3'):'3',warning_rule:(ga,age,freq)=>{const r=ga<37?(age<8?'2':'3'):'3';if(freq!==r)return`⚠️ تنبيه: التردد المقترح بناءً على PNA هو ${r==='3'?'ثلاث مرات يومياً (كل ٨ ساعات)':'مرتان يومياً (كل ١٢ ساعة)'}!`;return null;}},
+{id:16,name:'Amikacin',dosePerKg:15,unit:'mg',factor:8,methodIndex:2,inputMode:'weightBased',getRecommendedFreq:(ga,pna)=>{if(ga<=29)return(pna<=14)?'q48hr':'q36hr';if(ga<=34)return'q36hr';return'1';},warning_rule:(ga,age,freq)=>{let r;if(ga<=29)r=(age<=14)?'q48hr':'q36hr';else if(ga<=34)r='q36hr';else r='1';if(r&&freq!==r)return`⚠️ تنبيه: التردد المقترح بناءً على GA و PNA هو ${r==='1'?'مرة يومياً (كل ٢٤ ساعة)':r}!`;return null;}},
+{id:2,name:'Gentamicin',dosePerKg:5,unit:'mg',factor:40,methodIndex:2,inputMode:'weightBased',getRecommendedFreq:(ga,pna)=>{if(ga<=29)return(pna<=14)?'q48hr':'q36hr';if(ga<=34)return'q36hr';return'1';},warning_rule:(ga,age,freq)=>{let r;if(ga<=29)r=(age<=14)?'q48hr':'q36hr';else if(ga<=34)r='q36hr';else r='1';if(r&&freq!==r)return`⚠️ تنبيه: التردد المقترح بناءً على GA و PNA هو ${r==='1'?'مرة يومياً (كل ٢٤ ساعة)':r}!`;return null;}},
+{id:3,name:'Caffeine Loading',dosePerKg:20,unit:'mg',factor:20,methodIndex:3,defaultFreq:1,inputMode:'weightBased'},
+{id:4,name:'Caffeine Maint.',dosePerKg:10,unit:'mg',factor:20,methodIndex:2,defaultFreq:1,inputMode:'weightBased'},
+{id:5,name:'Colistin Loading',dosePerKg:150000,unit:'IU',factor:500000,methodIndex:2,defaultFreq:1,inputMode:'weightBased'},
+{id:6,name:'Colistin Maint.',dosePerKg:37500,unit:'IU',factor:500000,methodIndex:2,defaultFreq:2,inputMode:'weightBased'},
+{id:24,name:'Colistin neb.',dosePerKg:5,unit:'mg',factor:16.667,methodIndex:11,defaultFreq:2,inputMode:'weightBased',alert:'مهم: يعطى فنتلوين تبخير قبله ب١٠ دقائق'},
+{id:25,name:'Decadron DART',dosePerKg:0.075,unit:'mg',factor:0.4,methodIndex:2,defaultFreq:2,inputMode:'weightBased',doseDecimals:3,alert:'مهم: تخفف الامبولة الى ٢٠ مل مع NS قبل الاعطاء'},
+{id:28,name:'Decadron amp',dosePerKg:0.25,unit:'mg',factor:0.4,methodIndex:2,defaultFreq:2,inputMode:'weightBased',alert:'مهم: تخفف الامبولة الى ٢٠ مل مع NS قبل الاعطاء'},
+{id:7,name:'Tigecycline',dosePerKg:2,unit:'mg',factor:2,methodIndex:3,defaultFreq:2,inputMode:'weightBased'},
+{id:8,name:'Meropenem',dosePerKg:40,unit:'mg',factor:50,methodIndex:3,inputMode:'weightBased',getRecommendedFreq:(ga,pna)=>ga<32?(pna<14?'2':'3'):'3',warning_rule:(ga,age,freq)=>{const r=ga<32?(age<14?'2':'3'):'3';if(freq!==r)return`⚠️ تنبيه: التردد المقترح بناءً على GA و PNA هو ${r==='3'?'ثلاث مرات يومياً (كل ٨ ساعات)':'مرتان يومياً (كل ١٢ ساعة)'}!`;return null;}},
+{id:9,name:'Dopamine syringe pump',isDopamine:true,defaultFreq:1,inputMode:'dopaminePump'},
+{id:22,name:'Dopamine + fluid',dosePerKg:5,unit:'mg',factor:40,methodIndex:8,defaultFreq:1,isDopamine:true,inputMode:'infusion',defaultDosePerKg:5},
+{id:23,name:'Dopamine Y-site',dosePerKg:5,unit:'mg',factor:40,methodIndex:10,defaultFreq:1,isDopamine:true,inputMode:'infusion',defaultDosePerKg:5},
+{id:37,name:'Noradrenaline Y-site',dosePerKg:0.05,unit:'mcg',factor:1000,methodIndex:10,defaultFreq:1,perMinute:true,inputMode:'infusion',defaultDosePerKg:0.05,alert:'مهم: الجرعة محسوبة على تركيز الامبولة 4mg/4ml (1mg/ml)'},
+{id:10,name:'Vit k',dosePerKg:1,unit:'mg',factor:10,methodIndex:4,defaultFreq:1,inputMode:'fixed',fixedDose:1},
+{id:11,name:'Vancomycin',dosePerKg:15,unit:'mg',factor:2,methodIndex:5,inputMode:'weightBased',getRecommendedFreq:(ga,pna,w)=>pna<7?(w<1.2?'1':w<=2?'2':'3'):(w<1.2?'1':'3'),warning_rule:(ga,pna,freq,w)=>{let r;if(pna<7){if(w<1.2)r='1';else if(w<=2)r='2';else r='3';}else{if(w<1.2)r='1';else r='3';}if(freq!==r){let msg=r==='1'?'مرة واحدة يومياً (كل ٢٤ ساعة)':r==='2'?'مرتان يومياً (كل ١٢ ساعة)':'ثلاث مرات يومياً (كل ٨ ساعات)';return`⚠️ تنبيه: التردد المقترح بناءً على الوزن وPNA هو ${msg}!`}return null;}},
+{id:17,name:'Dexmedetomidine + fluid',dosePerKg:0.3,unit:'mcg',factor:100,methodIndex:8,defaultFreq:1,inputMode:'infusion',defaultDosePerKg:0.3},
+{id:18,name:'Dexmedetomidine Y-site',dosePerKg:0.3,unit:'mcg',factor:100,methodIndex:10,defaultFreq:1,inputMode:'infusion',defaultDosePerKg:0.3},
+{id:19,name:'Midazolam + fluid',dosePerKg:0.03,unit:'mg',factor:5,methodIndex:8,defaultFreq:1,inputMode:'infusion',defaultDosePerKg:0.03},
+{id:20,name:'Midazolam Y-site',dosePerKg:0.03,unit:'mg',factor:5,methodIndex:10,defaultFreq:1,inputMode:'infusion',defaultDosePerKg:0.03},
+{id:26,name:'Phenobarbital loading',dosePerKg:20,unit:'mg',factor:10,methodIndex:3,defaultFreq:1,inputMode:'weightBased',alert:'مهم: تخفف الامبولة الى ٢٠ مل مع NS قبل الاعطاء'},
+{id:27,name:'Phenobarbital Maint.',dosePerKg:2.5,unit:'mg',factor:10,methodIndex:3,defaultFreq:2,inputMode:'weightBased',alert:'مهم: تخفف الامبولة الى ٢٠ مل مع NS قبل الاعطاء'},
+{id:21,name:'Fluconazol prophylactic',dosePerKg:4,unit:'mg',methodIndex:9,defaultFreq:1,inputMode:'fixed',fixedDose:4},
+{id:29,name:'Sildenafil cap',dosePerKg:1,unit:'mg',methodIndex:12,defaultFreq:3,inputMode:'weightBased'},
+{id:12,name:'TPN',methodIndex:6,defaultFreq:1,hideDetails:true,inputMode:'volume'},
+{id:13,name:'1/5 GS',methodIndex:7,defaultFreq:1,hideDetails:true,isNutrient:true,inputMode:'volume'},
+{id:14,name:'10% GW',methodIndex:7,defaultFreq:1,hideDetails:true,isNutrient:true,inputMode:'volume'},
+{id:15,name:'5% GW',methodIndex:7,defaultFreq:1,hideDetails:true,isNutrient:true,inputMode:'volume'},
+{id:43,name:'GIR Fluid',methodIndex:7,defaultFreq:1,hideDetails:true,isNutrient:true,isGIR:true,inputMode:'gir'},
+{id:44,name:'Feeding',methodIndex:7,defaultFreq:1,hideDetails:true,isNutrient:true,inputMode:'volume'},
+{id:30,name:'Vit D drop',dosePerKg:400,unit:'IU',factor:1,methodIndex:13,defaultFreq:1,inputMode:'fixed',fixedDose:400},
+{id:31,name:'HydroCHLOROthiazide cap',dosePerKg:1,unit:'mg',methodIndex:12,defaultFreq:2,inputMode:'weightBased'},
+{id:32,name:'Ventolin neb.',dosePerKg:1.25,unit:'mg',factor:5,methodIndex:11,defaultFreq:4,inputMode:'fixed',fixedDose:1.25},
+{id:34,name:'Pulmicort neb.',dosePerKg:0.25,unit:'mg',factor:0.5,methodIndex:11,defaultFreq:2,inputMode:'fixed',fixedDose:0.25},
+{id:33,name:'NS neb.',dosePerKg:3,unit:'ml',factor:1,methodIndex:14,defaultFreq:4,inputMode:'fixed',fixedDose:3},
+{id:35,name:'Aminophylline amp',dosePerKg:5,unit:'mg',factor:25,methodIndex:3,defaultFreq:1,inputMode:'weightBased'},
+{id:38,name:'Paracetamol vial',dosePerKg:15,unit:'mg',factor:10,methodIndex:2,defaultFreq:4,inputMode:'weightBased'},
+{id:36,name:'Lasix amp',dosePerKg:1,unit:'mg',factor:10,methodIndex:2,defaultFreq:1,inputMode:'weightBased'},
+{id:39,name:'Gentamicin eye drop',dosePerKg:1,unit:'',methodIndex:15,defaultFreq:4,inputMode:'fixed',fixedDose:1},
+{id:40,name:'Ciprofloxacin eye drop',dosePerKg:1,unit:'',methodIndex:15,defaultFreq:3,inputMode:'fixed',fixedDose:1},
+{id:41,name:'Calcium amp',dosePerKg:1.5,unit:'ml',factor:1,methodIndex:3,defaultFreq:1,inputMode:'weightBased',alert:'مهم: تأكد من الكانيولا قبل الاعطاء'},
+{id:42,name:'Iron drop',dosePerKg:1.5,unit:'mg',factor:1,methodIndex:13,defaultFreq:2,inputMode:'weightBased'},
+{id:45,name:'Ceftazidem/Avibactam',dosePerKg:25,unit:'mg',factor:6.25,methodIndex:16,defaultFreq:3,inputMode:'weightBased'},
+];
+const DRUG_CATEGORIES=[{name:'Antibiotics',ids:[1,16,2,5,6,7,8,11,24,45]},{name:'Sedatives & Inotropes',ids:[9,17,18,19,20,22,23,26,27,37]},{name:'Miscellaneous',ids:[3,4,10,25,28,35,36,38,41]},{name:'Fluids',ids:[12,13,14,15,43,44]},{name:'Oral & Ocular',ids:[21,29,30,31,39,40,42]},{name:'Nebulization',ids:[32,33,34]},{name:'Other+',ids:['other']}];
+const ROOMS=['Room 1','Room 2','Reception'];
+const ROOM_STYLES={'Room 1':{tag:'r1',label:'R1'},'Room 2':{tag:'r2',label:'R2'},'Reception':{tag:'rec',label:'REC'}};
+
+/* ===== TPN CONSTANTS ===== */
+const TPN_B={Smofkabiven:{l:'Smofkabiven',g:13,a:10,li:20,na:.079,k:.06,cl:.07,ca:.005},Kabiven:{l:'Kabiven',g:11,a:11.3,li:20,na:.1,k:.08,cl:.156,ca:.006},Periolimel:{l:'Periolimel',g:18.75,a:6.3,li:15,na:.0525,k:.04,cl:.0617,ca:.005}};
+const TPN_AT={na3:{l:'Na 3%',na:.513,k:0},na09:{l:'Na 0.9%',na:.154,k:0},k:{l:'K',na:0,k:2},other:{l:'Other',na:0,k:0}};
+
+/* ===== STATE ===== */
+let patients=[],currentDrugs=[],selectedPatientIds=new Set(),editingPatientId=null,activeFilter='all';
+let standaloneTpn=[],selectedTpnIds=new Set(),tpnEditId=null,tpnEditType=null,activeTab='doc',linkedPatientId=null,dirty=false,initialLoaded=false,docSearch='',docSort='newest';
+
+/* ===== UTILITIES ===== */
+const $=id=>document.getElementById(id);
+const cleanN=s=>{if(!s)return 0;let c=s.toString().replace(/[،,٫]/g,'.');['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'].forEach((n,i)=>c=c.replace(new RegExp(n,'g'),i));return parseFloat(c.replace(/[^0-9.]/g,''))||0;};
+const esc=s=>{if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML.replace(/"/g,'&quot;').replace(/'/g,'&#39;');};
+const fmt=(n,d)=>{const x=parseFloat(n);return isNaN(x)?'—':x.toFixed(d);};
+const safeBN=t=>!t?'':esc(t).toString().replace(/\d+(\.\d+)?/g,'<strong style="font-weight:900">$&</strong>');
+const boldN=t=>!t?'':t.toString().replace(/\d+(\.\d+)?/g,'<strong style="font-weight:900">$&</strong>');
+const genId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,11);
+const daysDiff=(d1,d2)=>{const t=(new Date(d2)-new Date(d1))/86400000;return isNaN(t)?0:Math.max(0,Math.round(t));};
+const ageDay=(d1,d2)=>daysDiff(d1,d2)+1;
+const debounce=(fn,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
+const nn=v=>{const n=parseFloat(v);return(isNaN(n)||n<0)?0:n;};
+const tpf=(v,d)=>(v==null||isNaN(v))?'—':Number(v).toFixed(d);
+const getNextEmptyName=()=>{let max=0;const re=/^empty\s+(\d+)$/i;standaloneTpn.forEach(p=>{const m=re.exec((p.name||'').trim());if(m)max=Math.max(max,parseInt(m[1]));});return`empty ${max+1}`;};
+
+/* ===== AGE ===== */
+const isOver30=v=>v==='>30'||parseInt(v)>=999;
+const getLiveAge=p=>{if(p.dob)return ageDay(p.dob,new Date());if(p.saveDate&&p.ageBaseline&&!isOver30(p.ageBaseline))return(parseInt(p.ageBaseline)||0)+daysDiff(p.saveDate,new Date());if(isOver30(p.ageBaseline))return 999;return parseInt(p.ageBaseline)||0;};
+const getFormPna=()=>{const d=$('inputDOB').value;return d?daysDiff(d,new Date()):0;};
+const isAgeLive=p=>{if(p.dob)return true;return p.saveDate&&!isOver30(p.ageBaseline)&&daysDiff(p.saveDate,new Date())>0;};
+const fmtAge=a=>a>=999?'30+':a;
+const updatePna=()=>{const d=$('inputDOB').value;if(!d){$('pnaDisplay').classList.add('hidden');$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';return;}const p=ageDay(d,new Date()),ps=d.split('-');$('dobText').textContent=`${ps[2]}/${ps[1]}/${ps[0]}`;$('dobFake').classList.add('has-date');$('pnaDisplay').textContent=`Postnatal Age: Day ${p}`;$('pnaDisplay').classList.remove('hidden');};
+
+const showToast=(m,t='success')=>{const c={success:'bg-[#047857] text-white',error:'bg-[#B91C1C] text-white',info:'bg-[#334155] text-white'};const toast=$('toast');$('toastMsg').textContent=m;toast.className=`fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl font-medium shadow-xl z-50 transition-all duration-300 ${c[t]}`;toast.style.opacity='1';toast.style.transform='translateX(-50%) translateY(0)';setTimeout(()=>{toast.style.opacity='0';toast.style.transform='translateX(-50%) translateY(16px)';},3000);};
+const safeGet=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
+const safeSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
+const initDark=()=>{const d=safeGet('theme')==='dark';document.body.classList.toggle('dark-mode',d);$('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!d);$('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',d);};
+const validateClin=()=>{const w=cleanN($('inputWeight').value),ga=cleanN($('inputGA').value),ws=[];if(w>0&&(w<.4||w>6))ws.push(`Weight ${w}kg outside NICU range (0.4–6 kg)`);if(ga>0&&(ga<22||ga>44))ws.push(`GA ${ga}w outside range (22–44 weeks)`);if(ws.length){$('clinicalWarningText').innerHTML=ws.join('<br>');$('clinicalWarning').classList.remove('hidden');}else $('clinicalWarning').classList.add('hidden');};
+const checkAlerts=drug=>{const ga=cleanN($('inputGA').value),a=getFormPna(),f=$('inputFreq').value,w=cleanN($('inputWeight').value);$('warningMessage').classList.add('hidden');if(drug&&drug.warning_rule){const r=drug.warning_rule(ga,a,f,w);if(r){$('warningMessage').innerHTML=r;$('warningMessage').classList.remove('hidden');}}};
+const calcGIR=(w,g,v)=>{if(w<=0||g<=0||v<=0)return null;let ht=Math.round(((w*g*1440/50)-v)/9),gw=v-ht,ws=[];if(ht<0){ht=0;gw=v;ws.push("تنبيه: 5% GW يوفر تركيزاً أعلى من GIR المطلوب.");}else if(ht>v){ht=v;gw=0;ws.push("خطأ: الحجم غير كافٍ.");}const td=gw*50+ht*500,c=td/v/10,ag=td/w/1440;if(c>12.5)ws.push("تحذير: التركيز أعلى من 12.5%");return{gw,ht,conc:c,actualGIR:ag,warnings:ws};};
+
+const genMethod=(drug,dose)=>{
+if(drug.isDopamine&&drug.methodIndex!==10&&drug.methodIndex!==8)return'1 ml dopamin + 39 ml GW';
+if(drug.isGIR){const w=cleanN($('inputWeight').value),g=cleanN($('inputGIR').value),v=cleanN($('inputBagVol').value);if(g<=0||v<=0)return'<span style="color:var(--muted);font-style:italic">Enter GIR and volume</span>';const r=calcGIR(w,g,v);if(!r)return'-';const av=cleanN($('inputAddonVol').value),at=esc($('inputAddonType').value.trim())||'Add-on';let cgw=r.gw,cht=r.ht,ca=av,sf="";if((v+av)>160){cgw=r.gw/2;cht=r.ht/2;ca=av/2;sf=" X2";}let ps=[];if(cgw>0)ps.push(`5% GW ${Math.round(cgw)} ml`);if(cht>0)ps.push(`50% HT ${Math.round(cht)} ml`);if(ca>0)ps.push(`${ca.toFixed(0)} ml ${at}`);return`(${ps.join(' + ')})${sf}`;}
+if(drug.isNutrient){let tf=dose;if(tf<=0)return'<span style="color:var(--muted);font-style:italic">Enter volume</span>';const av=cleanN($('inputAddonVol').value),at=esc($('inputAddonType').value.trim())||'Add-on';let cf=tf,ca=av,sf="";if((tf+av)>160){cf=tf/2;ca=av/2;sf=" X2";}let at2=av>0?` + ${ca.toFixed(0)} ml ${at}`:"";let pr="";if(drug.name==='1/5 GS')pr=`(5% GW ${(cf*.8).toFixed(0)} ml + ${(cf*.2).toFixed(0)} ml NS${at2})${sf}`;else if(drug.name==='10% GW')pr=`(5% GW ${(cf*.9).toFixed(0)} ml + ${(cf*.1).toFixed(0)} ml HT${at2})${sf}`;else pr=`(${drug.name} ${cf} ml${at2})${sf}`;return pr;}
+if(!METHODS[drug.methodIndex])return'-';let rv=dose/drug.factor,mt=METHODS[drug.methodIndex],dv;if(drug.methodIndex===3||drug.methodIndex===10||drug.methodIndex===16){const tv=parseInt($('inputTargetVol').value)||10;if(tv===10){rv*=2;if(rv<=20){dv=20-rv;mt=mt.replace('^^','10');}else{dv=0;mt=mt.replace('^^','10').replace('## ml GW >> ','');}}else if(tv===5){rv*=3;if(rv<=15){dv=15-rv;mt=mt.replace('^^','5');}else{dv=0;mt=mt.replace('^^','5').replace('## ml GW >> ','');}}}else dv=20-rv;let dvol=rv,us=' ml';if(rv<1){dvol=rv*100;us=' units';}let ds=us===' units'?Math.round(dvol):fmt(dvol,1);mt=mt.replace('**',`${ds}${us}`);if(mt.includes('##'))mt=mt.replace('##',`${fmt(Math.max(0,dv),0)} ml`);return mt;
+};
+
+/* ===== DOCUMENTATION RENDER HELPERS ===== */
+const renderM=d=>{if(d.drugId==='other'){if(d.isCalculated&&d.method)return d.method;if(d.customMethodIndex!=null&&METHODS[d.customMethodIndex])return boldN(METHODS[d.customMethodIndex]);return`<span class="arabic-text">${safeBN(d.method)}</span>`;}return boldN(d.method);};
+const girSum=d=>`Fluid ${d.dose} ml / 24 hr | GIR= ${d.girRate} | Conc.= ${d.girConc}%`;
+const drugName=d=>d.isGIR?girSum(d):esc(d.name);
+const nutBadge=d=>{if(d.isGIR)return`<span class="text-[var(--accent)]">${girSum(d)}</span>`;let t=`${d.dose} ml`;if(d.addonVol)t+=` (+ ${d.addonVol} ml ${esc(d.addonType)})`;return`<span class="text-[var(--accent)]">${t} / 24 hr</span>`;};
+
+/* ===== DOCUMENTATION DRUG MANAGEMENT ===== */
+const updateDrugList=()=>{const c=$('selectCategory').value,ds=$('selectDrug');ds.innerHTML='';$('freqContainer').classList.toggle('hidden',c==='Fluids');if(!c){ds.innerHTML='<option value="">-- Select Category First --</option>';handleDrugSel();return;}const cat=DRUG_CATEGORIES.find(x=>x.name===c);let o='<option value="">-- Select Drug --</option>';if(c==='Other+')o+='<option value="other">Other+ (علاج آخر)</option>';else cat.ids.forEach(id=>{const d=DRUG_CONFIG.find(i=>i.id===id);if(d)o+=`<option value="${d.id}">${d.name}</option>`;});ds.innerHTML=o;handleDrugSel();};
+const updateConcLabel=()=>{const u=$('inputCustomUnit').value.trim();$('concentrationLabel').textContent=u?`Concentration (${u}/ml)`:'Concentration (/ml)';};
+const updateOtherPreview=()=>{const mv=$('selectCustomMethod').value;if(!mv||mv==='other')return;const mi=parseInt(mv),dose=cleanN($('inputDose').value);if(!METHODS[mi])return;if(METHODS_WITH_CALC.includes(mi)){const cn=cleanN($('inputConcentration').value);if(cn<=0){$('methodPreviewContainer').classList.remove('hidden');$('previewMethod').innerHTML='<span style="color:var(--muted);font-style:italic">Enter concentration</span>';return;}$('methodPreviewContainer').classList.remove('hidden');$('previewMethod').innerHTML=genMethod({methodIndex:mi,factor:cn,isDopamine:false,isNutrient:false},dose);}else{$('methodPreviewContainer').classList.remove('hidden');$('previewMethod').innerHTML=boldN(METHODS[mi]);}};
+const handleCustMethod=()=>{const v=$('selectCustomMethod').value;if(!v){$('inputCustomMethod').classList.add('hidden');$('concentrationContainer').classList.add('hidden');$('targetVolContainer').classList.add('hidden');$('methodPreviewContainer').classList.add('hidden');return;}if(v==='other'){$('inputCustomMethod').classList.remove('hidden');$('concentrationContainer').classList.add('hidden');$('targetVolContainer').classList.add('hidden');const ct=$('inputCustomMethod').value.trim();if(ct){$('methodPreviewContainer').classList.remove('hidden');$('previewMethod').innerHTML=`<span class="arabic-text">${safeBN(ct)}</span>`;}else $('methodPreviewContainer').classList.add('hidden');}else{$('inputCustomMethod').classList.add('hidden');const mi=parseInt(v);if(METHODS_WITH_CALC.includes(mi)){$('concentrationContainer').classList.remove('hidden');updateConcLabel();}else $('concentrationContainer').classList.add('hidden');if(mi===3||mi===10||mi===16)$('targetVolContainer').classList.remove('hidden');else $('targetVolContainer').classList.add('hidden');updateOtherPreview();}};
+
+const handleDrugSel=()=>{
+const v=$('selectDrug').value,ga=cleanN($('inputGA').value),w=cleanN($('inputWeight').value),pna=getFormPna();
+ $('totalDoseContainer').classList.remove('hidden');$('freqContainer').classList.remove('hidden');$('addonContainer').classList.add('hidden');$('dosePerKgContainer').classList.add('hidden');$('girContainer').classList.add('hidden');$('alertMessage').classList.add('hidden');$('warningMessage').classList.add('hidden');$('selectCustomMethod').classList.add('hidden');$('inputCustomMethod').classList.add('hidden');$('concentrationContainer').classList.add('hidden');
+if(v===''){$('inputDose').value='';$('inputDose').disabled=false;$('methodPreviewContainer').classList.add('hidden');$('inputCustomDrug').classList.add('hidden');$('inputCustomUnit').classList.add('hidden');$('targetVolContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');return;}
+const did=parseInt(v),drug=DRUG_CONFIG.find(d=>d.id===did);
+if($('selectCategory').value==='Fluids')$('freqContainer').classList.add('hidden');
+if(drug&&drug.isNutrient&&drug.id!==44)$('addonContainer').classList.remove('hidden');
+if(v==='other'){$('inputCustomDrug').classList.remove('hidden');$('selectCustomMethod').classList.remove('hidden');$('selectCustomMethod').value='';$('inputCustomUnit').classList.remove('hidden');$('inputDose').disabled=false;$('inputDose').placeholder='Manual Dose';$('inputDose').value='';$('concentrationContainer').classList.add('hidden');$('inputCustomMethod').classList.add('hidden');$('methodPreviewContainer').classList.add('hidden');$('targetVolContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');return;}
+else{$('inputCustomDrug').classList.add('hidden');$('selectCustomMethod').classList.add('hidden');$('inputCustomMethod').classList.add('hidden');$('inputCustomUnit').classList.add('hidden');$('concentrationContainer').classList.add('hidden');}
+if(!drug)return;
+ $('targetVolContainer').classList.toggle('hidden',drug.methodIndex!==3&&drug.methodIndex!==10&&drug.methodIndex!==16);
+if(drug.inputMode==='gir'){$('totalDoseContainer').classList.add('hidden');$('girContainer').classList.remove('hidden');$('methodPreviewContainer').classList.remove('hidden');$('dopamineTableContainer').classList.add('hidden');updPreview(drug,0);return;}
+if(drug.inputMode==='dopaminePump'){$('inputDose').value='';$('inputDose').placeholder='See table';$('inputDose').disabled=true;$('dopamineTableContainer').classList.remove('hidden');$('methodPreviewContainer').classList.add('hidden');renderDopTable(w);return;}
+ $('inputDose').disabled=false;$('inputDose').placeholder='Auto';$('dopamineTableContainer').classList.add('hidden');$('methodPreviewContainer').classList.remove('hidden');
+switch(drug.inputMode){case'infusion':$('dosePerKgContainer').classList.remove('hidden');$('inputDosePerKg').value=drug.defaultDosePerKg;if(w>0){let c;if(drug.perMinute)c=w*drug.defaultDosePerKg*1440;else if(drug.isDopamine)c=(w*drug.defaultDosePerKg*1440)/1000;else c=w*drug.defaultDosePerKg*24;$('inputDose').value=c.toFixed(2);}break;case'fixed':$('inputDose').value=drug.fixedDose;break;case'volume':$('inputDose').value='';$('inputDose').placeholder='Total Volume (ml)';if(drug.isNutrient)updPreview(drug,0);break;default:if(w>0&&drug.dosePerKg)$('inputDose').value=parseFloat((w*drug.dosePerKg).toFixed(drug.doseDecimals||1)).toString();else $('inputDose').value='';break;}
+if(drug.getRecommendedFreq)$('inputFreq').value=drug.getRecommendedFreq(ga,pna,w);else $('inputFreq').value=drug.defaultFreq||1;
+checkAlerts(drug);updPreview(drug,parseFloat($('inputDose').value)||0);
+if(drug.alert){$('alertText').textContent=drug.alert;$('alertMessage').classList.remove('hidden');}
+};
+
+const handleDoseChange=src=>{
+const v=$('selectDrug').value;if(v==='')return;if(v==='other'){updateOtherPreview();return;}
+const did=parseInt(v),drug=DRUG_CONFIG.find(d=>d.id===did),w=cleanN($('inputWeight').value);
+if(src==='dosePerKg'&&drug.inputMode==='infusion'){const dk=cleanN($('inputDosePerKg').value);if(w>0){let c;if(drug.perMinute)c=w*dk*1440;else if(drug.isDopamine)c=(w*dk*1440)/1000;else c=w*dk*24;$('inputDose').value=c.toFixed(2);}}
+else if(src==='totalDose'&&drug.inputMode==='infusion'){const td=cleanN($('inputDose').value);if(w>0){let c;if(drug.perMinute)c=td/(w*1440);else if(drug.isDopamine)c=(td*1000)/(w*1440);else c=td/(w*24);$('inputDosePerKg').value=c.toFixed(3);}}
+if(drug&&drug.isGIR&&(src==='gir'||src==='bagVol'||src==='addon')){const g=cleanN($('inputGIR').value),vl=cleanN($('inputBagVol').value);if(g>0&&vl>0&&w>0){const r=calcGIR(w,g,vl);if(r&&r.warnings.length){let h=`<strong>Actual GIR: ${r.actualGIR.toFixed(2)}</strong>`;h+='<br>'+r.warnings.join('<br>');$('alertText').innerHTML=h;$('alertMessage').classList.remove('hidden');}else $('alertMessage').classList.add('hidden');}else $('alertMessage').classList.add('hidden');updPreview(drug,0);return;}
+if(src==='freq')checkAlerts(drug);
+if(src==='targetVol'&&drug&&(drug.methodIndex===3||drug.methodIndex===10||drug.methodIndex===16))updPreview(drug,cleanN($('inputDose').value));
+if(src==='addon'&&drug&&drug.isNutrient)updPreview(drug,cleanN($('inputDose').value));
+if(src==='totalDose'||src==='dosePerKg'){const md=cleanN($('inputDose').value);if(drug&&!drug.isDopamine){checkAlerts(drug);updPreview(drug,md);}else if(drug&&drug.isDopamine&&(drug.methodIndex===10||drug.methodIndex===8))updPreview(drug,md);}
+};
+const updPreview=(d,dose)=>{$('previewMethod').innerHTML=genMethod(d,dose);$('methodPreviewContainer').classList.remove('hidden');};
+const renderDopTable=w=>{const tb=$('dopamineTableBody');if(w<=0){tb.innerHTML='<tr><td colspan="2" class="p-4 text-center text-[var(--muted)]">Enter weight</td></tr>';return;}tb.innerHTML=[2,5,7,10].map(d=>`<tr><td class="p-2 text-center font-bold text-[var(--accent)] border border-[var(--border)]">${((d*w*1440)/1000).toFixed(0)} ml/24hr</td><td class="p-2 text-center border border-[var(--border)]">${d}</td></tr>`).join('');};
+
+const clearForm=()=>{editingPatientId=null;dirty=false;$('inputName').value='';$('inputWeight').value='';$('inputGA').value='';$('inputDOB').value='';$('inputRoom').value='';$('inputGIR').value='';$('inputBagVol').value='';currentDrugs=[];renderDrugList();updateFluidBar();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');$('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';$('inputConcentration').value='';$('concentrationContainer').classList.add('hidden');$('editingBanner').classList.add('hidden');$('clinicalWarning').classList.add('hidden');$('fluidSummary').classList.add('hidden');$('pnaDisplay').classList.add('hidden');$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('btnSavePatient').textContent='Save Patient to Queue';};
+const setConn=on=>{const b=$('connectionStatus');b.textContent=on?"Live":"Offline";b.classList.toggle('offline',!on);};
+
+/* ===== DOCUMENTATION QUEUE ===== */
+const getRoomC=()=>{const c={all:patients.length};ROOMS.forEach(r=>c[r]=0);c.unassigned=0;patients.forEach(p=>{if(p.room&&ROOMS.includes(p.room))c[p.room]++;else c.unassigned++;});return c;};
+const applySearch=arr=>{const q=docSearch.trim().toLowerCase();if(!q)return arr;return arr.filter(p=>(p.name||'').toLowerCase().includes(q));};
+const applySort=arr=>{const a=[...arr];switch(docSort){case 'name':return a.sort((x,y)=>(x.name||'').localeCompare(y.name||''));case 'wAsc':return a.sort((x,y)=>(parseFloat(x.weight)||0)-(parseFloat(y.weight)||0));case 'wDesc':return a.sort((x,y)=>(parseFloat(y.weight)||0)-(parseFloat(x.weight)||0));case 'room':return a.sort((x,y)=>(x.room||'~').localeCompare(y.room||'~'));default:return a;}};
+const getFiltered=()=>{let r;if(activeFilter==='all')r=patients;else if(activeFilter==='unassigned')r=patients.filter(p=>!p.room||!ROOMS.includes(p.room));else r=patients.filter(p=>p.room===activeFilter);return applySort(applySearch(r));};
+const renderFilterBar=()=>{const c=getRoomC();let h=`<button onclick="setFilter('all')" class="filter-pill px-3 py-1.5 rounded-full text-sm font-medium border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] ${activeFilter==='all'?'active':''}">All (${c.all})</button>`;ROOMS.forEach(r=>{if(c[r]>0)h+=`<button onclick="setFilter('${r}')" class="filter-pill px-3 py-1.5 rounded-full text-sm font-medium border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] ${activeFilter===r?'active':''}">${r} (${c[r]})</button>`;});if(c.unassigned>0)h+=`<button onclick="setFilter('unassigned')" class="filter-pill px-3 py-1.5 rounded-full text-sm font-medium border border-dashed border-[var(--muted)] bg-[var(--surface)] text-[var(--muted)] ${activeFilter==='unassigned'?'active':''}" style="${activeFilter==='unassigned'?'':'opacity:.6'}">Unassigned (${c.unassigned})</button>`;$('filterBar').innerHTML=h;};
+window.setFilter=f=>{activeFilter=f;safeSet('docFilter',f);renderFilterBar();renderQueue();updateCounter();};
+const expandedIds=new Set(),expandedTpnIds=new Set();
+window.toggleCard=id=>{const b=$('body-'+id),c=$('chevron-'+id);if(!b||!c)return;const on=!b.classList.contains('expanded');b.classList.toggle('expanded',on);c.classList.toggle('rotated',on);if(on)expandedIds.add(id);else expandedIds.delete(id);};
+
+const calcFluidDose=(d,w)=>{if(d.active===false)return 0;if(d.noPrint)return 0;if(d.isNutrient&&!d.isDopamine)return d.dose||0;if(d.drugId===9)return(5*w*1440)/1000;if(d.drugId===12)return d.dose||0;if(d.methodIndex===3||d.methodIndex===10||d.methodIndex===16)return d.targetVol||10;if(d.methodIndex===5&&d.factor)return d.dose/d.factor;return 0;};
+const getFreqMul=f=>{if(!f)return 1;if(f==='q36hr')return 24/36;if(f==='q48hr')return .5;const n=parseInt(f.replace(/[^0-9]/g,''));return n>0?n:1;};
+const calcTotalFluid=(drugs,w)=>{if(w<=0)return null;let t=0;drugs.forEach(d=>{t+=calcFluidDose(d,w)*getFreqMul(d.freq);});if(t<=0)return null;return{totalMl:Math.round(t*10)/10,mlKgD:Math.round((t/w)*100)/100,mlKgH:Math.round((t/w/24)*100)/100};};
+const updateFluidBar=()=>{const w=cleanN($('inputWeight').value);const f=calcTotalFluid(currentDrugs,w);if(!f||f.totalMl<=0){$('fluidSummary').classList.add('hidden');return;}$('fluidTotal').textContent=f.totalMl;$('fluidPerKgDay').textContent=f.mlKgD;$('fluidPerKgHr').textContent=f.mlKgH;$('fluidSummary').classList.remove('hidden');};
+const fluidTxt=p=>{const w=parseFloat(p.weight)||0;if(w<=0)return'';const f=calcTotalFluid(p.drugs,w);if(!f||f.totalMl<=0)return'';return`💧 ${f.mlKgD} ml/kg/day`;};
+
+const updateCounter=()=>{const t=patients.length,s=selectedPatientIds.size,fl=getFiltered(),f=fl.length,sf=fl.filter(p=>selectedPatientIds.has(p.id)).length;$('pdfBtnText').textContent=s>0?`Generate PDF (${s})`:'Generate PDF';$('clearBtnText').textContent=s>0?`Clear Selected (${s})`:'Clear All';$('btnPdf').disabled=s===0;const es=$('emptyState'),em=$('emptyStateMsg'),eh=$('emptyStateHint');if(!initialLoaded){es.classList.remove('hidden');em.innerHTML='<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Loading patients...';eh.textContent='';}else if(f>0){es.classList.add('hidden');}else{es.classList.remove('hidden');if(docSearch.trim()){em.textContent='No patients match "'+docSearch.trim()+'"';eh.textContent='Clear the search to see all patients';}else if(activeFilter!=='all'){em.textContent='No patients in '+activeFilter;eh.textContent='Switch to All to see every patient';}else{em.textContent='No patients in queue';eh.textContent='Add patient information above to begin';}}const cb=$('selectAllCheckbox');if(cb){cb.checked=f>0&&sf===f;cb.indeterminate=sf>0&&sf<f;}};
+window.toggleSel=id=>{if(selectedPatientIds.has(id))selectedPatientIds.delete(id);else selectedPatientIds.add(id);updateCounter();renderQueue();};
+window.toggleDrugActiveForm=i=>{const d=currentDrugs[i];if(!d)return;d.active=d.active===false?true:false;renderDrugList();updateFluidBar();showToast(d.active===false?'Drug paused':'Drug resumed','info');};
+window.toggleDrugActive=async(pid,idx)=>{const p=patients.find(x=>x.id===pid);if(!p||!p.drugs[idx])return;const d=p.drugs[idx];const was=d.active!==false;d.active=was?false:true;renderQueue();updateCounter();try{await setDoc(doc(db,"patients",pid),{drugs:p.drugs},{merge:true});showToast(was?'Drug paused':'Drug resumed','info');}catch(e){d.active=was?true:false;renderQueue();updateCounter();showToast('Failed: '+e.message,'error');}};
+
+const renderQueue=()=>{
+const fl=getFiltered();
+ $('patientQueue').innerHTML=fl.map((p,i)=>{const isSel=selectedPatientIds.has(p.id),la=getLiveAge(p),ad=fmtAge(la),sl=isAgeLive(p),isE=editingPatientId===p.id,dc=p.drugs.length,activeDc=p.drugs.filter(d=>d.active!==false).length,ac=p.drugs.filter(d=>d.active!==false&&d.alert).length,rm=p.room&&ROOMS.includes(p.room)?p.room:null,rb=rm?`<span class="room-tag ${ROOM_STYLES[rm].tag}">${ROOM_STYLES[rm].label}</span>`:'<span class="room-tag un">--</span>',ft=fluidTxt(p);
+return`<div class="patient-card bg-[var(--card)] rounded-2xl border ${isE?'border-amber-400 ring-2 ring-amber-400/30':'border-[var(--border)]'} shadow-sm overflow-hidden card-hover" style="animation-delay:${i*40}ms"><div class="px-4 py-3 flex items-center justify-between cursor-pointer select-none" onclick="toggleCard('${p.id}')"><div class="flex items-center gap-3 min-w-0"><input type="checkbox" ${isSel?'checked':''} onclick="event.stopPropagation();toggleSel('${p.id}')" class="w-5 h-5 rounded border border-[var(--border)] text-[var(--accent)] flex-shrink-0"><div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="font-bold text-[var(--fg)] truncate">${esc(p.name)}</h3>${rb}</div><div class="flex items-center gap-2 flex-wrap"><span class="text-xs text-[var(--muted)]">${p.weight}kg | GA:${esc(p.ga)}w | D${ad}</span>${ft?`<span class="text-xs font-semibold text-[var(--accent)]">${ft}</span>`:''}${sl?'<span class="live-badge">LIVE</span>':''}${isE?'<span class="live-badge" style="background:#F59E0B">EDITING</span>':''}</div></div></div><div class="flex items-center gap-2 flex-shrink-0"><span class="text-xs font-medium ${activeDc<dc?'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20':'text-[var(--muted)] bg-[var(--surface)]'} px-2 py-1 rounded-lg">${activeDc}${activeDc<dc?'/'+dc:''} drug${dc!==1?'s':''}</span>${ac>0?`<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400">${ac}</span>`:''}<svg id="chevron-${p.id}" class="w-5 h-5 text-[var(--muted)] chevron-icon ${expandedIds.has(p.id)?'rotated':''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div><div id="body-${p.id}" class="card-body ${expandedIds.has(p.id)?'expanded':''}"><div class="px-4 border-t border-[var(--border)] pt-3 flex justify-end gap-1 mb-3"><button onclick="editPatient('${p.id}')" class="p-2 hover:bg-[var(--accent)]/10 rounded-lg text-[var(--accent)] transition-colors" aria-label="Edit patient" ${isE?'disabled style="opacity:.3"':''}><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="deletePatient('${p.id}')" class="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-[var(--danger)] transition-colors" aria-label="Delete patient" ${isE?'disabled style="opacity:.3"':''}><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div><div class="px-4 pb-2 space-y-3">${p.drugs.map((d,di)=>{const pa=d.active===false;return`<div class="drug-row text-sm border-b border-dashed border-[var(--border)] last:border-0 pb-2 ${pa?'paused':''}"><div class="flex justify-between font-bold text-[var(--fg)] items-center"><span class="drug-name">${drugName(d)}</span><span class="flex items-center gap-2">${pa?'<span class="drug-badge paused-badge px-1.5 py-0.5 rounded text-[10px] font-bold">⏸</span>':''}${d.isNutrient&&!d.isGIR?nutBadge(d):(d.hideDetails?'':`<span>${d.dose}${d.unit?esc(d.unit):''} ${esc(d.freq)}</span>`)}</span></div>${d.alert?`<p class="text-[var(--danger)] font-bold text-[10px] mt-1 arabic-text">${esc(d.alert)}</p>`:''}<div class="flex items-center justify-between mt-1"><p class="text-xs text-[var(--muted)] flex-1" style="direction:ltr;text-align:left">${renderM(d)}</p><button onclick="toggleDrugActive('${p.id}',${di})" class="drug-toggle ${pa?'paused':''}" style="width:26px;height:26px" aria-label="${pa?'Resume drug':'Pause drug'}" title="${pa?'Resume':'Pause'}"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${pa?'<path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/>':'<path stroke-linecap="round" stroke-linejoin="round" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>'}</svg></button></div></div>`;}).join('')}</div></div></div>`;}).join('');
+};
+
+const popDropdowns=()=>{$('selectCategory').innerHTML='<option value="">-- Select Category --</option>'+DRUG_CATEGORIES.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');$('selectDrug').innerHTML='<option value="">-- Select Category First --</option>';$('selectCustomMethod').innerHTML='<option value="">-- Select Method --</option>'+METHOD_OPTIONS.map(m=>`<option value="${m.value}">${m.label}</option>`).join('');};
+const renderDrugList=()=>{$('drugsList').innerHTML=currentDrugs.map((d,i)=>{const pa=d.active===false;let bh;if(d.isGIR)bh='';else if(d.isNutrient)bh=`<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose} ml${d.addonVol?' (+ '+d.addonVol+' ml '+esc(d.addonType)+')':''} / 24 hr</span>`;else if(d.hideDetails)bh='';else bh=`<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose}${d.unit?esc(d.unit):''} ${esc(d.freq)}</span>`;if(pa)bh=`<span class="drug-badge paused-badge px-2 py-0.5 rounded-full text-xs font-semibold">⏸ Paused</span>`;return`<div class="drug-row animate-slide-in bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-3 ${pa?'paused':''}"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><p class="drug-name font-bold text-[var(--fg)]">${drugName(d)}</p>${bh}</div>${d.alert?`<p class="text-[var(--danger)] font-bold text-xs mb-1 arabic-text">${esc(d.alert)}</p>`:''}<p class="text-sm text-[var(--muted)] mt-1" style="direction:ltr;text-align:left">${renderM(d)}</p></div><div class="flex items-center gap-1 flex-shrink-0"><button onclick="toggleDrugActiveForm(${i})" class="drug-toggle ${pa?'paused':''}" aria-label="${pa?'Resume drug':'Pause drug'}" title="${pa?'Resume':'Pause'}"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${pa?'<path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/>':'<path stroke-linecap="round" stroke-linejoin="round" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>'}</svg></button><button onclick="removeDrug(${i})" class="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg group flex-shrink-0" aria-label="Remove drug"><svg class="w-5 h-5 text-[var(--muted)] group-hover:text-[var(--danger)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div></div>`;}).join('');updateCounter();};
+
+const addDrug=()=>{
+const w=cleanN($('inputWeight').value);if(!w||w<=0){showToast('Enter weight','error');return;}
+const v=$('selectDrug').value;if(!v){showToast('Select a drug','error');return;}
+const fv=$('inputFreq').value;let fd=fv==='q36hr'?'q36hr':fv==='q48hr'?'q48hr':`x ${fv}`;
+let dn='',dobj=null;
+if(v==='other'){dn=$('inputCustomDrug').value.trim();if(!dn){showToast('Drug name missing','error');return;}}else{dobj=DRUG_CONFIG.find(d=>d.id===parseInt(v));dn=dobj.name;}
+if(currentDrugs.some(d=>d.name.trim().toLowerCase()===dn.toLowerCase())){showToast('هذا العلاج مضاف مسبقاً!','error');return;}
+if(v==='other'){const mv=$('selectCustomMethod').value;let ms=null,mi=null,ic=false;if(mv&&mv!=='other'&&METHODS[parseInt(mv)]){const mx=parseInt(mv);mi=mx;if(METHODS_WITH_CALC.includes(mx)){const cn=cleanN($('inputConcentration').value);if(cn<=0){showToast('Enter concentration','error');return;}ms=genMethod({methodIndex:mx,factor:cn,isDopamine:false,isNutrient:false},cleanN($('inputDose').value));ic=true;}else ms=METHODS[mx];}else ms=$('inputCustomMethod').value.trim()||'Manual';currentDrugs.push({id:genId(),active:true,drugId:'other',name:$('inputCustomDrug').value.trim(),dose:cleanN($('inputDose').value),unit:$('inputCustomUnit').value.trim(),freq:fd,method:ms,customMethodIndex:mi,isCalculated:ic,hideDetails:false,isNutrient:false,isDopamine:false,isGIR:false,alert:'',addonVol:0,addonType:'',methodIndex:null,targetVol:null,factor:null});}
+else{const drug=dobj,dose=cleanN($('inputDose').value);let av=drug.isNutrient?cleanN($('inputAddonVol').value):0,at=drug.isNutrient?($('inputAddonType').value.trim()||''):'';
+if(drug.inputMode==='dopaminePump')currentDrugs.push({id:genId(),active:true,drugId:drug.id,name:drug.name,dose:'Infusion',unit:'',freq:'',method:'1 ml dopamin + 39 ml GW',hideDetails:false,isNutrient:false,isDopamine:true,isGIR:false,alert:drug.alert||'',addonVol:0,addonType:'',methodIndex:null,targetVol:null,factor:null});
+else if(drug.isGIR){const gt=cleanN($('inputGIR').value),bv=cleanN($('inputBagVol').value);if(gt<=0||bv<=0){showToast('Enter GIR and volume','error');return;}const r=calcGIR(w,gt,bv);currentDrugs.push({id:genId(),active:true,drugId:drug.id,name:drug.name,dose:bv,unit:'ml',freq:'',method:genMethod(drug,bv),hideDetails:false,isNutrient:true,isDopamine:false,isGIR:true,girRate:(r?r.actualGIR:gt).toFixed(1),girConc:(r?r.conc:0).toFixed(1),alert:r&&r.warnings.length?r.warnings.join(' | '):'',addonVol:av,addonType:at,methodIndex:null,targetVol:null,factor:null});}
+else{const tv=(drug.methodIndex===3||drug.methodIndex===10||drug.methodIndex===16)?parseInt($('inputTargetVol').value):null;currentDrugs.push({id:genId(),active:true,drugId:drug.id,name:drug.name,dose,unit:drug.unit||'',freq:(drug.hideDetails||drug.name==='TPN'||$('selectCategory').value==='Fluids')?'':fd,method:genMethod(drug,dose),hideDetails:drug.hideDetails||false,noPrint:drug.noPrint||false,isNutrient:drug.isNutrient||false,isDopamine:drug.isDopamine||false,isGIR:false,alert:drug.alert||'',addonVol:av,addonType:at,methodIndex:drug.methodIndex,targetVol:tv,factor:drug.factor||null});}}
+renderDrugList();updateFluidBar();showToast('Added');$('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';
+};
+window.removeDrug=i=>{currentDrugs.splice(i,1);renderDrugList();updateFluidBar();};
+const toggleSelAll=e=>{const f=getFiltered();if(e.target.checked)f.forEach(p=>selectedPatientIds.add(p.id));else f.forEach(p=>selectedPatientIds.delete(p.id));updateCounter();renderQueue();};
+
+/* ===== DOCUMENTATION SAVE/EDIT/DELETE ===== */
+const savePatient=async()=>{
+const name=$('inputName').value.trim(),weight=cleanN($('inputWeight').value),room=$('inputRoom').value,dob=$('inputDOB').value;
+if(!name||!weight||currentDrugs.length===0){showToast('Missing info','error');return;}
+if(!editingPatientId&&!dob){showToast('Select Date of Birth','error');return;}
+const sorted=[...currentDrugs].sort((a,b)=>{if(a.isNutrient&&!b.isNutrient)return 1;if(!a.isNutrient&&b.isNutrient)return-1;return 0;});
+const np={name,weight,dob:dob||null,ga:$('inputGA').value,room,drugs:sorted,saveDate:new Date().toLocaleDateString('en-CA')};
+showToast('Saving...','info');
+try{if(editingPatientId)await setDoc(doc(db,"patients",editingPatientId),np,{merge:true});else await addDoc(patientsRef,np);dirty=false;clearForm();renderQueue();renderFilterBar();showToast('Saved');}
+catch(e){showToast(`Save Failed: ${e.message}`,'error');}
+};
+window.deletePatient=async id=>{if(editingPatientId===id)return;const p=patients.find(x=>x.id===id);if(!p||!confirm(`Delete "${p.name}"?`))return;const pi=patients.findIndex(x=>x.id===id),bk=patients[pi];patients.splice(pi,1);selectedPatientIds.delete(id);renderQueue();renderFilterBar();try{await deleteDoc(doc(db,"patients",id));renderQueue();renderFilterBar();}catch(e){patients.splice(pi,0,bk);renderQueue();renderFilterBar();showToast(`Failed: ${e.message}`,'error');}};
+window.editPatient=async id=>{const p=patients.find(x=>x.id===id);if(!p)return;editingPatientId=id;$('inputName').value=p.name;$('inputWeight').value=p.weight;$('inputGA').value=p.ga;$('inputDOB').value=p.dob||'';if(p.dob){const ps=p.dob.split('-');$('dobText').textContent=`${ps[2]}/${ps[1]}/${ps[0]}`;$('dobFake').classList.add('has-date');updatePna();}else{$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('pnaDisplay').classList.add('hidden');}$('inputRoom').value=p.room||'';currentDrugs=[...p.drugs];renderDrugList();updateFluidBar();$('editingBannerName').textContent=p.name;$('editingBanner').classList.remove('hidden');$('btnSavePatient').textContent='Update Patient';renderQueue();renderFilterBar();window.scrollTo({top:0,behavior:'smooth'});};
+
+/* ===== DOCUMENTATION PDF ===== */
+const genPDF=async()=>{
+const sel=patients.filter(p=>selectedPatientIds.has(p.id));if(!sel.length){showToast('No patients selected','error');return;}if(!window.jspdf||!window.html2canvas){showToast('PDF libs not loaded','error');return;}
+showToast('Generating...','info');const container=$('pdf-render-container');container.innerHTML='';container.style.opacity='1';
+try{const now=new Date(),ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}),ts=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+let processed=[];sel.forEach(p=>{let rem=[...p.drugs],chunks=[];while(rem.length>0){let chunk=[],hd=false;for(let i=0;i<rem.length;i++){if(rem[i].drugId===9)hd=true;chunk.push(rem[i]);let lim=hd?15:20;if(chunk.length===lim||i===rem.length-1){chunks.push(chunk);rem=rem.slice(i+1);break;}}}chunks.forEach((c,i)=>processed.push({...p,name:i===0?p.name:p.name+' (تابع)',dr:c}));});
+let pages=[],cells=Array(6).fill(null);
+const place=pat=>{const hd=pat.dr.some(d=>d.drugId===9),ct=pat.dr.filter(d=>d.drugId!==9&&!d.noPrint).length;let sp=1;if(ct>11||(hd&&ct>8))sp=3;else if(ct>5||(hd&&ct>1))sp=2;for(let i=0;i<6;i++){if(cells[i]===null){if(sp===3&&i+4<6&&cells[i+2]===null&&cells[i+4]===null){cells[i]={patient:pat,span:3};cells[i+2]='blocked';cells[i+4]='blocked';return true;}if(sp===2&&i+2<6&&cells[i+2]===null){cells[i]={patient:pat,span:2};cells[i+2]='blocked';return true;}if(sp===1){cells[i]={patient:pat,span:1};return true;}}}return false;};
+processed.forEach(p=>{if(!place(p)){pages.push([...cells]);cells=Array(6).fill(null);place(p);}});if(cells.some(c=>c!==null))pages.push([...cells]);
+const{jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+for(let i=0;i<pages.length;i++){const pd=document.createElement('div');pd.className='pdf-page';pd.innerHTML=`<div class="pdf-page-header"><h2>NICU Pharmacist Documentation</h2><p>Baghdad Teaching Hospital — ${ds} ${ts} — Page ${i+1}/${pages.length}</p></div><div class="pdf-grid"></div>`;const grid=pd.querySelector('.pdf-grid');
+pages[i].forEach(cd=>{if(!cd||cd==='blocked')return;const el=document.createElement('div');el.className='pdf-cell';const p=cd.patient;if(cd.span>1)el.style.gridRow=`span ${cd.span}`;const ad=fmtAge(getLiveAge(p)),dt=p.dr.some(d=>d.drugId===9)?`<table style="width:100%;margin-top:2mm;font-size:8.5pt;border-collapse:collapse;text-align:center"><tr style="background:#f8f0f0"><th style="border:1px solid #000;padding:4px">Rate ml/24h</th><th style="border:1px solid #000;padding:4px">mcg/kg/min</th></tr>${[2,5,7,10].map(ds=>`<tr><td style="border:1px solid #000;padding:3px 4px;font-weight:bold">${((ds*(p.weight||0)*1440)/1000).toFixed(0)} ml</td><td style="border:1px solid #000;padding:3px 4px">${ds}</td></tr>`).join('')}</table>`:'';
+el.innerHTML=`<div class="pdf-cell-header"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:10pt;color:#000;font-weight:bold">${p.weight}kg | GA:${esc(p.ga)}w | D${ad}${p.room?' | '+esc(p.room):''}</div><div style="font-weight:900;color:#000;direction:rtl;font-family:'Cairo'">${esc(p.name)}</div></div></div><div style="flex:1">${p.dr.filter(d=>!d.noPrint).map(d=>`<div class="pdf-drug-item"><div style="display:flex;justify-content:space-between;font-weight:bold;font-size:10pt"><span>${d.isGIR?girSum(d):esc(d.name)}</span>${d.isNutrient&&!d.isGIR?`<span>${d.dose} ml${d.addonVol?' (+ '+d.addonVol+' ml '+esc(d.addonType)+')':''}</span>`:(d.hideDetails?'':`<span>${d.dose}${d.unit?esc(d.unit):''} ${esc(d.freq)}</span>`)}</div>${d.alert?`<div class="arabic-text" style="color:red;font-weight:bold;font-size:8.5pt;text-align:right;margin-top:1px">${esc(d.alert)}</div>`:''}<div style="font-size:9.5pt;text-align:left;margin-top:1px">${renderM(d)}</div>${d.drugId===9?dt:''}</div>`).join('')}</div>`;grid.appendChild(el);});
+container.appendChild(pd);await document.fonts.ready;await new Promise(r=>setTimeout(r,200));const canvas=await html2canvas(pd,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',0,0,210,297);if(i<pages.length-1)doc.addPage();container.removeChild(pd);}
+doc.save('NICU_Report.pdf');showToast('PDF Generated');}catch(err){showToast('PDF failed: '+err.message,'error');}finally{container.style.opacity='0';container.innerHTML='';}};
+
+/* ===== TPN CALCULATION ENGINE ===== */
+function tpnCalc(p,brand){
+const b=TPN_B[brand],el=p.loss,aoV=p.ao.reduce((s,a)=>s+(parseFloat(a.v)||0),0),tv=(p.fi*p.w)-p.tv-aoV,errs=[];
+if(!p.w||p.w<=0)errs.push('Weight must be positive.');if(!p.fi||p.fi<=0)errs.push('Fluid input must be positive.');if(tv<=0&&p.w>0&&p.fi>0)errs.push('TPN volume is zero or negative.');if(errs.length)return{errs,tv:0};
+const lv=(p.ld*p.w*100)/b.li,av=(p.ad*p.w*100)/b.a,gv=tv-lv-av;if(gv<=0)return{errs:['Lipid + AA exceed TPN target.'],tv};
+const gg=p.gir*1440*p.w/1000,tgp=(gg/gv)*100;let vb=0,v5=0,v50=0;
+if(tgp>=b.g&&tgp<=50){vb=Math.abs(tgp-50)/(50-b.g)*gv;v50=Math.abs(tgp-b.g)/(50-b.g)*gv}else if(tgp>=5&&tgp<b.g){v5=Math.abs(tgp-50)/45*gv;v50=Math.abs(tgp-5)/45*gv}else if(tgp<5)v5=gv;else v50=gv;
+const actualGG=(vb*b.g+v5*5+v50*50)/100;let Na=b.na*av,K=b.k*av,Cl=b.cl*av,Ca=b.ca*av,aNa=0,aK=0;
+p.ao.forEach(a=>{const v=parseFloat(a.v)||0,t=TPN_AT[a.t];if(t){aNa+=t.na*v;aK+=t.k*v}});Na+=aNa;K+=aK;
+const bagVol=tv+aoV,agir=actualGG*1000/(1440*p.w),gpt=(actualGG*100)/bagVol,ce=actualGG*3.4,le=p.ld*p.w*9,en=(le+(p.ad*p.w*4)+ce)/p.w;
+const lcr=(ce+le)>0?(le/(ce+le))*100:0,ap=(p.ad*p.w)/bagVol*100,ng=(p.ad*p.w)/6.25,npc=ng>0?(le+ce)/ng:0;
+const osm=((p.ad*p.w*10)+(actualGG*5)+((Na+K)*2)+(Ca*2*1.4))/(bagVol/1000),tfkg=(bagVol+p.tv+p.tf)/p.w;
+const lm=1+(el/tv);let rawTot=(lv+av+vb+v5+v50)*lm;rawTot+=p.ao.reduce((s,a)=>s+(parseFloat(a.v)||0)*lm,0);const targetTot=Math.round(rawTot);
+let pl=Math.round(lv*lm),pa=Math.round(av*lm),pb=Math.round(vb*lm),p5=Math.round(v5*lm),p50=Math.round(v50*lm);
+const pao=p.ao.map(a=>({t:a.t,v:Math.round((parseFloat(a.v)||0)*lm)}));let paot=pao.reduce((s,a)=>s+a.v,0),ptot=pl+pa+pb+p5+p50+paot;
+const diff=targetTot-ptot;if(diff!==0){const cs=[{k:'pb',ref:v=>pb=v},{k:'p5',ref:v=>p5=v},{k:'p50',ref:v=>p50=v},{k:'pl',ref:v=>pl=v},{k:'pa',ref:v=>pa=v}],vs={pb,p5,p50,pl,pa};let best=null,bv=-1;for(const c of cs){if(vs[c.k]>bv){bv=vs[c.k];best=c}}if(best){best.ref(bv+diff);ptot=targetTot}}
+const split=tv>151&&tv<302;
+let b1t=0,b2t=0,b1ao=[],bag1=null,bag2=null;
+if(split){const sv=v=>{const h=Math.round(v/2);return[h,h]};const sl=sv(pl),sa=sv(pa),sb=sv(pb),sf=sv(p5),sf2=sv(p50);const bao=pao.map(x=>sv(x.v));b1ao=bao;b1t=sl[0]+sa[0]+sb[0]+sf[0]+sf2[0]+bao.reduce((s,x)=>s+x[0],0);b2t=sl[1]+sa[1]+sb[1]+sf[1]+sf2[1]+bao.reduce((s,x)=>s+x[1],0);bag1={pl:sl[0],pa:sa[0],pb:sb[0],p5:sf[0],p50:sf2[0],ao:bao.map(x=>x[0]),total:b1t};bag2={pl:sl[1],pa:sa[1],pb:sb[1],p5:sf[1],p50:sf2[1],ao:bao.map(x=>x[1]),total:b2t};}
+const w=[];if(tgp<5)w.push('Lowest GIR possible.');if(tgp>50)w.push('Highest GIR possible.');if(gpt>12)w.push('Consider central line.');const fmk=p.tf/p.w;if(fmk>=100)w.push('PN can be discontinued at 100-120 mL/kg/d.');if(fmk>60&&fmk<=99)w.push('Consider condensing PN to 80-90 mL/kg/d.');
+return{tv,lv,av,gv,gg,tgp,vb,v5,v50,actualGG,Na,K,Cl,Ca,aNa,aK,agir,gpt,en,lcr,ap,npc,osm,tfkg,pl,pa,pb,p5,p50,pao,paot,ptot,bagVol,lm,split,b1t,b2t,b1ao,bag1,bag2,w,fmk,errs:[]};
+}
+
+/* ===== TPN RENDER HELPERS ===== */
+function tpnSr(l,v,u){return`<div class="tpn-sr"><span class="tpn-sl">${l}</span><span><span class="tpn-sv">${v}</span><span class="tpn-su">${u}</span></span></div>`}
+function tpnEc(l,v,c){return`<div class="tpn-elec-c"><div class="tpn-el" style="color:${c}">${l}</div><div class="tpn-ev" style="color:${c}">${tpf(v,2)}</div><div class="tpn-eu">mmol</div></div>`}
+function tpnPr(l,v){return`<div class="tpn-pr"><span class="tpn-pr-l">${l}</span><span class="tpn-pr-v">${v} ml</span></div>`}
+function tpnSpr(l,v){return`<div class="tpn-split-row"><span>${l}</span><span class="fd">${v} ml</span></div>`}
+
+function renderTpnRes(r,brand){
+if(!r)return'';if(r.errs.length)return r.errs.map(e=>`<div class="tpn-emsg"><i class="fas fa-triangle-exclamation" style="margin-top:2px;flex-shrink:0"></i><span>${e}</span></div>`).join('');
+const b=TPN_B[brand];let h='<div class="tpn-sec-t">Clinical Summary</div><div class="tpn-sg">';
+h+=tpnSr('Actual GIR',tpf(r.agir,2),'mg/kg/min');h+=tpnSr('Glucose %',tpf(r.gpt,2),'%');h+=tpnSr('Energy',tpf(r.en,1),'kcal/kg');h+=tpnSr('Lipid:Carb',tpf(r.lcr,1),'%');h+=tpnSr('AA %',tpf(r.ap,2),'%');h+=tpnSr('NPC:N',tpf(r.npc,1),'kcal:N');h+=tpnSr('Osmolarity',tpf(r.osm,0),'mOsm/L');h+=tpnSr('Total Fluid/kg',smartN(r.tfkg,1),'ml/kg');
+h+='</div><div class="tpn-sec-t">Electrolytes</div><div class="tpn-elec-row">';h+=tpnEc('Na',r.Na,'#0F766E');h+=tpnEc('K',r.K,'#7C3AED');h+=tpnEc('Cl',r.Cl,'#0284C7');h+=tpnEc('Ca',r.Ca,'#D97706');h+='</div>';
+h+='<div class="tpn-sec-t">Pharmacy Preparation</div><div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:8px">';
+h+=tpnPr(`Lipid (${b.l} ${b.li}%)`,r.pl);h+=tpnPr(`AA (${b.l} ${b.a}%)`,r.pa);if(r.pb>0)h+=tpnPr(`Glucose (${b.l} ${b.g}%)`,r.pb);if(r.p5>0)h+=tpnPr('Glucose (D5W 5%)',r.p5);if(r.p50>0)h+=tpnPr('Glucose (D50W 50%)',r.p50);
+r.pao.forEach(a=>{if(a.v>0)h+=tpnPr(`Add-on: ${TPN_AT[a.t].l}`,a.v)});h+=`<div class="tpn-pr tpn-pr-t"><span class="tpn-pr-l">Total</span><span class="tpn-pr-v">${r.ptot} ml</span></div></div>`;
+if(r.split&&r.bag1){h+=`<div class="tpn-split-box"><div class="flex items-center gap-2 text-xs font-bold text-[var(--accent)] mb-2"><i class="fas fa-layer-group"></i> Prepare as 2 Bags</div><div class="tpn-split-grid"><div class="tpn-split-bag"><div class="tpn-split-bag-t">Bag 1</div>`;h+=tpnSpr('Lipid',r.bag1.pl);h+=tpnSpr('AA',r.bag1.pa);if(r.bag1.pb>0)h+=tpnSpr(`Glu(${b.g}%)`,r.bag1.pb);if(r.bag1.p5>0)h+=tpnSpr('Glu(5%)',r.bag1.p5);if(r.bag1.p50>0)h+=tpnSpr('Glu(50%)',r.bag1.p50);r.bag1.ao.forEach((v,i)=>{if(v>0)h+=tpnSpr(TPN_AT[r.pao[i].t].l,v)});h+=`<div class="tpn-split-tot"><span>Total</span><span>${r.bag1.total} ml</span></div></div><div class="tpn-split-bag"><div class="tpn-split-bag-t">Bag 2</div>`;h+=tpnSpr('Lipid',r.bag2.pl);h+=tpnSpr('AA',r.bag2.pa);if(r.bag2.pb>0)h+=tpnSpr(`Glu(${b.g}%)`,r.bag2.pb);if(r.bag2.p5>0)h+=tpnSpr('Glu(5%)',r.bag2.p5);if(r.bag2.p50>0)h+=tpnSpr('Glu(50%)',r.bag2.p50);r.bag2.ao.forEach((v,i)=>{if(v>0)h+=tpnSpr(TPN_AT[r.pao[i].t].l,v)});h+=`<div class="tpn-split-tot"><span>Total</span><span>${r.bag2.total} ml</span></div></div></div></div>`}
+if(r.w.length)h+=r.w.map(w=>`<div class="tpn-wmsg"><i class="fas fa-exclamation-circle" style="margin-top:2px;flex-shrink:0"></i><span>${w}</span></div>`).join('');return h;
+}
+
+/* ===== TPN STATE MANAGEMENT ===== */
+function getTpnCards(){const linked=patients.filter(p=>p.tpn).map(p=>({id:p.id,type:'linked',name:p.name,weight:p.weight,tpn:p.tpn,dob:p.dob}));const sa=standaloneTpn.map(p=>({id:p.id,type:'standalone',name:p.name,weight:p.weight,tpn:p.tpn}));return[...linked,...sa];}
+
+function readTpnForm(){const ao=[];document.querySelectorAll('#tpnAddons .tpn-addon-row').forEach(r=>{ao.push({t:r.querySelector('select').value,v:nn(r.querySelector('input').value)})});const lb=document.querySelector('#tpnLossSel button.on');return{w:nn($('tpnWeight').value),fi:nn($('tpnFluidInput').value),tv:nn($('tpnTreatVol').value),gir:nn($('tpnGIR').value),ld:nn($('tpnLipid').value),ad:nn($('tpnAA').value),tf:nn($('tpnEnteral').value),rbs:nn($('tpnRBS').value),loss:lb?parseInt(lb.dataset.lv):10,ao};}
+
+function fillTpnForm(data,isLinked){
+ $('tpnWeight').value=data.w||'';$('tpnFluidInput').value=data.fi||'';$('tpnTreatVol').value=data.tv||'';$('tpnGIR').value=data.gir||'';$('tpnLipid').value=data.ld||'';$('tpnAA').value=data.ad||'';$('tpnEnteral').value=data.tf||'';$('tpnRBS').value=data.rbs||'';
+document.querySelectorAll('#tpnLossSel button').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.lv)===(data.loss||10)));
+ $('tpnWeight').readOnly=!!isLinked;$('tpnAddons').innerHTML=(data.ao||[]).map((a,i)=>`<div class="tpn-addon-row"><select class="tpn-inp"><option value="na3"${a.t==='na3'?' selected':''}>Na 3%</option><option value="na09"${a.t==='na09'?' selected':''}>Na 0.9%</option><option value="k"${a.t==='k'?' selected':''}>K</option><option value="other"${a.t==='other'?' selected':''}>Other</option></select><input type="number" inputmode="numeric" class="tpn-inp" value="${a.v||''}" step="1" min="0"><span style="font-size:10px;color:#94A3B8;flex-shrink:0">ml</span><button class="tpn-addon-rm" data-idx="${i}"><i class="fas fa-times"></i></button></div>`).join('');
+ $('tpnLinkedInfo').style.display=isLinked?'block':'none';updTpnPreview();
+}
+
+function clearTpnForm(){tpnEditId=null;tpnEditType=null;linkedPatientId=null;dirty=false;$('tpnSearch').value='';$('tpnSearch').readOnly=false;$('tpnWeight').value='';$('tpnWeight').readOnly=false;$('tpnFluidInput').value='';$('tpnTreatVol').value='';$('tpnGIR').value='';$('tpnLipid').value='';$('tpnAA').value='';$('tpnEnteral').value='';$('tpnRBS').value='';document.querySelectorAll('#tpnLossSel button').forEach((b,i)=>b.classList.toggle('on',i===0));$('tpnAddons').innerHTML='';$('tpnPreview').innerHTML='';$('tpnLinkedInfo').style.display='none';$('tpnEditingBanner').classList.add('hidden');$('btnSaveTpn').textContent='Save TPN';}
+
+function updTpnPreview(){const d=readTpnForm();const fs=$('tpnFluidsSummary');if(!d.w||!d.fi){$('tpnPreview').innerHTML='';fs.classList.add('hidden');return;}const aoV=d.ao.reduce((s,a)=>s+(parseFloat(a.v)||0),0);const targetLoss=((d.fi*d.w)-d.tv-aoV)>150?20:10;d.loss=targetLoss;document.querySelectorAll('#tpnLossSel button').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.lv)===targetLoss));fs.classList.remove('hidden');const tfml=d.tf,totF=((d.fi*d.w)+d.tf),totFkg=totF/d.w;fs.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center"><div><div style="font-size:10px;color:var(--muted);font-weight:600">TOTAL FEEDINGS</div><div style="font-size:16px;font-weight:900;font-family:'Crimson Pro',serif">${Math.round(tfml)} ml</div></div><div><div style="font-size:10px;color:var(--muted);font-weight:600">FEEDING /kg</div><div style="font-size:16px;font-weight:900;font-family:'Crimson Pro',serif">${smartN(tfml/d.w,1)} ml</div></div><div><div style="font-size:10px;color:var(--muted);font-weight:600">TOTAL FLUID /kg</div><div style="font-size:16px;font-weight:900;font-family:'Crimson Pro',serif;color:var(--accent)">${smartN(totFkg,1)} ml</div></div></div>`;const r=tpnCalc(d,$('tpnBrand').value);$('tpnPreview').innerHTML=renderTpnRes(r,$('tpnBrand').value);}
+
+function renderTpnQueue(){
+const cards=getTpnCards();$('tpnQueue').innerHTML=cards.map((c,i)=>{const isSel=selectedTpnIds.has(c.id),r=c.tpn.results,hasErr=r&&r.errs.length,vol=hasErr?'—':(r?Math.round(r.bagVol||(r.tv+(r.paot||0)/(r.lm||1)))+' ml':'—'),bags=hasErr?'—':(r?(r.split?'2':'1'):'—'),badge=c.type==='linked'?'<span class="linked-badge">linked</span>':'<span class="standalone-badge">standalone</span>',isE=tpnEditId===c.id;
+return`<div class="patient-card bg-[var(--card)] rounded-2xl border ${isE?'border-amber-400 ring-2 ring-amber-400/30':'border-[var(--border)]'} shadow-sm overflow-hidden card-hover" style="animation-delay:${i*40}ms"><div class="px-4 py-3 flex items-center justify-between cursor-pointer select-none" onclick="toggleTpnCard('${c.id}')"><div class="flex items-center gap-3 min-w-0"><input type="checkbox" ${isSel?'checked':''} onclick="event.stopPropagation();toggleTpnSel('${c.id}')" class="w-5 h-5 rounded border border-[var(--border)] text-[var(--accent)] flex-shrink-0"><div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="font-bold text-[var(--fg)] truncate">${esc(c.name||'Unnamed')}</h3>${badge}</div><div class="flex items-center gap-2"><span class="text-xs text-[var(--muted)]">${c.weight?fmt(c.weight,1):'—'} kg | D${c.dob?ageDay(c.dob,new Date()):'—'} | ${vol} | ${bags} bag${bags!=='—'&&bags!=='1'?'s':''}${c.tpn.rbs?' | RBS: '+c.tpn.rbs:''}</span>${isE?'<span class="live-badge" style="background:#F59E0B">EDITING</span>':''}</div></div></div><svg id="tpn-chev-${c.id}" class="w-5 h-5 text-[var(--muted)] chevron-icon ${isE||expandedTpnIds.has(c.id)?'rotated':''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div><div id="tpn-body-${c.id}" class="card-body ${isE||expandedTpnIds.has(c.id)?'expanded':''}"><div class="px-4 border-t border-[var(--border)] pt-3"><div class="flex justify-end gap-1 mb-3"><button onclick="editTpnCard('${c.id}','${c.type}')" class="p-2 hover:bg-[var(--accent)]/10 rounded-lg text-[var(--accent)] transition-colors ${isE?'opacity-30':''}"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="deleteTpnCard('${c.id}','${c.type}')" class="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-[var(--danger)] transition-colors ${isE?'opacity-30':''}"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div><div class="text-sm">${renderTpnRes(r,c.tpn.brand||$('tpnBrand').value)}</div></div></div></div>`;}).join('');
+ $('tpnEmptyState').classList.toggle('hidden',cards.length>0);
+}
+
+window.toggleTpnCard=id=>{const b=$('tpn-body-'+id),c=$('tpn-chev-'+id);if(!b||!c)return;const on=!b.classList.contains('expanded');b.classList.toggle('expanded',on);c.classList.toggle('rotated',on);if(on)expandedTpnIds.add(id);else expandedTpnIds.delete(id);};
+window.toggleTpnSel=id=>{if(selectedTpnIds.has(id))selectedTpnIds.delete(id);else selectedTpnIds.add(id);renderTpnQueue();};
+
+/* ===== TPN SAVE/EDIT/DELETE ===== */
+async function saveTpn(){
+const d=readTpnForm(),brand=$('tpnBrand').value,r=tpnCalc(d,brand);
+if(r.errs.length){showToast('Fix errors before saving','error');return;}
+const tpnData={w:d.w,fi:d.fi,tv:d.tv,gir:d.gir,ld:d.ld,ad:d.ad,tf:d.tf,rbs:d.rbs,loss:d.loss,ao:d.ao,brand,results:r};
+showToast('Saving...','info');
+try{
+if(linkedPatientId){
+    const p=patients.find(x=>x.id===linkedPatientId);if(!p)throw new Error('Patient not found');
+    const drugs=[...p.drugs.filter(x=>x.drugId!==12),{id:genId(),active:true,drugId:12,name:'TPN',dose:r.tv,unit:'ml',freq:'',method:'over 24 hr',hideDetails:false,isNutrient:false,isDopamine:false,isGIR:false,noPrint:false,alert:'',addonVol:0,addonType:'',methodIndex:6,targetVol:null,factor:null}];
+    await setDoc(doc(db,"patients",linkedPatientId),{drugs,tpn:tpnData},{merge:true});
+}else{
+    const searchName=$('tpnSearch').value.trim();
+    const name=searchName||getNextEmptyName();
+    if(!tpnEditId)tpnEditId=genId();
+    await setDoc(doc(db,"tpn_standalone",tpnEditId),{name,weight:d.w,tpn:tpnData});
+}
+dirty=false;clearTpnForm();renderTpnQueue();showToast('TPN Saved');
+}catch(e){showToast(`Failed: ${e.message}`,'error');}
+}
+
+window.editTpnCard=async(id,type)=>{
+const card=getTpnCards().find(c=>c.id===id);if(!card)return;
+tpnEditId=id;tpnEditType=type;
+if(type==='linked'){
+    linkedPatientId=id;
+    const p=patients.find(x=>x.id===id);
+    $('tpnSearch').value=p?p.name:'';
+    $('tpnSearch').readOnly=true;
+    $('tpnLinkedInfo').style.display='block';
+    $('tpnLinkedInfo').textContent='🔗 Linked — name and weight locked';
+    $('tpnEditingName').textContent=p?p.name:'';
+}else{
+    linkedPatientId=null;
+    const sa=standaloneTpn.find(x=>x.id===id);
+    $('tpnSearch').value=sa?sa.name:'';
+    $('tpnSearch').readOnly=false;
+    $('tpnLinkedInfo').style.display='none';
+    $('tpnEditingName').textContent=sa?sa.name:'';
+}
+$('tpnEditMode').textContent='Editing';
+fillTpnForm(card.tpn,type==='linked');
+if(type==='linked'){const lp=patients.find(x=>x.id===id);if(lp&&lp.weight)$('tpnWeight').value=lp.weight;}
+$('tpnEditingBanner').classList.remove('hidden');$('btnSaveTpn').textContent='Update TPN';renderTpnQueue();window.scrollTo({top:0,behavior:'smooth'});
+};
+
+window.deleteTpnCard=async(id,type)=>{
+if(tpnEditId===id)return;if(!confirm('Delete this TPN?'))return;
+try{
+if(type==='linked'){
+    const p=patients.find(x=>x.id===id);
+    if(p){
+        const drugs=p.drugs.filter(x=>x.drugId!==12);
+        await setDoc(doc(db,"patients",id),{drugs,tpn:deleteField()},{merge:true});
+    }
+}
+else{await deleteDoc(doc(db,"tpn_standalone",id));standaloneTpn=standaloneTpn.filter(x=>x.id!==id);}
+if(tpnEditId===id)clearTpnForm();selectedTpnIds.delete(id);renderTpnQueue();showToast('TPN Deleted');
+}catch(e){showToast(`Failed: ${e.message}`,'error');}
+};
+
+async function deleteSelectedTpn(){
+const cards=getTpnCards().filter(c=>selectedTpnIds.has(c.id));if(!cards.length)return;if(!confirm(`Delete ${cards.length} TPN(s)?`))return;
+try{
+await Promise.all(cards.map(c=>{if(c.type==='linked'){const p=patients.find(x=>x.id===c.id);if(p)return setDoc(doc(db,"patients",c.id),{drugs:p.drugs.filter(x=>x.drugId!==12),tpn:deleteField()},{merge:true});return Promise.resolve();}return deleteDoc(doc(db,"tpn_standalone",c.id));}));
+if(cards.some(c=>c.id===tpnEditId))clearTpnForm();
+selectedTpnIds.clear();renderTpnQueue();showToast(`${cards.length} TPN(s) deleted`);
+}catch(e){showToast(`Failed: ${e.message}`,'error');renderTpnQueue();}
+}
+
+/* ===== TPN SEARCH ===== */
+function handleTpnSearch(q){
+const dd=$('tpnSearchDropdown');
+if(linkedPatientId){dd.classList.remove('show');dd.innerHTML='';return;}
+if(!q||q.length<1){dd.classList.remove('show');dd.innerHTML='';return;}
+const lq=q.toLowerCase();
+const matches=patients.filter(p=>p.name&&p.name.toLowerCase().includes(lq)).slice(0,8);
+if(!matches.length){dd.classList.remove('show');dd.innerHTML='';return;}
+dd.innerHTML=matches.map(p=>{const w=p.weight?fmt(p.weight,1)+' kg':'—';const hasTpn=p.tpn?'<span style="font-size:9px;color:var(--accent);margin-left:4px">has TPN</span>':'';return`<div class="search-item" data-pid="${p.id}"><span class="si-name">${esc(p.name)}</span><span class="si-info">${w}</span>${hasTpn}</div>`;}).join('');
+dd.classList.add('show');
+}
+
+/* ===== TPN ORDER PRINT ===== */
+function genTpnOrder(){
+  const btn=$('btnTpnOrder');if(btn.disabled)return;btn.disabled=true;
+  const sel=getTpnCards().filter(c=>selectedTpnIds.has(c.id)&&c.tpn.results&&!c.tpn.results.errs.length);
+  if(!sel.length){showToast('No valid TPN selected','error');btn.disabled=false;return;}
+  const now=new Date(),ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const brands=[...new Set(sel.map(p=>p.tpn.brand).filter(Boolean))];
+  const brandLabel=brands.length===1?(TPN_B[brands[0]]?.l||brands[0]):'Multiple Brands';
+  let h=`<div style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;color:#000">TPN Preparation Sheet — ${brandLabel}</div><div style="font-size:11px;color:#333;margin-bottom:12px">Date: ${ds} | Patients: ${sel.length}</div>`;
+  h+='<table style="width:100%;border-collapse:collapse;font-size:11px;font-family:Arial,sans-serif;color:#000"><thead><tr style="background:#E2E8F0"><th style="border:1px solid #999;padding:5px 6px;text-align:left">Metric</th>';
+  sel.forEach(p=>{const age=p.dob?ageDay(p.dob,new Date()):'—';h+=`<th style="border:1px solid #999;padding:5px 6px;text-align:center">${esc(p.name)}<br><span style="font-weight:400;font-size:10px">${fmt(p.weight,1)} kg | D${age}${p.tpn.rbs?' | RBS: '+p.tpn.rbs:''}</span></th>`;});
+  h+='</tr></thead><tbody>';
+  let ri=0;
+  const gb=r=>r.bag1||(r.split?{pl:r.pl/2,pa:r.pa/2,pb:(r.pb||0)/2,p5:(r.p5||0)/2,p50:(r.p50||0)/2,total:r.ptot/2}:{...r,total:r.ptot});
+  function prow(label,pts,fn,bold){const bg=ri%2===0?'#FFFFFF':'#F3F4F6';ri++;return`<tr style="background:${bg};${bold?'font-weight:700;':''}"><td style="border:1px solid #bbb;padding:4px 6px;text-align:left">${label}</td>${pts.map(p=>{const r=p.tpn.results;if(!r||r.errs.length)return'<td style="border:1px solid #bbb;padding:4px 6px;text-align:center;color:#DC2626;font-style:italic">Error</td>';return`<td style="border:1px solid #bbb;padding:4px 6px;text-align:center">${fn(p)}</td>`;}).join('')}</tr>`;}
+  function sectionHeader(title){const bg=ri%2===0?'#FFFFFF':'#F3F4F6';ri++;return`<tr style="background:${bg};font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid #999"><td style="border:1px solid #bbb;padding:5px 6px;text-align:left">${title}</td><td colspan="${sel.length}" style="border:1px solid #bbb;padding:0"></td></tr>`;}
+  
+  h+=sectionHeader('Inputs');
+  h+=prow('RBS (mg/dl)',sel,p=>p.tpn.rbs||'—');h+=prow('Weight (kg)',sel,p=>fmt(p.weight,1));h+=prow('Age (days)',sel,p=>p.dob?ageDay(p.dob,new Date()):'—');h+=prow('Target Fluid/kg',sel,p=>p.tpn.fi+' ml');h+=prow('TPN Vol (ml)',sel,p=>Math.round(p.tpn.results.bagVol||(p.tpn.results.tv+(p.tpn.results.paot||0)/(p.tpn.results.lm||1))));h+=prow('GIR',sel,p=>fmt(p.tpn.gir,1));h+=prow('Lipid (g/kg)',sel,p=>fmt(p.tpn.ld,1));h+=prow('AA (g/kg)',sel,p=>fmt(p.tpn.ad,1));
+  h+=sectionHeader('Patient Fluids');
+  h+=prow('Total Feedings (ml)',sel,p=>p.tpn.tf||0);h+=prow('Feeding /kg (ml)',sel,p=>p.tpn.tf&&p.weight?smartN(p.tpn.tf/p.weight,1):'—');h+=prow('Total Fluid /kg (ml)',sel,p=>smartN(p.tpn.results.tfkg,1),true);
+  h+=sectionHeader('Preparation');
+  h+=prow('Lipid (ml)',sel,p=>gb(p.tpn.results).pl);h+=prow('AA (ml)',sel,p=>gb(p.tpn.results).pa);h+=prow('Glucose (ml)',sel,p=>{const pb=gb(p.tpn.results).pb||0;if(!pb)return 0;const br=p.tpn.brand,g=br&&TPN_B[br]?TPN_B[br].g:'?';return`${pb} (${g}%)`;});h+=prow('D5W (ml)',sel,p=>gb(p.tpn.results).p5||0);h+=prow('D50W (ml)',sel,p=>gb(p.tpn.results).p50||0);
+  const gaos=r=>{const g=gb(r);return g.ao||g.pao||[]};
+  const allAddonTypes=[...new Set(sel.flatMap(p=>gaos(p.tpn.results).filter(a=>a.v>0).map(a=>a.t)))];
+  allAddonTypes.forEach(t=>{h+=prow(`Add-on: ${TPN_AT[t].l} (ml)`,sel,p=>{const a=gaos(p.tpn.results).find(x=>x.t===t);return a?a.v:0;});});
+  h+=prow('Bags',sel,p=>p.tpn.results.split?'x2 (PREPARE TWICE)':'1',true);
+  h+=sectionHeader('Clinical');
+  h+=prow('Osmolarity',sel,p=>Math.round(p.tpn.results.osm));h+=prow('Energy (kcal/kg)',sel,p=>smartN(p.tpn.results.en,1));h+=prow('Actual GIR',sel,p=>smartN(p.tpn.results.agir,2));
+  h+='</tbody></table>';
+
+  showToast('Generating order PDF...','info');
+  const container=$('pdf-render-container');
+  const wrapper=document.createElement('div');
+  wrapper.style.cssText='width:297mm;padding:10mm;box-sizing:border-box;background:#fff;font-family:Arial,sans-serif;';
+  wrapper.innerHTML=h;
+  container.appendChild(wrapper);
+  container.style.opacity='1';
+
+  requestAnimationFrame(async()=>{
+    try{
+      await document.fonts.ready;
+      await new Promise(r=>setTimeout(r,200));
+      const canvas=await html2canvas(wrapper,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});
+      const{jsPDF}=window.jspdf;
+      const doc=new jsPDF({orientation:'l',unit:'mm',format:'a4'});
+      const imgW=297,imgH=210;
+      const ratio=canvas.width/canvas.height;
+      let drawW=imgW,drawH=imgW/ratio;
+      if(drawH>imgH){drawH=imgH;drawW=imgH*ratio;}
+      doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',(imgW-drawW)/2,(imgH-drawH)/2,drawW,drawH);
+      doc.save('TPN_Order_'+ds.replace(/\//g,'-')+'.pdf');
+      showToast('Order PDF generated');
+    }catch(e){
+      showToast('Order PDF failed: '+e.message,'error');
+    }finally{
+      container.removeChild(wrapper);
+      container.style.opacity='0';
+      container.innerHTML='';
+      btn.disabled=false;
+    }
+  });
+}
+
+/* ===== TPN LABELS ===== */
+function smartN(v, d) {
+  if (v == null || isNaN(v)) return '—';
+  let s = Number(v).toFixed(d);
+  if (s.includes('.')) { s = s.replace(/0+$/, '').replace(/\.$/, ''); }
+  return s;
+}
+
+function genTpnLabels(){
+  const btn=$('btnTpnLabels');if(btn.disabled)return;btn.disabled=true;
+  const sel=getTpnCards().filter(c=>selectedTpnIds.has(c.id)&&c.tpn.results&&!c.tpn.results.errs.length&&c.tpn.results.ptot>0);
+  if(!sel.length){showToast('No valid TPN selected','error');btn.disabled=false;return;}
+  if(!window.html2canvas||!window.jspdf){showToast('Libraries not loaded','error');btn.disabled=false;return;}
+  showToast('Generating labels...','info');
+  const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;justify-content:center';overlay.innerHTML='<div style="background:#fff;border-radius:10px;padding:20px 32px;font-size:14px;font-weight:600;color:#333;box-shadow:0 8px 30px rgba(0,0,0,.18);display:flex;align-items:center;gap:10px"><i class="fas fa-spinner fa-spin" style="color:#0F766E;font-size:18px"></i> Generating labels...</div>';document.body.appendChild(overlay);
+  const ra=document.createElement('div');ra.style.cssText='position:fixed;top:0;left:0;z-index:-1;pointer-events:none';document.body.appendChild(ra);
+  const cd=new Date().toLocaleDateString('en-CA').split('-').slice(1).reverse().join('/');
+  const bags=[];
+  sel.forEach(p=>{
+    const r=p.tpn.results,nb=(r.split&&r.bag1)?2:1;
+    const lossRatio=r.ptot>0?r.tv/r.ptot:1;
+    const bagVol=r.bagVol||(r.tv+(r.paot||0)/(r.lm||1));
+    const totalAddos=r.pao.map(a=>({t:a.t,v:Math.round(a.v*lossRatio)})).filter(a=>a.v>0);
+    let bvs,bna,durs,baoArr;
+    if(nb===2){
+        const half=Math.round(bagVol/2);
+        bvs=[half,bagVol-half];
+        bna=['\u0643\u064A\u0633 \u0661 \u0645\u0646 \u0662','\u0643\u064A\u0633 \u0662 \u0645\u0646 \u0662'];durs=[12,12];baoArr=[totalAddos,totalAddos];
+    }else{
+        bvs=[Math.round(bagVol)];
+        bna=[''];durs=[24];baoArr=[totalAddos];
+    }
+    for(let i=0;i<nb;i++){
+      const adds=[];baoArr[i].forEach(a=>adds.push(TPN_AT[a.t].l+': '+smartN(a.v,1)+' ml'));
+      bags.push({
+        name:esc(p.name),
+        vol:smartN(bvs[i],0)+' ml',
+        date:cd,
+        gir:smartN(r.agir,1)+' mg/kg/min',
+        osm:smartN(r.osm,0)+' mOsm/L',
+        additives:adds.length?adds.join(', '):'\u2014',
+        route:r.osm>999?'Central':'Peripheral',
+        instr:'\u064A\u0636\u0628\u0637 \u0627\u0644\u062C\u0647\u0627\u0632 \u0639\u0644\u0649 '+smartN(bvs[i],0)+' \u0645\u0644 \u062E\u0644\u0627\u0644 '+durs[i]+' \u0633\u0627\u0639\u0629',
+        sub:bna[i]||''
+      });
+    }
+  });
+  const canvases=[];let bi=0;
+  function renderNext(){
+    if(bi>=bags.length){assemblePDF();return;}
+    const d=bags[bi],el=document.createElement('div');
+    el.style.cssText='width:270px;height:330px;overflow:hidden;border:1px solid #000;padding:4px 6px;font-family:Arial,sans-serif;direction:rtl;background:#fff;box-sizing:border-box';
+    el.innerHTML=`<div style="text-align:center;margin-bottom:3px"><div style="font-weight:800;font-size:22px;letter-spacing:4px">TPN</div>${d.sub?`<div style="font-size:9px;font-weight:700;margin-top:1px">${d.sub}</div>`:''}</div><table style="width:100%;border-collapse:collapse;font-size:11px;font-weight:700;vertical-align:middle"><tr style="border-bottom:.4mm solid #000"><td style="padding:6px 0;width:48%">اسم المريض</td><td style="padding:6px 5px;text-align:left;direction:ltr;overflow-wrap:break-word">${d.name}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:6px 0">الحجم الكلي</td><td style="padding:6px 5px;text-align:left;direction:ltr">${d.vol}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:6px 0">التاريخ</td><td style="padding:6px 5px;text-align:left;direction:ltr">${d.date}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:6px 0">وقت التحضير</td><td style="padding:6px 5px;text-align:left;direction:ltr">12:00 PM</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:6px 0">GIR</td><td style="padding:6px 5px;text-align:left;direction:ltr">${d.gir}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:6px 0">Osmolarity</td><td style="padding:6px 5px;text-align:left;direction:ltr">${d.osm}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:6px 0">الإضافات اليومية</td><td style="padding:6px 5px;text-align:left;direction:ltr;overflow-wrap:break-word">${d.additives}</td></tr><tr style="border-bottom:.4mm solid #000"><td style="padding:6px 0">طريقة الإعطاء</td><td style="padding:6px 5px;text-align:left;direction:ltr">${d.route}</td></tr><tr><td colspan="2" style="padding:6px 0;text-align:center;font-size:11px;font-weight:700">${d.instr}</td></tr></table>`;
+    ra.appendChild(el);bi++;
+    html2canvas(el,{scale:3,backgroundColor:'#fff',useCORS:true,logging:false}).then(canvas=>{
+      ra.removeChild(el);const rot=document.createElement('canvas');rot.width=canvas.height;rot.height=canvas.width;const ctx=rot.getContext('2d');ctx.translate(rot.width/2,rot.height/2);ctx.rotate(Math.PI/2);ctx.drawImage(canvas,-canvas.width/2,-canvas.height/2);canvases.push(rot);renderNext();
+    }).catch(()=>{if(el.parentNode)ra.removeChild(el);renderNext();});
+  }
+  function assemblePDF(){
+    document.body.removeChild(ra);
+    if(!canvases.length){if(overlay.parentNode)document.body.removeChild(overlay);showToast('Failed to render labels','error');return;}
+    try{
+      const jsPDF=window.jspdf.jsPDF,doc=new jsPDF('p','mm','a4');
+      const lw=100,lh=90;
+      const x=(210-lw)/2,y=(297-lh)/2;
+      canvases.forEach((c,i)=>{
+        if(i>0)doc.addPage();
+        doc.addImage(c.toDataURL('image/jpeg',.95),'JPEG',x,y,lw,lh);
+      });
+      doc.save('TPN-Labels-'+new Date().toLocaleDateString('en-CA')+'.pdf');showToast('Labels generated');
+    }catch(e){showToast('Label PDF failed: '+e.message,'error');}
+    if(overlay.parentNode)document.body.removeChild(overlay);
+    btn.disabled=false;
+  }
+  renderNext();
+}
+
+/* ===== TAB SWITCHING ===== */
+function switchTab(tab){
+activeTab=tab;$('docSection').style.display=tab==='doc'?'':'none';$('tpnSection').style.display=tab==='tpn'?'':'none';$('tabDoc').classList.toggle('active',tab==='doc');$('tabTpn').classList.toggle('active',tab==='tpn');if(tab==='tpn')renderTpnQueue();
+}
+
+/* ===== FIREBASE LISTENERS ===== */
+const unsub=onSnapshot(query(patientsRef,orderBy("saveDate","desc")),snap=>{
+setConn(true);initialLoaded=true;patients=snap.docs.map(d=>({drugs:[],...d.data(),id:d.id}));
+if(editingPatientId&&!patients.find(p=>p.id===editingPatientId)){clearForm();showToast('Patient deleted by another user','error');}
+renderQueue();renderFilterBar();updateCounter();if(activeTab==='tpn')renderTpnQueue();
+},err=>{console.error("Firestore error:",err);setConn(false);if(!patients.length){showToast('Connection failed. Retrying...','error');}else{showToast(`Connection lost — showing cached data (${patients.length} patients).`,'error');}renderQueue();renderFilterBar();updateCounter();if(activeTab==='tpn')renderTpnQueue();});
+
+const unsubTpn=onSnapshot(query(tpnStandRef,orderBy("weight","desc")),snap=>{
+standaloneTpn=snap.docs.map(d=>({id:d.id,...d.data()}));if(activeTab==='tpn')renderTpnQueue();
+},err=>console.warn("Standalone TPN error:",err));
+
+/* ===== EVENT LISTENERS ===== */
+ $('tabDoc').addEventListener('click',()=>switchTab('doc'));
+ $('tabTpn').addEventListener('click',()=>switchTab('tpn'));
+ $('btnAddDrug').addEventListener('click',addDrug);
+ $('btnSavePatient').addEventListener('click',savePatient);
+ $('btnPdf').addEventListener('click',genPDF);
+ $('btnClearAll').addEventListener('click',async()=>{if(!patients.length)return;const sc=selectedPatientIds.size;let ids,cm,sm;if(sc>0){ids=[...selectedPatientIds];cm=`Delete ${sc} selected?`;sm=`${sc} deleted`;}else{ids=patients.map(p=>p.id);cm=`Delete ALL ${patients.length}?`;sm='All deleted';}if(!confirm(cm))return;const bks=ids.map(id=>{const i=patients.findIndex(p=>p.id===id);const b=patients[i];patients.splice(i,1);return b;});selectedPatientIds.clear();renderQueue();renderFilterBar();try{await Promise.all(ids.map(id=>deleteDoc(doc(db,"patients",id))));showToast(sm);}catch(e){bks.forEach(b=>patients.push(b));renderQueue();renderFilterBar();showToast(`Failed: ${e.message}`,'error');}});
+ $('btnCancelEdit').addEventListener('click',()=>{clearForm();renderQueue();renderFilterBar();showToast('Edit cancelled','info');});
+ $('selectAllCheckbox').addEventListener('change',toggleSelAll);
+ $('selectCategory').addEventListener('change',updateDrugList);
+ $('selectDrug').addEventListener('change',handleDrugSel);
+ $('selectCustomMethod').addEventListener('change',handleCustMethod);
+ const debouncedDoc=debounce(handleDrugSel,150);
+ $('inputWeight').addEventListener('input',()=>{validateClin();debouncedDoc();updateFluidBar();});
+ $('inputGA').addEventListener('input',()=>{validateClin();debouncedDoc();});
+ $('inputDOB').addEventListener('change',()=>{updatePna();handleDrugSel();});
+ $('inputDose').addEventListener('input',()=>handleDoseChange('totalDose'));
+ $('inputDosePerKg').addEventListener('input',()=>handleDoseChange('dosePerKg'));
+ $('inputFreq').addEventListener('change',()=>handleDoseChange('freq'));
+ $('inputTargetVol').addEventListener('change',()=>handleDoseChange('targetVol'));
+ $('inputAddonVol').addEventListener('input',()=>handleDoseChange('addon'));
+ $('inputAddonType').addEventListener('input',()=>handleDoseChange('addon'));
+ $('inputBagVol').addEventListener('input',()=>handleDoseChange('bagVol'));
+ $('inputConcentration').addEventListener('input',()=>{if($('selectDrug').value==='other')updateOtherPreview();});
+ $('inputCustomUnit').addEventListener('input',()=>{updateConcLabel();if($('selectDrug').value==='other')updateOtherPreview();});
+ $('inputCustomMethod').addEventListener('input',()=>{const ct=$('inputCustomMethod').value.trim();if(ct){$('methodPreviewContainer').classList.remove('hidden');$('previewMethod').innerHTML=`<span class="arabic-text">${safeBN(ct)}</span>`;}else $('methodPreviewContainer').classList.add('hidden');});
+ $('darkModeToggle').addEventListener('click',()=>{const d=safeGet('theme')==='dark',n=!d;document.body.classList.toggle('dark-mode',n);safeSet('theme',n?'dark':'light');$('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!n);$('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',n);});
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+$('docSection').addEventListener('input',()=>{if(editingPatientId)dirty=true;});
+$('tpnSection').addEventListener('input',()=>{if(tpnEditId)dirty=true;});
+/* ===== v2: doc-tab search + keyboard shortcuts ===== */
+const debouncedDocSearch=debounce(q=>{docSearch=q;safeSet('docSearch',q);renderQueue();updateCounter();},150);
+$('docSearch').addEventListener('input',e=>{const q=e.target.value;$('docSearchClear').classList.toggle('show',q.length>0);debouncedDocSearch(q);});
+$('docSearchClear').addEventListener('click',()=>{$('docSearch').value='';docSearch='';safeSet('docSearch','');$('docSearchClear').classList.remove('show');renderQueue();updateCounter();$('docSearch').focus();});
+$('docSort').addEventListener('change',e=>{docSort=e.target.value;safeSet('docSort',docSort);renderQueue();updateCounter();});
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'){e.preventDefault();if(activeTab==='doc')savePatient();else saveTpn();}});
+
+/* ===== TPN EVENT LISTENERS ===== */
+ $('tpnBrand').addEventListener('change',()=>{safeSet('tpnBrand',$('tpnBrand').value);updTpnPreview();renderTpnQueue();});
+ $('tpnSearch').addEventListener('input',e=>handleTpnSearch(e.target.value));
+ $('tpnSearch').addEventListener('focus',e=>handleTpnSearch(e.target.value));
+ $('tpnSearchDropdown').addEventListener('click',e=>{const item=e.target.closest('.search-item');if(!item)return;const pid=item.dataset.pid,p=patients.find(x=>x.id===pid);if(!p)return;$('tpnSearchDropdown').classList.remove('show');$('tpnSearch').value=p.name;$('tpnSearch').readOnly=true;linkedPatientId=pid;tpnEditId=pid;tpnEditType='linked';$('tpnLinkedInfo').style.display='block';$('tpnLinkedInfo').textContent='🔗 Linked — name and weight locked';$('tpnEditingName').textContent=p.name;$('tpnEditingBanner').classList.remove('hidden');if(p.tpn){fillTpnForm(p.tpn,true);$('tpnEditMode').textContent='Editing';$('btnSaveTpn').textContent='Update TPN';}else{$('tpnWeight').value=p.weight;$('tpnWeight').readOnly=true;$('tpnEditMode').textContent='New';$('btnSaveTpn').textContent='Save TPN';updTpnPreview();}});
+document.addEventListener('click',e=>{if(!e.target.closest('#tpnSearch')&&!e.target.closest('#tpnSearchDropdown'))$('tpnSearchDropdown').classList.remove('show');});
+ const debouncedTpn=debounce(updTpnPreview,150);
+ $('tpnWeight').addEventListener('input',debouncedTpn);
+ $('tpnFluidInput').addEventListener('input',debouncedTpn);
+ $('tpnTreatVol').addEventListener('input',debouncedTpn);
+ $('tpnGIR').addEventListener('input',debouncedTpn);
+ $('tpnLipid').addEventListener('input',debouncedTpn);
+ $('tpnAA').addEventListener('input',debouncedTpn);
+ $('tpnEnteral').addEventListener('input',debouncedTpn);
+ $('tpnRBS').addEventListener('input',debouncedTpn);
+ $('btnTpnAddAddon').addEventListener('click',()=>{const c=$('tpnAddons'),idx=c.children.length;c.insertAdjacentHTML('beforeend',`<div class="tpn-addon-row"><select class="tpn-inp"><option value="na3">Na 3%</option><option value="na09">Na 0.9%</option><option value="k">K</option><option value="other">Other</option></select><input type="number" inputmode="numeric" class="tpn-inp" value="" step="1" min="0"><span style="font-size:10px;color:#94A3B8;flex-shrink:0">ml</span><button class="tpn-addon-rm" data-idx="${idx}"><i class="fas fa-times"></i></button></div>`);});
+ $('tpnAddons').addEventListener('click',e=>{const btn=e.target.closest('.tpn-addon-rm');if(!btn)return;btn.closest('.tpn-addon-row').remove();updTpnPreview();});
+ $('tpnAddons').addEventListener('input',updTpnPreview);
+ $('btnSaveTpn').addEventListener('click',saveTpn);
+ $('btnTpnCancelEdit').addEventListener('click',()=>{clearTpnForm();renderTpnQueue();showToast('Cancelled','info');});
+  $('btnDeleteSelectedTpn').addEventListener('click', deleteSelectedTpn);
+ $('tpnSelectAll').addEventListener('change',e=>{const cards=getTpnCards();if(e.target.checked)cards.forEach(c=>selectedTpnIds.add(c.id));else selectedTpnIds.clear();renderTpnQueue();});
+ $('btnTpnOrder').addEventListener('click',genTpnOrder);
+ $('btnTpnLabels').addEventListener('click',genTpnLabels);
+
+/* ===== INIT ===== */
+popDropdowns();
+initDark();
+/* v2: restore persisted UI state */
+const sb=safeGet('tpnBrand');if(sb&&[...$('tpnBrand').options].some(o=>o.value===sb))$('tpnBrand').value=sb;
+const df=safeGet('docFilter');if(df)activeFilter=df;
+const ds=safeGet('docSearch');if(ds){docSearch=ds;const el=$('docSearch');if(el){el.value=ds;el.parentNode.querySelector('.ds-clear')?.classList.add('show');}}
+const ss=safeGet('docSort');if(ss){docSort=ss;const sel=$('docSort');if(sel)sel.value=ss;}
+</script>
+</body>
+</html>
