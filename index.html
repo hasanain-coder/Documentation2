@@ -59,16 +59,18 @@ body.dark-mode input:-webkit-autofill,body.dark-mode input:-webkit-autofill:hove
 .chart-grid{border-collapse:collapse;font-size:11px;table-layout:fixed}
 .chart-grid th,.chart-grid td{border:1px solid var(--border);padding:4px 6px;text-align:center;vertical-align:middle}
 .chart-grid thead th{background:var(--surface);font-weight:700;color:var(--fg);position:sticky;top:0;z-index:2}
-.chart-grid .corner-cell{background:var(--accent);color:white;font-weight:700;writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;letter-spacing:1px}
+.chart-grid .corner-cell{background:var(--accent);color:white;font-weight:700;writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;letter-spacing:1px;position:sticky;right:0;z-index:5}
 .chart-grid .drug-head{height:120px;width:36px;min-width:36px;background:var(--surface);position:relative}
 .chart-grid .drug-head span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(180deg);white-space:nowrap;font-size:10px;font-weight:600;color:var(--fg);max-height:110px;overflow:hidden;text-orientation:mixed}
-.chart-grid .patient-cell{position:sticky;left:0;z-index:3;background:var(--card);text-align:left;font-weight:600;color:var(--fg);min-width:140px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chart-grid thead .patient-cell{z-index:4}
+.chart-grid .patient-cell{position:sticky;right:0;z-index:3;background:var(--card);text-align:left;font-weight:600;color:var(--fg);min-width:140px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-grid thead .patient-cell{z-index:6}
 .chart-grid .dose-cell{background:var(--card);color:var(--fg);font-weight:500}
 .chart-grid .dose-cell.has-dose{background:rgba(15,118,110,.06);color:var(--accent);font-weight:700}
-.chart-grid .sum-row td{background:var(--surface);font-weight:700;color:var(--muted);font-style:italic}
+.chart-grid .sum-row td{background:var(--surface);font-weight:700;color:var(--muted);font-style:italic;position:sticky;right:0;z-index:3}
 .chart-grid .sum-row .patient-cell{background:var(--surface);color:var(--muted)}
+.chart-grid .sum-row td:not(.patient-cell){position:static;z-index:auto}
 .chart-grid .empty-grid-cell{background:repeating-linear-gradient(45deg,transparent,transparent 4px,var(--surface) 4px,var(--surface) 8px)}
+#chartGrid{max-height:70vh;overflow:auto}
 /* PDF render of chart grid — forced light mode, sized for A4 landscape */
 .pdf-chart-page{width:297mm;min-height:210mm;padding:8mm;background:#fff;color:#000;box-sizing:border-box;font-family:'Inter','Cairo','Noto Sans Arabic',sans-serif}
 .pdf-chart-page h2{font-size:14pt;font-weight:900;margin:0 0 2mm 0;color:#000;font-family:'Crimson Pro',serif}
@@ -225,22 +227,26 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(15,118,110,.08);"><i class="fas fa-user-circle text-2xl text-[var(--accent)]"></i></div>
 <div class="flex-1 min-w-0"><p class="text-[var(--fg)] font-semibold">No patient selected</p><p class="text-[var(--muted)] text-sm">Calculator is in experimentation mode — click a patient below to view details, then Edit to load</p></div>
 </div>
-<div id="docPatientSelected" class="hidden p-4 flex items-center justify-between gap-3 flex-wrap">
+<div id="docPatientSelected" class="hidden p-4 space-y-3">
+<div class="flex items-center justify-between gap-3 flex-wrap">
 <div class="flex items-center gap-3 min-w-0">
 <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);"><i class="fas fa-user text-xl text-white"></i></div>
-<div class="min-w-0"><p id="docPatientName" class="font-bold text-[var(--fg)] truncate">—</p><p id="docPatientMeta" class="text-xs text-[var(--muted)] mt-0.5">—</p></div>
+<div class="min-w-0"><p id="docPatientName" class="font-bold text-[var(--fg)] truncate text-lg">—</p><p id="docPatientRoom" class="text-xs text-[var(--muted)] mt-0.5">—</p></div>
 </div>
 <button id="btnClearDocPatient" class="px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--muted)] text-sm font-medium hover:bg-[var(--surface)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>Clear</button>
+</div>
+<div id="docPatientStats" class="grid grid-cols-3 gap-2">
+<div class="bg-[var(--surface)] rounded-xl px-3 py-2 text-center"><p class="text-[10px] text-[var(--muted)] uppercase font-semibold tracking-wide">Weight</p><p id="docStatWeight" class="text-lg font-bold text-[var(--accent)]">—</p></div>
+<div class="bg-[var(--surface)] rounded-xl px-3 py-2 text-center"><p class="text-[10px] text-[var(--muted)] uppercase font-semibold tracking-wide">GA</p><p id="docStatGA" class="text-lg font-bold text-[var(--accent)]">—</p></div>
+<div class="bg-[var(--surface)] rounded-xl px-3 py-2 text-center"><p class="text-[10px] text-[var(--muted)] uppercase font-semibold tracking-wide">Age</p><p id="docStatAge" class="text-lg font-bold text-[var(--accent)]">—</p></div>
+</div>
 </div>
 </div>
 <section class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
 <div id="editingBanner" class="hidden editing-banner px-6 py-3 flex items-center justify-between"><div class="flex items-center gap-2"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span class="text-white font-semibold text-sm">Editing drugs for: <span id="editingBannerName" class="font-bold"></span></span></div><button id="btnCancelEdit" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors">Cancel</button></div>
 <div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">Medication & Dosage</h2><p class="text-white/75 text-sm mt-1">Calculate precise dosages by weight</p></div>
 <div class="p-6 space-y-6">
-<div class="patient-grid grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-x-hidden">
-<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Weight (kg) <span id="docWeightLock" class="text-[10px] text-[var(--accent)] font-bold uppercase tracking-wide hidden">· locked</span></label><input type="text" id="inputWeight" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Enter weight to calculate doses"></div>
-<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Postnatal Age</label><div id="docPnaBadge" class="px-4 py-3 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--muted)] bg-[var(--surface)]">—</div></div>
-</div>
+<div id="docWeightSection" class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Weight (kg) <span id="docWeightLock" class="text-[10px] text-[var(--accent)] font-bold uppercase tracking-wide hidden">· locked</span></label><input type="text" id="inputWeight" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Enter weight to calculate doses"></div>
 <div class="flex items-center gap-2 mb-4"><svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg><h3 class="text-lg font-semibold text-[var(--fg)]">Medication & Dosage</h3></div>
 <div class="med-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 items-start">
 <div class="space-y-2 lg:col-span-1"><label class="block text-sm font-semibold text-[var(--fg)]">Category</label><select id="selectCategory" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select></div>
@@ -393,7 +399,7 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <!-- Section 2: Grid -->
 <div class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
 <div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h3 class="text-lg text-white font-semibold flex items-center gap-2"><i class="fas fa-table"></i> Drug Grid</h3><p class="text-white/75 text-sm mt-0.5">Patient × drug matrix with single-dose quantities</p></div>
-<div id="chartGrid" class="p-4 overflow-x-auto"></div>
+<div id="chartGrid" class="p-4"></div>
 <div id="chartGridEmpty" class="hidden text-center py-8 px-6"><i class="fas fa-table text-3xl text-[var(--muted)]/30 mb-2"></i><p class="text-[var(--muted)] font-medium text-sm">No drugs to display</p></div>
 </div>
 </section>
@@ -506,7 +512,9 @@ const safeSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
 const initDark=()=>{const d=safeGet('theme')==='dark';document.body.classList.toggle('dark-mode',d);$('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!d);$('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',d);};
 const validateClin=()=>{const w=cleanN($('admissionWeight').value),ga=cleanN($('inputGA').value),ws=[];if(w>0&&(w<.4||w>6))ws.push(`Weight ${w}kg outside NICU range (0.4–6 kg)`);if(ga>0&&(ga<22||ga>44))ws.push(`GA ${ga}w outside range (22–44 weeks)`);if(ws.length){$('clinicalWarningText').innerHTML=ws.join('<br>');$('clinicalWarning').classList.remove('hidden');}else $('clinicalWarning').classList.add('hidden');};
 const validateDocWeight=()=>{const w=cleanN($('inputWeight').value);if(w>0&&(w<.4||w>6)){$('clinicalWarningText').innerHTML=`Weight ${w}kg outside NICU range (0.4–6 kg)`;$('clinicalWarning').classList.remove('hidden');}else if(!docPatientId){$('clinicalWarning').classList.add('hidden');}};
-const checkAlerts=drug=>{const ga=docPatientId?(patients.find(p=>p.id===docPatientId)?.ga||0):cleanN($('inputGA').value),a=docPatientId?(patients.find(p=>p.id===docPatientId)?getFormPna():0):getFormPna(),f=$('inputFreq').value,w=cleanN($('inputWeight').value);$('warningMessage').classList.add('hidden');if(drug&&drug.warning_rule){const r=drug.warning_rule(ga,a,f,w);if(r){$('warningMessage').innerHTML=r;$('warningMessage').classList.remove('hidden');}}};
+const getDocGa=()=>{if(docPatientId){const p=patients.find(x=>x.id===docPatientId);if(p)return cleanN(p.ga);}return cleanN($('inputGA').value);};
+const getDocPna=()=>{if(docPatientId){const p=patients.find(x=>x.id===docPatientId);if(p&&p.dob)return daysDiff(p.dob,new Date());}return getFormPna();};
+const checkAlerts=drug=>{const ga=getDocGa(),a=getDocPna(),f=$('inputFreq').value,w=cleanN($('inputWeight').value);$('warningMessage').classList.add('hidden');if(drug&&drug.warning_rule){const r=drug.warning_rule(ga,a,f,w);if(r){$('warningMessage').innerHTML=r;$('warningMessage').classList.remove('hidden');}}};
 const calcGIR=(w,g,v)=>{if(w<=0||g<=0||v<=0)return null;let ht=Math.round(((w*g*1440/50)-v)/9),gw=v-ht,ws=[];if(ht<0){ht=0;gw=v;ws.push("تنبيه: 5% GW يوفر تركيزاً أعلى من GIR المطلوب.");}else if(ht>v){ht=v;gw=0;ws.push("خطأ: الحجم غير كافٍ.");}const td=gw*50+ht*500,c=td/v/10,ag=td/w/1440;if(c>12.5)ws.push("تحذير: التركيز أعلى من 12.5%");return{gw,ht,conc:c,actualGIR:ag,warnings:ws};};
 
 const genMethod=(drug,dose)=>{
@@ -529,7 +537,7 @@ const updateOtherPreview=()=>{const mv=$('selectCustomMethod').value;if(!mv||mv=
 const handleCustMethod=()=>{const v=$('selectCustomMethod').value;if(!v){$('inputCustomMethod').classList.add('hidden');$('concentrationContainer').classList.add('hidden');$('targetVolContainer').classList.add('hidden');$('methodPreviewContainer').classList.add('hidden');return;}if(v==='other'){$('inputCustomMethod').classList.remove('hidden');$('concentrationContainer').classList.add('hidden');$('targetVolContainer').classList.add('hidden');const ct=$('inputCustomMethod').value.trim();if(ct){$('methodPreviewContainer').classList.remove('hidden');$('previewMethod').innerHTML=`<span class="arabic-text">${safeBN(ct)}</span>`;}else $('methodPreviewContainer').classList.add('hidden');}else{$('inputCustomMethod').classList.add('hidden');const mi=parseInt(v);if(METHODS_WITH_CALC.includes(mi)){$('concentrationContainer').classList.remove('hidden');updateConcLabel();}else $('concentrationContainer').classList.add('hidden');if(mi===3||mi===10||mi===16)$('targetVolContainer').classList.remove('hidden');else $('targetVolContainer').classList.add('hidden');updateOtherPreview();}};
 
 const handleDrugSel=()=>{
-const v=$('selectDrug').value,ga=cleanN($('inputGA').value),w=cleanN($('inputWeight').value),pna=getFormPna();
+const v=$('selectDrug').value,ga=getDocGa(),w=cleanN($('inputWeight').value),pna=getDocPna();
  $('totalDoseContainer').classList.remove('hidden');$('freqContainer').classList.remove('hidden');$('addonContainer').classList.add('hidden');$('dosePerKgContainer').classList.add('hidden');$('girContainer').classList.add('hidden');$('alertMessage').classList.add('hidden');$('warningMessage').classList.add('hidden');$('selectCustomMethod').classList.add('hidden');$('inputCustomMethod').classList.add('hidden');$('concentrationContainer').classList.add('hidden');
 if(v===''){$('inputDose').value='';$('inputDose').disabled=false;$('methodPreviewContainer').classList.add('hidden');$('inputCustomDrug').classList.add('hidden');$('inputCustomUnit').classList.add('hidden');$('targetVolContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');return;}
 const did=parseInt(v),drug=DRUG_CONFIG.find(d=>d.id===did);
@@ -563,7 +571,7 @@ const updPreview=(d,dose)=>{$('previewMethod').innerHTML=genMethod(d,dose);$('me
 const renderDopTable=w=>{const tb=$('dopamineTableBody');if(w<=0){tb.innerHTML='<tr><td colspan="2" class="p-4 text-center text-[var(--muted)]">Enter weight</td></tr>';return;}tb.innerHTML=[2,5,7,10].map(d=>`<tr><td class="p-2 text-center font-bold text-[var(--accent)] border border-[var(--border)]">${((d*w*1440)/1000).toFixed(0)} ml/24hr</td><td class="p-2 text-center border border-[var(--border)]">${d}</td></tr>`).join('');};
 
 /* ===== FORM CLEAR (split) ===== */
-const clearDocForm=()=>{editingPatientId=null;dirty=false;docPatientId=null;$('inputWeight').value='';$('inputWeight').readOnly=false;$('docWeightLock').classList.add('hidden');$('inputGIR').value='';$('inputBagVol').value='';currentDrugs=[];currentDrugLog=[];renderDrugList();updateFluidBar();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');$('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';$('inputConcentration').value='';$('concentrationContainer').classList.add('hidden');$('editingBanner').classList.add('hidden');$('clinicalWarning').classList.add('hidden');$('fluidSummary').classList.add('hidden');$('docPatientEmpty').classList.remove('hidden');$('docPatientSelected').classList.add('hidden');$('docPnaBadge').textContent='—';$('docPnaBadge').className='px-4 py-3 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--muted)] bg-[var(--surface)]';$('btnSavePatient').disabled=true;$('btnSavePatient').textContent='Save Drug Therapy';};
+const clearDocForm=()=>{editingPatientId=null;dirty=false;docPatientId=null;$('inputWeight').value='';$('inputWeight').readOnly=false;$('docWeightLock').classList.add('hidden');$('docWeightSection').classList.remove('hidden');$('inputGIR').value='';$('inputBagVol').value='';currentDrugs=[];currentDrugLog=[];renderDrugList();updateFluidBar();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');$('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';$('inputConcentration').value='';$('concentrationContainer').classList.add('hidden');$('editingBanner').classList.add('hidden');$('clinicalWarning').classList.add('hidden');$('fluidSummary').classList.add('hidden');$('docPatientEmpty').classList.remove('hidden');$('docPatientSelected').classList.add('hidden');$('btnSavePatient').disabled=true;$('btnSavePatient').textContent='Save Drug Therapy';};
 const clearAdmissionForm=()=>{editingPatientId=null;dirty=false;$('inputName').value='';$('admissionWeight').value='';$('inputGA').value='';$('inputDOB').value='';$('inputRoom').value='';$('inputFileId').value='';$('pnaDisplay').classList.add('hidden');$('clinicalWarning').classList.add('hidden');$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('admissionEditingBanner').classList.add('hidden');$('btnSavePatientInfo').textContent='Save Patient';};
 /* legacy alias for code that still references clearForm() — clears BOTH forms */
 const clearForm=()=>{clearDocForm();clearAdmissionForm();};
@@ -983,11 +991,11 @@ const renderChartTab=()=>{
       pages.forEach((drugPage,di)=>{
         const pageLabel=(patientPages.length>1||pages.length>1)?`<div class="text-xs text-[var(--muted)] mb-2 font-semibold">Page ${pi*pages.length+di+1}</div>`:'';
         html+=pageLabel+`<table class="chart-grid"><thead><tr>`;
-        html+=`<th class="patient-cell corner-cell">الخدج</th>`;
         drugPage.forEach(d=>{html+=`<th class="drug-head"><span>${esc(d.name)}</span></th>`;});
+        html+=`<th class="patient-cell corner-cell">الخدج</th>`;
         html+=`</tr></thead><tbody>`;
         patPage.forEach(p=>{
-          html+=`<tr><td class="patient-cell">${esc(p.name)}</td>`;
+          html+=`<tr>`;
           drugPage.forEach(d=>{
             const drug=(p.drugs||[]).find(x=>x.drugId===d.drugId);
             if(drug){
@@ -1001,19 +1009,19 @@ const renderChartTab=()=>{
               html+=`<td class="dose-cell empty-grid-cell"></td>`;
             }
           });
-          html+=`</tr>`;
+          html+=`<td class="patient-cell">${esc(p.name)}</td></tr>`;
         });
         /* fill empty patient rows up to PATIENT_ROWS (for handwriting) */
         const emptyRows=PATIENT_ROWS-patPage.length;
         for(let r=0;r<emptyRows;r++){
-          html+=`<tr><td class="patient-cell">&nbsp;</td>`;
+          html+=`<tr>`;
           drugPage.forEach(()=>{html+=`<td class="dose-cell empty-grid-cell"></td>`;});
-          html+=`</tr>`;
+          html+=`<td class="patient-cell">&nbsp;</td></tr>`;
         }
         /* sum row (blank for now — Q4.a) */
-        html+=`<tr class="sum-row"><td class="patient-cell">المجموع</td>`;
+        html+=`<tr class="sum-row">`;
         drugPage.forEach(()=>{html+=`<td></td>`;});
-        html+=`</tr>`;
+        html+=`<td class="patient-cell">المجموع</td></tr>`;
         html+=`</tbody></table>`;
         if(pi<patientPages.length-1||di<pages.length-1)html+=`<div class="h-6"></div>`; /* spacer between pages */
       });
@@ -1163,7 +1171,7 @@ const clearAllToDischarge=async()=>{
 /* editPatientInfo: Admission tab — loads identity into Admission form */
 window.editPatientInfo=async id=>{const p=patients.find(x=>x.id===id);if(!p)return;editingPatientId=id;$('inputName').value=p.name;$('admissionWeight').value=p.weight;$('inputGA').value=p.ga;$('inputDOB').value=p.dob||'';if(p.dob){const ps=p.dob.split('-');$('dobText').textContent=`${ps[2]}/${ps[1]}/${ps[0]}`;$('dobFake').classList.add('has-date');updatePna();}else{$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('pnaDisplay').classList.add('hidden');}$('inputRoom').value=p.room||'';$('inputFileId').value=p.fileId||'';$('admissionEditingName').textContent=p.name;$('admissionEditingBanner').classList.remove('hidden');$('btnSavePatientInfo').textContent='Update Patient';renderAdmissionQueue();window.scrollTo({top:0,behavior:'smooth'});};
 /* editPatientDrugs: Documentation tab — loads drugs into Documentation form, sets docPatientId */
-window.editPatient=async id=>{const p=patients.find(x=>x.id===id);if(!p)return;docPatientId=id;editingPatientId=id;$('inputWeight').value=p.weight;$('inputWeight').readOnly=true;$('docWeightLock').classList.remove('hidden');currentDrugs=[...p.drugs];currentDrugLog=[];renderDrugList();updateFluidBar();$('editingBannerName').textContent=p.name;$('editingBanner').classList.remove('hidden');$('docPatientEmpty').classList.add('hidden');$('docPatientSelected').classList.remove('hidden');$('docPatientName').textContent=p.name;const la=getLiveAge(p),ad=fmtAge(la),rm=p.room&&ROOMS.includes(p.room)?p.room:null;$('docPatientMeta').innerHTML=`${p.weight}kg | GA:${esc(p.ga)}w | D${ad}${rm?' | '+rm:''}`;const pnaTxt=p.dob?`Day ${ageDay(p.dob,new Date())}`:'—';$('docPnaBadge').textContent=pnaTxt;$('docPnaBadge').className='px-4 py-3 rounded-xl border border-[var(--accent)]/30 text-sm font-semibold bg-[var(--accent)]/5';$('btnSavePatient').disabled=false;$('btnSavePatient').textContent='Update Drug Therapy';renderQueue();window.scrollTo({top:0,behavior:'smooth'});};
+window.editPatient=async id=>{const p=patients.find(x=>x.id===id);if(!p)return;docPatientId=id;editingPatientId=id;$('inputWeight').value=p.weight;$('inputWeight').readOnly=true;$('docWeightLock').classList.remove('hidden');$('docWeightSection').classList.add('hidden');currentDrugs=[...p.drugs];currentDrugLog=[];renderDrugList();updateFluidBar();$('editingBannerName').textContent=p.name;$('editingBanner').classList.remove('hidden');$('docPatientEmpty').classList.add('hidden');$('docPatientSelected').classList.remove('hidden');$('docPatientName').textContent=p.name;const la=getLiveAge(p),ad=fmtAge(la),rm=p.room&&ROOMS.includes(p.room)?p.room:null;$('docPatientRoom').textContent=rm||'No room assigned';$('docStatWeight').textContent=p.weight+'kg';$('docStatGA').textContent=(p.ga||'—')+'w';$('docStatAge').textContent='D'+ad;$('btnSavePatient').disabled=false;$('btnSavePatient').textContent='Update Drug Therapy';renderQueue();window.scrollTo({top:0,behavior:'smooth'});};
 /* clearDocPatient: Documentation tab — exits drug-editing mode, returns to experimentation */
 window.clearDocPatient=()=>{clearDocForm();renderQueue();};
 
@@ -1183,7 +1191,7 @@ el.innerHTML=`<div class="pdf-cell-header"><div style="display:flex;justify-cont
 container.appendChild(pd);await document.fonts.ready;await new Promise(r=>setTimeout(r,200));const canvas=await html2canvas(pd,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',0,0,210,297);if(i<pages.length-1)doc.addPage();container.removeChild(pd);}
 doc.save('NICU_Report.pdf');showToast('PDF Generated');}catch(err){showToast('PDF failed: '+err.message,'error');}finally{container.style.opacity='0';container.innerHTML='';}};
 
-/* genChartPdf: generates A4 landscape PDF of the Chart tab (Section 1 + Section 2).
+/* genChartPdf: generates A4 landscape PDF of the Chart tab — DRUG GRID ONLY (Step 5 fix).
    Uses same pattern as genPDF — renders to #pdf-render-container, captures with html2canvas.
    Button disables during generation (prevents double-click race). */
 const genChartPdf=async()=>{
@@ -1194,12 +1202,6 @@ const genChartPdf=async()=>{
   try{
     const now=new Date(),ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}),ts=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
     const chartPatients=getChartPatients();
-    /* === build Section 1 data (same logic as renderChartTab) === */
-    const groups=SPECIAL_DRUG_IDS.map(did=>{
-      const entries=[];
-      chartPatients.forEach(p=>{(p.drugs||[]).forEach(d=>{if(d.drugId===did)entries.push({patient:p,drug:d});});});
-      return{drugId:did,name:SPECIAL_DRUG_NAMES[did],entries};
-    }).filter(g=>g.entries.length>0);
     /* === build Section 2 data (same logic as renderChartTab) === */
     const drugMap=new Map();
     chartPatients.forEach(p=>{
@@ -1221,6 +1223,7 @@ const genChartPdf=async()=>{
       });
     });
     const eligibleDrugs=[...drugMap.values()].sort((a,b)=>a.order!==b.order?a.order-b.order:a.name.localeCompare(b.name));
+    if(eligibleDrugs.length===0){showToast('No drugs to export','error');return;}
     /* paginate: 39 cols/page, 34 patients/page */
     const MAX_COLS=39,PATIENT_ROWS=34;
     const drugPages=[];
@@ -1228,46 +1231,22 @@ const genChartPdf=async()=>{
     const patientPages=[];
     for(let i=0;i<chartPatients.length;i+=PATIENT_ROWS)patientPages.push(chartPatients.slice(i,i+PATIENT_ROWS));
     if(patientPages.length===0)patientPages.push([]);
-    const totalGridPages=patientPages.length*drugPages.length;
-    const totalPages=(groups.length>0?1:0)+totalGridPages;
+    const totalPages=patientPages.length*drugPages.length;
     const{jsPDF}=window.jspdf;
-    const doc=new jsPDF({orientation:'l',unit:'mm',format:'a4'}); /* landscape A4 = 297×210 */
+    const doc=new jsPDF({orientation:'l',unit:'mm',format:'a4'});
     let pageNum=0;
-    /* === Page 1: Section 1 (Specific Drugs) — only if there are entries === */
-    if(groups.length>0){
-      const pd=document.createElement('div');pd.className='pdf-chart-page';
-      let html=`<h2>NICU Daily Supply Request</h2><div class="pdf-date">Baghdad Teaching Hospital — ${ds} ${ts}</div>`;
-      html+=`<h3>Specific Drugs</h3><div class="pdf-chart-specific">`;
-      groups.forEach(g=>{
-        html+=`<div class="pdf-chart-specific-group"><div class="gname">${esc(g.name)} (${g.entries.length})</div>`;
-        g.entries.forEach(e=>{
-          const p=e.patient,d=e.drug;
-          const doseStr=d.isNutrient&&d.isGIR?`${d.dose} ml`:`${d.dose||''}${d.unit?esc(d.unit):''}`;
-          html+=`<div class="pdf-chart-specific-entry"><div><div class="pname">${esc(p.name)}</div><div class="pfile">File: ${p.fileId||'—'}</div></div><div class="pdose">${esc(doseStr)} ${esc(d.freq||'')}</div></div>`;
-        });
-        html+=`</div>`;
-      });
-      html+=`</div>`;
-      pd.innerHTML=html;
-      container.appendChild(pd);await document.fonts.ready;await new Promise(r=>setTimeout(r,200));
-      const canvas=await html2canvas(pd,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});
-      doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',0,0,297,210);
-      pageNum++;
-      if(pageNum<totalPages)doc.addPage();
-      container.removeChild(pd);
-    }
-    /* === Pages 2+: Section 2 (Grid) — one page per patient-page × drug-page combo === */
+    /* === Grid pages — patient column on the RIGHT === */
     for(let pi=0;pi<patientPages.length;pi++){
       for(let di=0;di<drugPages.length;di++){
         const patPage=patientPages[pi],drugPage=drugPages[di];
         const pd=document.createElement('div');pd.className='pdf-chart-page';
-        let html=`<h2>NICU Daily Supply Request — Drug Grid</h2><div class="pdf-date">Baghdad Teaching Hospital — ${ds} ${ts}${(patientPages.length>1||drugPages.length>1)?' — Page '+(pi*drugPages.length+di+1):''}</div>`;
+        let html=`<h2>NICU Daily Supply Request — Drug Grid</h2><div class="pdf-date">Baghdad Teaching Hospital — ${ds} ${ts}${(patientPages.length>1||drugPages.length>1)?' — Page '+(pi*drugPages.length+di+1)+'/'+totalPages:''}</div>`;
         html+=`<table class="pdf-chart-grid-table"><thead><tr>`;
-        html+=`<th class="pdf-patient-cell pdf-corner">الخدج</th>`;
         drugPage.forEach(d=>{html+=`<th class="pdf-drug-head"><span>${esc(d.name)}</span></th>`;});
+        html+=`<th class="pdf-patient-cell pdf-corner">الخدج</th>`;
         html+=`</tr></thead><tbody>`;
         patPage.forEach(p=>{
-          html+=`<tr><td class="pdf-patient-cell">${esc(p.name)}</td>`;
+          html+=`<tr>`;
           drugPage.forEach(d=>{
             const drug=(p.drugs||[]).find(x=>x.drugId===d.drugId);
             if(drug){
@@ -1276,17 +1255,18 @@ const genChartPdf=async()=>{
               else{html+=`<td class="pdf-dose"></td>`;}
             }else{html+=`<td class="pdf-dose pdf-empty"></td>`;}
           });
-          html+=`</tr>`;
+          html+=`<td class="pdf-patient-cell">${esc(p.name)}</td></tr>`;
         });
         const emptyRows=PATIENT_ROWS-patPage.length;
         for(let r=0;r<emptyRows;r++){
-          html+=`<tr><td class="pdf-patient-cell">&nbsp;</td>`;
+          html+=`<tr>`;
           drugPage.forEach(()=>{html+=`<td class="pdf-dose pdf-empty"></td>`;});
-          html+=`</tr>`;
+          html+=`<td class="pdf-patient-cell">&nbsp;</td></tr>`;
         }
-        html+=`<tr class="pdf-sum-row"><td class="pdf-patient-cell">المجموع</td>`;
+        html+=`<tr class="pdf-sum-row">`;
         drugPage.forEach(()=>{html+=`<td></td>`;});
-        html+=`</tr></tbody></table>`;
+        html+=`<td class="pdf-patient-cell">المجموع</td></tr>`;
+        html+=`</tbody></table>`;
         pd.innerHTML=html;
         container.appendChild(pd);await document.fonts.ready;await new Promise(r=>setTimeout(r,200));
         const canvas=await html2canvas(pd,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});
