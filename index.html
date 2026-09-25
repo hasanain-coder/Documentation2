@@ -55,6 +55,65 @@ body.dark-mode input:-webkit-autofill,body.dark-mode input:-webkit-autofill:hove
 .filter-pill{transition:all .2s ease;cursor:pointer;user-select:none}
 .filter-pill:hover{transform:translateY(-1px)}
 .filter-pill.active{background:var(--accent)!important;color:white!important;border-color:var(--accent)!important;box-shadow:0 2px 8px rgba(15,118,110,.3)}
+/* ===== chart grid (Step 4) ===== */
+.chart-grid{border-collapse:collapse;font-size:11px;table-layout:fixed}
+.chart-grid th,.chart-grid td{border:1px solid var(--border);padding:4px 6px;text-align:center;vertical-align:middle}
+.chart-grid thead th{background:var(--surface);font-weight:700;color:var(--fg);position:sticky;top:0;z-index:2}
+.chart-grid .corner-cell{background:var(--accent);color:white;font-weight:700;writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;letter-spacing:1px}
+.chart-grid .drug-head{height:120px;width:36px;min-width:36px;background:var(--surface);position:relative}
+.chart-grid .drug-head span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(180deg);white-space:nowrap;font-size:10px;font-weight:600;color:var(--fg);max-height:110px;overflow:hidden;text-orientation:mixed}
+.chart-grid .patient-cell{position:sticky;left:0;z-index:3;background:var(--card);text-align:left;font-weight:600;color:var(--fg);min-width:140px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-grid thead .patient-cell{z-index:4}
+.chart-grid .dose-cell{background:var(--card);color:var(--fg);font-weight:500}
+.chart-grid .dose-cell.has-dose{background:rgba(15,118,110,.06);color:var(--accent);font-weight:700}
+.chart-grid .sum-row td{background:var(--surface);font-weight:700;color:var(--muted);font-style:italic}
+.chart-grid .sum-row .patient-cell{background:var(--surface);color:var(--muted)}
+.chart-grid .empty-grid-cell{background:repeating-linear-gradient(45deg,transparent,transparent 4px,var(--surface) 4px,var(--surface) 8px)}
+/* PDF render of chart grid — forced light mode, sized for A4 landscape */
+.pdf-chart-page{width:297mm;min-height:210mm;padding:8mm;background:#fff;color:#000;box-sizing:border-box;font-family:'Inter','Cairo','Noto Sans Arabic',sans-serif}
+.pdf-chart-page h2{font-size:14pt;font-weight:900;margin:0 0 2mm 0;color:#000;font-family:'Crimson Pro',serif}
+.pdf-chart-page h3{font-size:11pt;font-weight:700;margin:4mm 0 2mm 0;color:#000;padding-bottom:1mm;border-bottom:1.5px solid #000}
+.pdf-chart-page .pdf-date{font-size:9pt;color:#333;margin-bottom:3mm}
+.pdf-chart-specific{font-size:9pt;margin-bottom:3mm}
+.pdf-chart-specific-group{margin-bottom:2.5mm;page-break-inside:avoid}
+.pdf-chart-specific-group .gname{font-weight:700;color:#000;margin-bottom:1mm;font-size:9.5pt}
+.pdf-chart-specific-entry{display:flex;justify-content:space-between;padding:1mm 2mm;background:#f5f5f5;border-radius:2px;margin-bottom:0.8mm;font-size:8.5pt}
+.pdf-chart-specific-entry .pname{font-weight:600;color:#000}
+.pdf-chart-specific-entry .pfile{color:#555;font-size:7.5pt}
+.pdf-chart-specific-entry .pdose{font-weight:700;color:#0F766E}
+.pdf-chart-grid-table{border-collapse:collapse;font-size:7pt;table-layout:fixed;width:100%}
+.pdf-chart-grid-table th,.pdf-chart-grid-table td{border:0.5px solid #000;padding:1.5px 2px;text-align:center;vertical-align:middle}
+.pdf-chart-grid-table thead th{background:#f0f0f0;font-weight:700;color:#000}
+.pdf-chart-grid-table .pdf-corner{background:#0F766E;color:#fff;font-weight:700;writing-mode:vertical-rl;transform:rotate(180deg);font-size:9pt;letter-spacing:1px;width:8mm}
+.pdf-chart-grid-table .pdf-drug-head{height:32mm;width:6mm;background:#f0f0f0;position:relative}
+.pdf-chart-grid-table .pdf-drug-head span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(180deg);white-space:nowrap;font-size:6.5pt;font-weight:600;color:#000;max-height:30mm;overflow:hidden;text-orientation:mixed}
+.pdf-chart-grid-table .pdf-patient-cell{text-align:left;font-weight:600;color:#000;min-width:30mm;max-width:35mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#fff}
+.pdf-chart-grid-table thead .pdf-patient-cell{background:#f0f0f0}
+.pdf-chart-grid-table .pdf-dose{background:#fff;color:#000;font-weight:500}
+.pdf-chart-grid-table .pdf-dose.has{background:rgba(15,118,110,.1);color:#0F766E;font-weight:700}
+.pdf-chart-grid-table .pdf-empty{background:repeating-linear-gradient(45deg,transparent,transparent 2px,#f5f5f5 2px,#f5f5f5 4px)}
+.pdf-chart-grid-table .pdf-sum-row td{background:#f0f0f0;font-weight:700;color:#555;font-style:italic}
+.pdf-chart-grid-table .pdf-sum-row .pdf-patient-cell{background:#f0f0f0;color:#555}
+/* ===== sidebar navigation ===== */
+.app-layout{display:flex;gap:1.5rem;align-items:flex-start}
+.sidebar{width:200px;flex-shrink:0;position:sticky;top:80px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:600;color:var(--muted);background:transparent;border:1px solid transparent;cursor:pointer;transition:all .15s;font-family:inherit;text-align:left}
+.nav-item:hover:not(.active){background:var(--surface);color:var(--fg)}
+.nav-item.active{background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);color:white;box-shadow:0 2px 8px rgba(15,118,110,.25)}
+.nav-item i{width:18px;text-align:center;flex-shrink:0;font-size:14px}
+#navToggle{display:none;width:40px;height:40px;border:1px solid var(--border);background:var(--surface);border-radius:10px;align-items:center;justify-content:center;cursor:pointer;color:var(--fg);flex-shrink:0}
+#navToggle:hover{border-color:var(--accent);color:var(--accent)}
+.sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:55;display:none}
+.sidebar-backdrop.show{display:block}
+#sidebarClose{display:none;position:absolute;top:12px;right:12px;width:32px;height:32px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-radius:8px;align-items:center;justify-content:center}
+#sidebarClose:hover{background:var(--surface);color:var(--fg)}
+@media(max-width:1023px){
+#navToggle{display:flex}
+.sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:var(--card);border-right:1px solid var(--border);padding:1.5rem 1rem;z-index:60;transform:translateX(-100%);transition:transform .3s cubic-bezier(.22,1,.36,1);overflow-y:auto}
+.sidebar.open{transform:translateX(0)}
+#sidebarClose{display:flex}
+.sidebar nav{margin-top:8px}
+}
 .room-tag{font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600}
 .room-tag.r1{background:rgba(99,102,241,.15);color:#6366F1}.room-tag.r2{background:rgba(245,158,11,.15);color:#D97706}.room-tag.rec{background:rgba(16,185,129,.15);color:#059669}.room-tag.un{background:rgba(90,104,114,.12);color:var(--muted);border:1px dashed var(--muted)}
 body.dark-mode .room-tag.r1{color:#A5B4FC;background:rgba(165,180,252,.15)}
@@ -70,9 +129,6 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 .dob-fake svg{width:18px;height:18px;flex-shrink:0;opacity:.5}
 @media(max-width:640px){.med-grid{grid-template-columns:1fr!important}.med-grid>div{min-width:0!important}}
 @media(min-width:641px)and(max-width:1023px){.med-grid{grid-template-columns:1fr 1fr!important}}
-.tab-btn{padding:4px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);transition:all .2s;font-family:inherit}
-.tab-btn.active{background:var(--accent);color:white;border-color:var(--accent);box-shadow:0 2px 8px rgba(15,118,110,.25)}
-.tab-btn:hover:not(.active){border-color:var(--accent);color:var(--accent)}
 #tpnSection .tpn-inp{width:100%;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;color:var(--fg);background:var(--surface);transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield}
 #tpnSection .tpn-inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2.5px rgba(15,118,110,.1)}
 #tpnSection .tpn-inp::-webkit-outer-spin-button,#tpnSection .tpn-inp::-webkit-inner-spin-button{-webkit-appearance:none}
@@ -128,31 +184,20 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 .ds-clear:hover{background:var(--surface);color:var(--danger)}
 .queue-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 
-/* ===== v3: accessibility + sort + drug toggle ===== */
+/* ===== v3: accessibility + sort ===== */
 :where(button,select,input,[role="button"],a,label):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .sort-select{background:var(--surface);border:1px solid var(--border);color:var(--fg);padding:7px 28px 7px 11px;border-radius:10px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5'%3E%3Cpath d='M3 6h18M6 12h12M10 18h4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:all .2s;flex-shrink:0}
 .sort-select:hover{border-color:var(--accent)}
 .sort-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2.5px rgba(15,118,110,.1)}
-.drug-toggle{width:30px;height:30px;border:1px solid var(--border);background:var(--surface);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;color:var(--accent)}
-.drug-toggle:hover{border-color:var(--accent);background:rgba(15,118,110,.08)}
-.drug-toggle.paused{color:#D97706;border-color:rgba(217,119,6,.3)}
-.drug-toggle.paused:hover{color:#D97706;border-color:#D97706;background:rgba(217,119,6,.08)}
-.drug-row{transition:opacity .2s}
-.drug-row.paused{opacity:.5}
-.drug-row.paused .drug-name{text-decoration:line-through;text-decoration-color:var(--muted)}
-.drug-badge.paused-badge{background:rgba(217,119,6,.12);color:#D97706}
-body.dark-mode .drug-badge.paused-badge{background:rgba(252,211,77,.12);color:#FCD34D}
-body.dark-mode .drug-toggle.paused{color:#FCD34D;border-color:rgba(252,211,77,.3)}
-@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.55}}
-.live-badge{animation:livePulse 2.2s ease-in-out infinite}
 </style>
 </head>
 <body class="min-h-screen">
 <header class="sticky top-0 z-50 backdrop-blur-md border-b border-[var(--border)] shadow-sm" style="background-color:color-mix(in srgb, var(--card) 95%, transparent)">
 <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
 <div class="flex items-center gap-3">
+<button id="navToggle" aria-label="Open navigation"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] flex items-center justify-center shadow-md"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg></div>
-<div><h1 class="text-xl md:text-2xl font-bold text-[var(--fg)] tracking-tight">NICU Pharmacist Tool</h1><div class="flex items-center gap-1.5 mt-0.5"><button id="tabDoc" class="tab-btn active">Documentation</button><button id="tabTpn" class="tab-btn">TPN Calculator</button></div></div>
+<div><h1 class="text-xl md:text-2xl font-bold text-[var(--fg)] tracking-tight">NICU Pharmacist Tool</h1></div>
 </div>
 <div class="flex items-center gap-3">
 <div id="connectionStatus" class="connection-badge inline-block">Connecting...</div>
@@ -160,25 +205,42 @@ body.dark-mode .drug-toggle.paused{color:#FCD34D;border-color:rgba(252,211,77,.3
 </div>
 </div>
 </header>
-<main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+<div class="max-w-5xl mx-auto px-4 py-6 app-layout">
+<aside id="sidebar" class="sidebar" aria-label="Main navigation">
+<button id="sidebarClose" aria-label="Close navigation"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+<nav class="space-y-1">
+<button data-tab="doc" class="nav-item active"><i class="fas fa-file-medical"></i><span>Documentation</span></button>
+<button data-tab="tpn" class="nav-item"><i class="fas fa-flask"></i><span>TPN Calculator</span></button>
+<button data-tab="admission" class="nav-item"><i class="fas fa-user-plus"></i><span>Admission</span></button>
+<button data-tab="discharge" class="nav-item"><i class="fas fa-user-check"></i><span>Discharge</span></button>
+<button data-tab="chart" class="nav-item"><i class="fas fa-chart-line"></i><span>Chart</span></button>
+</nav>
+</aside>
+<div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+<main class="flex-1 min-w-0 space-y-6">
 <!-- ===== DOCUMENTATION ===== -->
 <section id="docSection">
+<div id="docPatientHeader" class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
+<div id="docPatientEmpty" class="p-6 flex items-center gap-3">
+<div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:rgba(15,118,110,.08);"><i class="fas fa-user-circle text-2xl text-[var(--accent)]"></i></div>
+<div class="flex-1 min-w-0"><p class="text-[var(--fg)] font-semibold">No patient selected</p><p class="text-[var(--muted)] text-sm">Calculator is in experimentation mode — click a patient below to view details, then Edit to load</p></div>
+</div>
+<div id="docPatientSelected" class="hidden p-4 flex items-center justify-between gap-3 flex-wrap">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,var(--accent) 0%,var(--accent-light) 100%);"><i class="fas fa-user text-xl text-white"></i></div>
+<div class="min-w-0"><p id="docPatientName" class="font-bold text-[var(--fg)] truncate">—</p><p id="docPatientMeta" class="text-xs text-[var(--muted)] mt-0.5">—</p></div>
+</div>
+<button id="btnClearDocPatient" class="px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--muted)] text-sm font-medium hover:bg-[var(--surface)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>Clear</button>
+</div>
+</div>
 <section class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
-<div id="editingBanner" class="hidden editing-banner px-6 py-3 flex items-center justify-between"><div class="flex items-center gap-2"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span class="text-white font-semibold text-sm">Editing: <span id="editingBannerName" class="font-bold"></span></span></div><button id="btnCancelEdit" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors">Cancel</button></div>
-<div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">Patient Information</h2><p class="text-white/75 text-sm mt-1">Enter details to calculate precise dosages</p></div>
+<div id="editingBanner" class="hidden editing-banner px-6 py-3 flex items-center justify-between"><div class="flex items-center gap-2"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span class="text-white font-semibold text-sm">Editing drugs for: <span id="editingBannerName" class="font-bold"></span></span></div><button id="btnCancelEdit" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors">Cancel</button></div>
+<div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">Medication & Dosage</h2><p class="text-white/75 text-sm mt-1">Calculate precise dosages by weight</p></div>
 <div class="p-6 space-y-6">
-<div class="patient-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-hidden">
-<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Patient Name</label><input type="text" id="inputName" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Full name"></div>
-<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Weight (kg)</label><input type="text" id="inputWeight" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 2.35"></div>
-<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Date of Birth</label><div class="dob-wrapper"><div class="dob-fake" id="dobFake" onclick="document.getElementById('inputDOB').showPicker()"><span id="dobText">Select date...</span><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><input type="date" id="inputDOB"></div></div>
-</div>
 <div class="patient-grid grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-x-hidden">
-<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Gestational Age (weeks)</label><input type="text" id="inputGA" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.').replace(/[^0-9.]/g,'')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 34"></div>
-<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Room</label><select id="inputRoom" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"><option value="">-- Optional --</option><option value="Room 1">Room 1</option><option value="Room 2">Room 2</option><option value="Reception">Reception</option></select></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Weight (kg) <span id="docWeightLock" class="text-[10px] text-[var(--accent)] font-bold uppercase tracking-wide hidden">· locked</span></label><input type="text" id="inputWeight" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Enter weight to calculate doses"></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Postnatal Age</label><div id="docPnaBadge" class="px-4 py-3 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--muted)] bg-[var(--surface)]">—</div></div>
 </div>
-<div id="pnaDisplay" class="hidden text-sm font-semibold px-4 py-2 rounded-xl" style="background:rgba(15,118,110,.08);border:1px solid rgba(15,118,110,.15);color:var(--accent);"></div>
-<div id="clinicalWarning" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2"><svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><p id="clinicalWarningText" class="text-sm text-amber-700 font-semibold"></p></div>
-<div class="border-t border-[var(--border)] pt-6">
 <div class="flex items-center gap-2 mb-4"><svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg><h3 class="text-lg font-semibold text-[var(--fg)]">Medication & Dosage</h3></div>
 <div class="med-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 items-start">
 <div class="space-y-2 lg:col-span-1"><label class="block text-sm font-semibold text-[var(--fg)]">Category</label><select id="selectCategory" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select></div>
@@ -202,11 +264,10 @@ body.dark-mode .drug-toggle.paused{color:#FCD34D;border-color:rgba(252,211,77,.3
 </div>
 <div id="methodPreviewContainer" class="hidden bg-[var(--surface)] border border-[var(--accent)]/20 rounded-xl p-4 mb-4"><div class="flex items-start gap-3"><div class="p-2 rounded-lg bg-[var(--accent)]/10"><svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></div><div class="flex-1"><p class="text-xs font-semibold text-[var(--accent)] uppercase tracking-wide mb-1">Method of Administration</p><p id="previewMethod" class="text-[var(--fg)] text-sm leading-relaxed font-bold" style="direction:ltr;text-align:left;">-</p><p id="warningMessage" class="hidden text-sm text-[var(--danger)] font-bold mt-2 arabic-text"></p></div></div></div>
 <div id="alertMessage" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 flex items-center gap-2"><svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><p id="alertText" class="text-sm text-amber-700 font-semibold arabic-text"></p></div>
-</div>
 <div id="dopamineTableContainer" class="hidden mt-6 overflow-x-auto"><h4 class="text-lg font-bold text-[var(--accent)] mb-3">Dopamine Infusion Table</h4><table class="w-full text-sm border-collapse border border-[var(--border)] rounded-xl overflow-hidden"><thead class="bg-[var(--accent)] text-white"><tr><th class="p-2 border border-[#0F766E]">Rate (ml/24hr)</th><th class="p-2 border border-[#0F766E]">Dose (mcg/kg/min)</th></tr></thead><tbody id="dopamineTableBody" class="bg-[var(--card)]"></tbody></table></div>
 <div id="drugsList" class="mt-4 space-y-2"></div>
 <div id="fluidSummary" class="hidden rounded-xl p-4 mb-4 flex items-center gap-3" style="background:rgba(15,118,110,.08);border:1px solid rgba(15,118,110,.2);"><div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink:0" style="background:rgba(15,118,110,.15);"><svg class="w-5 h-5 text-[var(--accent)]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0L12 2.69z"/></svg></div><div><p class="text-sm font-bold text-[var(--fg)]">Total Fluid: <span id="fluidTotal">0</span> ml / 24hr</p><p class="text-xs text-[var(--muted)]"><span id="fluidPerKgDay">0</span> ml/kg/day  |  <span id="fluidPerKgHr">0</span> ml/kg/hr</p></div></div>
-<button id="btnSavePatient" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg mt-6">Save Patient to Queue</button>
+<button id="btnSavePatient" disabled class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg mt-6">Save Drug Therapy</button>
 </div></section>
 <section class="space-y-4">
 <h2 class="text-2xl font-bold text-[var(--fg)]">Patient Queue</h2>
@@ -272,7 +333,72 @@ body.dark-mode .drug-toggle.paused{color:#FCD34D;border-color:rgba(252,211,77,.3
 <div id="tpnQueue" class="space-y-3"></div>
 <div id="tpnEmptyState" class="hidden text-center py-20 bg-[var(--card)] rounded-2xl border-2 border-dashed border-[var(--border)]"><svg class="w-20 h-20 mx-auto text-[var(--muted)]/30 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg><p class="text-[var(--muted)] text-lg font-medium">No TPN calculations</p><p class="text-[var(--muted)]/60 text-sm mt-1">Search a patient above or add standalone</p></div>
 </div></section>
+<!-- ===== ADMISSION ===== -->
+<section id="admissionSection" style="display:none">
+<div id="admissionEditingBanner" class="hidden editing-banner px-6 py-3 flex items-center justify-between"><div class="flex items-center gap-2"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span class="text-white font-semibold text-sm">Editing: <span id="admissionEditingName" class="font-bold"></span></span></div><button id="btnAdmissionCancelEdit" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors">Cancel</button></div>
+<section class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
+<div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">Patient Information</h2><p class="text-white/75 text-sm mt-1">Add new patient or edit existing</p></div>
+<div class="p-6 space-y-6">
+<div class="patient-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-hidden">
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Patient Name</label><input type="text" id="inputName" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Full name"></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Weight (kg)</label><input type="text" id="admissionWeight" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 2.35"></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Date of Birth</label><div class="dob-wrapper"><div class="dob-fake" id="dobFake" onclick="document.getElementById('inputDOB').showPicker()"><span id="dobText">Select date...</span><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><input type="date" id="inputDOB"></div></div>
+</div>
+<div class="patient-grid grid grid-cols-1 sm:grid-cols-3 gap-4 overflow-x-hidden">
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Gestational Age (weeks)</label><input type="text" id="inputGA" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.').replace(/[^0-9.]/g,'')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 34"></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Room</label><select id="inputRoom" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"><option value="">-- Optional --</option><option value="Room 1">Room 1</option><option value="Room 2">Room 2</option><option value="Reception">Reception</option></select></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">File ID</label><input type="text" id="inputFileId" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Numbers only"></div>
+</div>
+<div id="pnaDisplay" class="hidden text-sm font-semibold px-4 py-2 rounded-xl" style="background:rgba(15,118,110,.08);border:1px solid rgba(15,118,110,.15);color:var(--accent);"></div>
+<div id="clinicalWarning" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2"><svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><p id="clinicalWarningText" class="text-sm text-amber-700 font-semibold"></p></div>
+<button id="btnSavePatientInfo" class="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg">Save Patient</button>
+</div>
+</section>
+<section class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
+<div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">Patient List</h2><p class="text-white/75 text-sm mt-1">Click a patient to view details, then Edit to load</p></div>
+<div class="p-6 space-y-4">
+<div class="doc-search-wrap"><svg class="ds-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="admissionSearch" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] text-sm" placeholder="Search patients by name…" autocomplete="off" aria-label="Search patients in admission"><button class="ds-clear" id="admissionSearchClear" title="Clear search" aria-label="Clear search"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+<div id="admissionQueue" class="space-y-3"></div>
+<div id="admissionEmptyState" class="hidden text-center py-20 bg-[var(--card)] rounded-2xl border-2 border-dashed border-[var(--border)]"><svg class="w-20 h-20 mx-auto text-[var(--muted)]/30 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/></svg><p id="admissionEmptyStateMsg" class="text-[var(--muted)] text-lg font-medium">No patients in list</p><p id="admissionEmptyStateHint" class="text-[var(--muted)]/60 text-sm mt-1">Add patient information above to begin</p></div>
+</div>
+</section>
+</section>
+<!-- ===== DISCHARGE ===== -->
+<section id="dischargeSection" style="display:none">
+<!-- Pending discharges section -->
+<div class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
+<div class="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-4 flex items-center justify-between"><div><h2 class="text-xl text-white font-semibold flex items-center gap-2"><i class="fas fa-clock"></i> Pending Discharge</h2><p class="text-white/75 text-sm mt-1">Choose the fate of each patient to complete the discharge</p></div><span id="pendingCount" class="bg-white/20 text-white text-sm font-bold px-3 py-1 rounded-full">0</span></div>
+<div id="pendingDischargeQueue" class="p-4 space-y-3"></div>
+<div id="pendingEmptyState" class="hidden text-center py-12 px-6"><i class="fas fa-check-circle text-4xl text-[var(--muted)]/30 mb-3"></i><p class="text-[var(--muted)] font-medium">No pending discharges</p><p class="text-[var(--muted)]/60 text-sm mt-1">Discharge patients from the Documentation or Admission tab to see them here</p></div>
+</div>
+<!-- Completed discharges section -->
+<div class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
+<div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4 flex items-center justify-between"><div><h2 class="text-xl text-white font-semibold flex items-center gap-2"><i class="fas fa-check-circle"></i> Completed Discharges</h2><p class="text-white/75 text-sm mt-1">Records saved for further analysis</p></div><div class="flex items-center gap-2"><button id="btnExportCsv" class="bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"><i class="fas fa-file-csv"></i> Export CSV</button><span id="completedCount" class="bg-white/20 text-white text-sm font-bold px-3 py-1 rounded-full">0</span></div></div>
+<div id="completedDischargeQueue" class="p-4 space-y-3"></div>
+<div id="completedEmptyState" class="hidden text-center py-12 px-6"><i class="fas fa-file-medical text-4xl text-[var(--muted)]/30 mb-3"></i><p class="text-[var(--muted)] font-medium">No completed discharges yet</p><p class="text-[var(--muted)]/60 text-sm mt-1">Complete pending discharges above to build the analysis dataset</p></div>
+</div>
+</section>
+<!-- ===== CHART (Daily Supply Request) ===== -->
+<section id="chartSection" style="display:none">
+<!-- Header -->
+<div class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
+<div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4 flex items-center justify-between"><div><h2 class="text-xl text-white font-semibold">Daily Supply Request</h2><p class="text-white/75 text-sm mt-1">Pharmacist daily drug supply chart</p></div><button id="btnChartPdf" class="bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5"><i class="fas fa-file-pdf"></i> Export PDF</button></div>
+</div>
+<!-- Section 1: Specific Drugs -->
+<div class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
+<div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h3 class="text-lg text-white font-semibold flex items-center gap-2"><i class="fas fa-prescription-bottle-medical"></i> Specific Drugs</h3><p class="text-white/75 text-sm mt-0.5">Colistin (Loading/Maint/neb), Tigecycline, Meropenem, TPN</p></div>
+<div id="chartSpecificDrugs" class="p-4"></div>
+<div id="chartSpecificEmpty" class="hidden text-center py-8 px-6"><i class="fas fa-clipboard-list text-3xl text-[var(--muted)]/30 mb-2"></i><p class="text-[var(--muted)] font-medium text-sm">No patients currently on specific drugs</p></div>
+</div>
+<!-- Section 2: Grid -->
+<div class="bg-[var(--card)] rounded-2xl shadow-lg border border-[var(--border)] overflow-hidden animate-fade-up">
+<div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h3 class="text-lg text-white font-semibold flex items-center gap-2"><i class="fas fa-table"></i> Drug Grid</h3><p class="text-white/75 text-sm mt-0.5">Patient × drug matrix with single-dose quantities</p></div>
+<div id="chartGrid" class="p-4 overflow-x-auto"></div>
+<div id="chartGridEmpty" class="hidden text-center py-8 px-6"><i class="fas fa-table text-3xl text-[var(--muted)]/30 mb-2"></i><p class="text-[var(--muted)] font-medium text-sm">No drugs to display</p></div>
+</div>
+</section>
 </main>
+</div>
 <div id="pdf-render-container"></div>
 <div id="toast" role="status" aria-live="polite" class="fixed left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl font-medium shadow-xl z-50 opacity-0 translate-y-4 transition-all duration-300 pointer-events-none" style="bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px))"><span id="toastMsg">Message</span></div>
 <script type="module">
@@ -280,7 +406,7 @@ const firebaseConfig={apiKey:"AIzaSyAaMqxvBAuTkOykYHF5w_xjS98bDOhZoPY",authDomai
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getFirestore,collection,addDoc,deleteDoc,doc,setDoc,deleteField,onSnapshot,query,orderBy}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp(firebaseConfig),db=getFirestore(app);
-const patientsRef=collection(db,"patients"),tpnStandRef=collection(db,"tpn_standalone");
+const patientsRef=collection(db,"patients"),tpnStandRef=collection(db,"tpn_standalone"),dischargesRef=collection(db,"discharges");
 
 /* ===== DOCUMENTATION CONSTANTS ===== */
 const METHODS={1:'** / 5min',2:'** + 5 ml GW / 10 min',3:'** + ## ml GW >> <span class="arabic-text" style="display:inline-block;direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /30 min',4:'** + 3 ml GW / 3 min',5:'** / 60 min',6:'over 24 hr',7:'Special Nutrients',9:'كل اثنين وخميس',8:'** <span class="arabic-text" style="display:inline-block;direction:rtl;">مع المغذي</span> ',10:'** + ## ml GW >> <span class="arabic-text" style="display:inline-block;direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /24 hr',11:' ** + 3ml NS / 15 min <span class="arabic-text" style="display:inline-block;direction:rtl;">تبخير</span>',12:'تحل الكبسولة ب ٢ سي سي كلوكوز وتر ثم يدفع عن طريق ال OG ثم يدفع ٢ سي سي كلوكوز وتر عن طريق ال OG',13:'بالفم',14:' 3ml NS / 15 min <span class="arabic-text" style="display:inline-block;direction:rtl;">تبخير</span>',15:'<span class="arabic-text" style="display:inline-block;direction:rtl;">قطرة واحدة بالعين المصابة</span>',16:'** + ## ml GW >> <span class="arabic-text" style="display:inline-block;direction:rtl;">تفرغ 10 سيسي</span> >> ^^ ml /2 hr'};
@@ -343,7 +469,12 @@ const TPN_AT={na3:{l:'Na 3%',na:.513,k:0},na09:{l:'Na 0.9%',na:.154,k:0},k:{l:'K
 
 /* ===== STATE ===== */
 let patients=[],currentDrugs=[],selectedPatientIds=new Set(),editingPatientId=null,activeFilter='all';
-let standaloneTpn=[],selectedTpnIds=new Set(),tpnEditId=null,tpnEditType=null,activeTab='doc',linkedPatientId=null,dirty=false,initialLoaded=false,docSearch='',docSort='newest';
+let standaloneTpn=[],selectedTpnIds=new Set(),tpnEditId=null,tpnEditType=null,activeTab='doc',linkedPatientId=null,dirty=false,initialLoaded=false,docSearch='',docSort='newest',admissionSearch='',docPatientId=null,admissionExpandedIds=new Set();
+let discharges=[],dischargeExpandedIds=new Set(),editingDischargeId=null;
+/* currentDrugLog tracks NEW drug add/remove events during the current edit session.
+   On saveDrugTherapy, these are appended to the patient's persisted drugLog array.
+   On editPatient or clearDocForm, currentDrugLog is reset to []. */
+let currentDrugLog=[];
 
 /* ===== UTILITIES ===== */
 const $=id=>document.getElementById(id);
@@ -363,6 +494,7 @@ const getNextEmptyName=()=>{let max=0;const re=/^empty\s+(\d+)$/i;standaloneTpn.
 /* ===== AGE ===== */
 const isOver30=v=>v==='>30'||parseInt(v)>=999;
 const getLiveAge=p=>{if(p.dob)return ageDay(p.dob,new Date());if(p.saveDate&&p.ageBaseline&&!isOver30(p.ageBaseline))return(parseInt(p.ageBaseline)||0)+daysDiff(p.saveDate,new Date());if(isOver30(p.ageBaseline))return 999;return parseInt(p.ageBaseline)||0;};
+/* ===== PNA / CLINICAL VALIDATION ===== */
 const getFormPna=()=>{const d=$('inputDOB').value;return d?daysDiff(d,new Date()):0;};
 const isAgeLive=p=>{if(p.dob)return true;return p.saveDate&&!isOver30(p.ageBaseline)&&daysDiff(p.saveDate,new Date())>0;};
 const fmtAge=a=>a>=999?'30+':a;
@@ -372,8 +504,9 @@ const showToast=(m,t='success')=>{const c={success:'bg-[#047857] text-white',err
 const safeGet=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
 const safeSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
 const initDark=()=>{const d=safeGet('theme')==='dark';document.body.classList.toggle('dark-mode',d);$('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!d);$('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',d);};
-const validateClin=()=>{const w=cleanN($('inputWeight').value),ga=cleanN($('inputGA').value),ws=[];if(w>0&&(w<.4||w>6))ws.push(`Weight ${w}kg outside NICU range (0.4–6 kg)`);if(ga>0&&(ga<22||ga>44))ws.push(`GA ${ga}w outside range (22–44 weeks)`);if(ws.length){$('clinicalWarningText').innerHTML=ws.join('<br>');$('clinicalWarning').classList.remove('hidden');}else $('clinicalWarning').classList.add('hidden');};
-const checkAlerts=drug=>{const ga=cleanN($('inputGA').value),a=getFormPna(),f=$('inputFreq').value,w=cleanN($('inputWeight').value);$('warningMessage').classList.add('hidden');if(drug&&drug.warning_rule){const r=drug.warning_rule(ga,a,f,w);if(r){$('warningMessage').innerHTML=r;$('warningMessage').classList.remove('hidden');}}};
+const validateClin=()=>{const w=cleanN($('admissionWeight').value),ga=cleanN($('inputGA').value),ws=[];if(w>0&&(w<.4||w>6))ws.push(`Weight ${w}kg outside NICU range (0.4–6 kg)`);if(ga>0&&(ga<22||ga>44))ws.push(`GA ${ga}w outside range (22–44 weeks)`);if(ws.length){$('clinicalWarningText').innerHTML=ws.join('<br>');$('clinicalWarning').classList.remove('hidden');}else $('clinicalWarning').classList.add('hidden');};
+const validateDocWeight=()=>{const w=cleanN($('inputWeight').value);if(w>0&&(w<.4||w>6)){$('clinicalWarningText').innerHTML=`Weight ${w}kg outside NICU range (0.4–6 kg)`;$('clinicalWarning').classList.remove('hidden');}else if(!docPatientId){$('clinicalWarning').classList.add('hidden');}};
+const checkAlerts=drug=>{const ga=docPatientId?(patients.find(p=>p.id===docPatientId)?.ga||0):cleanN($('inputGA').value),a=docPatientId?(patients.find(p=>p.id===docPatientId)?getFormPna():0):getFormPna(),f=$('inputFreq').value,w=cleanN($('inputWeight').value);$('warningMessage').classList.add('hidden');if(drug&&drug.warning_rule){const r=drug.warning_rule(ga,a,f,w);if(r){$('warningMessage').innerHTML=r;$('warningMessage').classList.remove('hidden');}}};
 const calcGIR=(w,g,v)=>{if(w<=0||g<=0||v<=0)return null;let ht=Math.round(((w*g*1440/50)-v)/9),gw=v-ht,ws=[];if(ht<0){ht=0;gw=v;ws.push("تنبيه: 5% GW يوفر تركيزاً أعلى من GIR المطلوب.");}else if(ht>v){ht=v;gw=0;ws.push("خطأ: الحجم غير كافٍ.");}const td=gw*50+ht*500,c=td/v/10,ag=td/w/1440;if(c>12.5)ws.push("تحذير: التركيز أعلى من 12.5%");return{gw,ht,conc:c,actualGIR:ag,warnings:ws};};
 
 const genMethod=(drug,dose)=>{
@@ -429,7 +562,11 @@ if(src==='totalDose'||src==='dosePerKg'){const md=cleanN($('inputDose').value);i
 const updPreview=(d,dose)=>{$('previewMethod').innerHTML=genMethod(d,dose);$('methodPreviewContainer').classList.remove('hidden');};
 const renderDopTable=w=>{const tb=$('dopamineTableBody');if(w<=0){tb.innerHTML='<tr><td colspan="2" class="p-4 text-center text-[var(--muted)]">Enter weight</td></tr>';return;}tb.innerHTML=[2,5,7,10].map(d=>`<tr><td class="p-2 text-center font-bold text-[var(--accent)] border border-[var(--border)]">${((d*w*1440)/1000).toFixed(0)} ml/24hr</td><td class="p-2 text-center border border-[var(--border)]">${d}</td></tr>`).join('');};
 
-const clearForm=()=>{editingPatientId=null;dirty=false;$('inputName').value='';$('inputWeight').value='';$('inputGA').value='';$('inputDOB').value='';$('inputRoom').value='';$('inputGIR').value='';$('inputBagVol').value='';currentDrugs=[];renderDrugList();updateFluidBar();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');$('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';$('inputConcentration').value='';$('concentrationContainer').classList.add('hidden');$('editingBanner').classList.add('hidden');$('clinicalWarning').classList.add('hidden');$('fluidSummary').classList.add('hidden');$('pnaDisplay').classList.add('hidden');$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('btnSavePatient').textContent='Save Patient to Queue';};
+/* ===== FORM CLEAR (split) ===== */
+const clearDocForm=()=>{editingPatientId=null;dirty=false;docPatientId=null;$('inputWeight').value='';$('inputWeight').readOnly=false;$('docWeightLock').classList.add('hidden');$('inputGIR').value='';$('inputBagVol').value='';currentDrugs=[];currentDrugLog=[];renderDrugList();updateFluidBar();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');$('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';$('inputConcentration').value='';$('concentrationContainer').classList.add('hidden');$('editingBanner').classList.add('hidden');$('clinicalWarning').classList.add('hidden');$('fluidSummary').classList.add('hidden');$('docPatientEmpty').classList.remove('hidden');$('docPatientSelected').classList.add('hidden');$('docPnaBadge').textContent='—';$('docPnaBadge').className='px-4 py-3 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--muted)] bg-[var(--surface)]';$('btnSavePatient').disabled=true;$('btnSavePatient').textContent='Save Drug Therapy';};
+const clearAdmissionForm=()=>{editingPatientId=null;dirty=false;$('inputName').value='';$('admissionWeight').value='';$('inputGA').value='';$('inputDOB').value='';$('inputRoom').value='';$('inputFileId').value='';$('pnaDisplay').classList.add('hidden');$('clinicalWarning').classList.add('hidden');$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('admissionEditingBanner').classList.add('hidden');$('btnSavePatientInfo').textContent='Save Patient';};
+/* legacy alias for code that still references clearForm() — clears BOTH forms */
+const clearForm=()=>{clearDocForm();clearAdmissionForm();};
 const setConn=on=>{const b=$('connectionStatus');b.textContent=on?"Live":"Offline";b.classList.toggle('offline',!on);};
 
 /* ===== DOCUMENTATION QUEUE ===== */
@@ -437,12 +574,15 @@ const getRoomC=()=>{const c={all:patients.length};ROOMS.forEach(r=>c[r]=0);c.una
 const applySearch=arr=>{const q=docSearch.trim().toLowerCase();if(!q)return arr;return arr.filter(p=>(p.name||'').toLowerCase().includes(q));};
 const applySort=arr=>{const a=[...arr];switch(docSort){case 'name':return a.sort((x,y)=>(x.name||'').localeCompare(y.name||''));case 'wAsc':return a.sort((x,y)=>(parseFloat(x.weight)||0)-(parseFloat(y.weight)||0));case 'wDesc':return a.sort((x,y)=>(parseFloat(y.weight)||0)-(parseFloat(x.weight)||0));case 'room':return a.sort((x,y)=>(x.room||'~').localeCompare(y.room||'~'));default:return a;}};
 const getFiltered=()=>{let r;if(activeFilter==='all')r=patients;else if(activeFilter==='unassigned')r=patients.filter(p=>!p.room||!ROOMS.includes(p.room));else r=patients.filter(p=>p.room===activeFilter);return applySort(applySearch(r));};
+/* admission queue: same data, no filter bar, just search + sort by newest */
+const getFilteredAdmission=()=>{const q=admissionSearch.trim().toLowerCase();let r=q?patients.filter(p=>(p.name||'').toLowerCase().includes(q)):patients;return r;};
 const renderFilterBar=()=>{const c=getRoomC();let h=`<button onclick="setFilter('all')" class="filter-pill px-3 py-1.5 rounded-full text-sm font-medium border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] ${activeFilter==='all'?'active':''}">All (${c.all})</button>`;ROOMS.forEach(r=>{if(c[r]>0)h+=`<button onclick="setFilter('${r}')" class="filter-pill px-3 py-1.5 rounded-full text-sm font-medium border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] ${activeFilter===r?'active':''}">${r} (${c[r]})</button>`;});if(c.unassigned>0)h+=`<button onclick="setFilter('unassigned')" class="filter-pill px-3 py-1.5 rounded-full text-sm font-medium border border-dashed border-[var(--muted)] bg-[var(--surface)] text-[var(--muted)] ${activeFilter==='unassigned'?'active':''}" style="${activeFilter==='unassigned'?'':'opacity:.6'}">Unassigned (${c.unassigned})</button>`;$('filterBar').innerHTML=h;};
 window.setFilter=f=>{activeFilter=f;safeSet('docFilter',f);renderFilterBar();renderQueue();updateCounter();};
 const expandedIds=new Set(),expandedTpnIds=new Set();
 window.toggleCard=id=>{const b=$('body-'+id),c=$('chevron-'+id);if(!b||!c)return;const on=!b.classList.contains('expanded');b.classList.toggle('expanded',on);c.classList.toggle('rotated',on);if(on)expandedIds.add(id);else expandedIds.delete(id);};
+window.toggleAdmissionCard=id=>{const b=$('admission-body-'+id),c=$('admission-chev-'+id);if(!b||!c)return;const on=!b.classList.contains('expanded');b.classList.toggle('expanded',on);c.classList.toggle('rotated',on);if(on)admissionExpandedIds.add(id);else admissionExpandedIds.delete(id);};
 
-const calcFluidDose=(d,w)=>{if(d.active===false)return 0;if(d.noPrint)return 0;if(d.isNutrient&&!d.isDopamine)return d.dose||0;if(d.drugId===9)return(5*w*1440)/1000;if(d.drugId===12)return d.dose||0;if(d.methodIndex===3||d.methodIndex===10||d.methodIndex===16)return d.targetVol||10;if(d.methodIndex===5&&d.factor)return d.dose/d.factor;return 0;};
+const calcFluidDose=(d,w)=>{if(d.noPrint)return 0;if(d.isNutrient&&!d.isDopamine)return d.dose||0;if(d.drugId===9)return(5*w*1440)/1000;if(d.drugId===12)return d.dose||0;if(d.methodIndex===3||d.methodIndex===10||d.methodIndex===16)return d.targetVol||10;if(d.methodIndex===5&&d.factor)return d.dose/d.factor;return 0;};
 const getFreqMul=f=>{if(!f)return 1;if(f==='q36hr')return 24/36;if(f==='q48hr')return .5;const n=parseInt(f.replace(/[^0-9]/g,''));return n>0?n:1;};
 const calcTotalFluid=(drugs,w)=>{if(w<=0)return null;let t=0;drugs.forEach(d=>{t+=calcFluidDose(d,w)*getFreqMul(d.freq);});if(t<=0)return null;return{totalMl:Math.round(t*10)/10,mlKgD:Math.round((t/w)*100)/100,mlKgH:Math.round((t/w/24)*100)/100};};
 const updateFluidBar=()=>{const w=cleanN($('inputWeight').value);const f=calcTotalFluid(currentDrugs,w);if(!f||f.totalMl<=0){$('fluidSummary').classList.add('hidden');return;}$('fluidTotal').textContent=f.totalMl;$('fluidPerKgDay').textContent=f.mlKgD;$('fluidPerKgHr').textContent=f.mlKgH;$('fluidSummary').classList.remove('hidden');};
@@ -450,17 +590,440 @@ const fluidTxt=p=>{const w=parseFloat(p.weight)||0;if(w<=0)return'';const f=calc
 
 const updateCounter=()=>{const t=patients.length,s=selectedPatientIds.size,fl=getFiltered(),f=fl.length,sf=fl.filter(p=>selectedPatientIds.has(p.id)).length;$('pdfBtnText').textContent=s>0?`Generate PDF (${s})`:'Generate PDF';$('clearBtnText').textContent=s>0?`Clear Selected (${s})`:'Clear All';$('btnPdf').disabled=s===0;const es=$('emptyState'),em=$('emptyStateMsg'),eh=$('emptyStateHint');if(!initialLoaded){es.classList.remove('hidden');em.innerHTML='<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Loading patients...';eh.textContent='';}else if(f>0){es.classList.add('hidden');}else{es.classList.remove('hidden');if(docSearch.trim()){em.textContent='No patients match "'+docSearch.trim()+'"';eh.textContent='Clear the search to see all patients';}else if(activeFilter!=='all'){em.textContent='No patients in '+activeFilter;eh.textContent='Switch to All to see every patient';}else{em.textContent='No patients in queue';eh.textContent='Add patient information above to begin';}}const cb=$('selectAllCheckbox');if(cb){cb.checked=f>0&&sf===f;cb.indeterminate=sf>0&&sf<f;}};
 window.toggleSel=id=>{if(selectedPatientIds.has(id))selectedPatientIds.delete(id);else selectedPatientIds.add(id);updateCounter();renderQueue();};
-window.toggleDrugActiveForm=i=>{const d=currentDrugs[i];if(!d)return;d.active=d.active===false?true:false;renderDrugList();updateFluidBar();showToast(d.active===false?'Drug paused':'Drug resumed','info');};
-window.toggleDrugActive=async(pid,idx)=>{const p=patients.find(x=>x.id===pid);if(!p||!p.drugs[idx])return;const d=p.drugs[idx];const was=d.active!==false;d.active=was?false:true;renderQueue();updateCounter();try{await setDoc(doc(db,"patients",pid),{drugs:p.drugs},{merge:true});showToast(was?'Drug paused':'Drug resumed','info');}catch(e){d.active=was?true:false;renderQueue();updateCounter();showToast('Failed: '+e.message,'error');}};
+
 
 const renderQueue=()=>{
 const fl=getFiltered();
- $('patientQueue').innerHTML=fl.map((p,i)=>{const isSel=selectedPatientIds.has(p.id),la=getLiveAge(p),ad=fmtAge(la),sl=isAgeLive(p),isE=editingPatientId===p.id,dc=p.drugs.length,activeDc=p.drugs.filter(d=>d.active!==false).length,ac=p.drugs.filter(d=>d.active!==false&&d.alert).length,rm=p.room&&ROOMS.includes(p.room)?p.room:null,rb=rm?`<span class="room-tag ${ROOM_STYLES[rm].tag}">${ROOM_STYLES[rm].label}</span>`:'<span class="room-tag un">--</span>',ft=fluidTxt(p);
-return`<div class="patient-card bg-[var(--card)] rounded-2xl border ${isE?'border-amber-400 ring-2 ring-amber-400/30':'border-[var(--border)]'} shadow-sm overflow-hidden card-hover" style="animation-delay:${i*40}ms"><div class="px-4 py-3 flex items-center justify-between cursor-pointer select-none" onclick="toggleCard('${p.id}')"><div class="flex items-center gap-3 min-w-0"><input type="checkbox" ${isSel?'checked':''} onclick="event.stopPropagation();toggleSel('${p.id}')" class="w-5 h-5 rounded border border-[var(--border)] text-[var(--accent)] flex-shrink-0"><div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="font-bold text-[var(--fg)] truncate">${esc(p.name)}</h3>${rb}</div><div class="flex items-center gap-2 flex-wrap"><span class="text-xs text-[var(--muted)]">${p.weight}kg | GA:${esc(p.ga)}w | D${ad}</span>${ft?`<span class="text-xs font-semibold text-[var(--accent)]">${ft}</span>`:''}${sl?'<span class="live-badge">LIVE</span>':''}${isE?'<span class="live-badge" style="background:#F59E0B">EDITING</span>':''}</div></div></div><div class="flex items-center gap-2 flex-shrink-0"><span class="text-xs font-medium ${activeDc<dc?'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20':'text-[var(--muted)] bg-[var(--surface)]'} px-2 py-1 rounded-lg">${activeDc}${activeDc<dc?'/'+dc:''} drug${dc!==1?'s':''}</span>${ac>0?`<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400">${ac}</span>`:''}<svg id="chevron-${p.id}" class="w-5 h-5 text-[var(--muted)] chevron-icon ${expandedIds.has(p.id)?'rotated':''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div><div id="body-${p.id}" class="card-body ${expandedIds.has(p.id)?'expanded':''}"><div class="px-4 border-t border-[var(--border)] pt-3 flex justify-end gap-1 mb-3"><button onclick="editPatient('${p.id}')" class="p-2 hover:bg-[var(--accent)]/10 rounded-lg text-[var(--accent)] transition-colors" aria-label="Edit patient" ${isE?'disabled style="opacity:.3"':''}><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="deletePatient('${p.id}')" class="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-[var(--danger)] transition-colors" aria-label="Delete patient" ${isE?'disabled style="opacity:.3"':''}><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div><div class="px-4 pb-2 space-y-3">${p.drugs.map((d,di)=>{const pa=d.active===false;return`<div class="drug-row text-sm border-b border-dashed border-[var(--border)] last:border-0 pb-2 ${pa?'paused':''}"><div class="flex justify-between font-bold text-[var(--fg)] items-center"><span class="drug-name">${drugName(d)}</span><span class="flex items-center gap-2">${pa?'<span class="drug-badge paused-badge px-1.5 py-0.5 rounded text-[10px] font-bold">⏸</span>':''}${d.isNutrient&&!d.isGIR?nutBadge(d):(d.hideDetails?'':`<span>${d.dose}${d.unit?esc(d.unit):''} ${esc(d.freq)}</span>`)}</span></div>${d.alert?`<p class="text-[var(--danger)] font-bold text-[10px] mt-1 arabic-text">${esc(d.alert)}</p>`:''}<div class="flex items-center justify-between mt-1"><p class="text-xs text-[var(--muted)] flex-1" style="direction:ltr;text-align:left">${renderM(d)}</p><button onclick="toggleDrugActive('${p.id}',${di})" class="drug-toggle ${pa?'paused':''}" style="width:26px;height:26px" aria-label="${pa?'Resume drug':'Pause drug'}" title="${pa?'Resume':'Pause'}"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${pa?'<path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/>':'<path stroke-linecap="round" stroke-linejoin="round" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>'}</svg></button></div></div>`;}).join('')}</div></div></div>`;}).join('');
+ $('patientQueue').innerHTML=fl.map((p,i)=>{const isSel=selectedPatientIds.has(p.id),la=getLiveAge(p),ad=fmtAge(la),isE=editingPatientId===p.id&&docPatientId===p.id,dc=p.drugs.length,ac=p.drugs.filter(d=>d.alert).length,rm=p.room&&ROOMS.includes(p.room)?p.room:null,rb=rm?`<span class="room-tag ${ROOM_STYLES[rm].tag}">${ROOM_STYLES[rm].label}</span>`:'<span class="room-tag un">--</span>',ft=fluidTxt(p);
+return`<div class="patient-card bg-[var(--card)] rounded-2xl border ${isE?'border-amber-400 ring-2 ring-amber-400/30':'border-[var(--border)]'} shadow-sm overflow-hidden card-hover" style="animation-delay:${i*40}ms"><div class="px-4 py-3 flex items-center justify-between cursor-pointer select-none" onclick="toggleCard('${p.id}')"><div class="flex items-center gap-3 min-w-0"><input type="checkbox" ${isSel?'checked':''} onclick="event.stopPropagation();toggleSel('${p.id}')" class="w-5 h-5 rounded border border-[var(--border)] text-[var(--accent)] flex-shrink-0"><div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="font-bold text-[var(--fg)] truncate">${esc(p.name)}</h3>${rb}</div><div class="flex items-center gap-2 flex-wrap"><span class="text-xs text-[var(--muted)]">${p.weight}kg | GA:${esc(p.ga)}w | D${ad}</span>${ft?`<span class="text-xs font-semibold text-[var(--accent)]">${ft}</span>`:''}${isE?'<span class="live-badge" style="background:#F59E0B">EDITING</span>':''}</div></div></div><div class="flex items-center gap-2 flex-shrink-0"><span class="text-xs font-medium text-[var(--muted)] bg-[var(--surface)] px-2 py-1 rounded-lg">${dc} drug${dc!==1?'s':''}</span>${ac>0?`<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400">${ac}</span>`:''}<svg id="chevron-${p.id}" onclick="event.stopPropagation();toggleCard('${p.id}')" class="w-5 h-5 text-[var(--muted)] chevron-icon ${expandedIds.has(p.id)?'rotated':''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div><div id="body-${p.id}" class="card-body ${expandedIds.has(p.id)?'expanded':''}"><div class="px-4 border-t border-[var(--border)] pt-3 flex justify-end gap-1 mb-3"><button onclick="editPatient('${p.id}')" class="p-2 hover:bg-[var(--accent)]/10 rounded-lg text-[var(--accent)] transition-colors" aria-label="Edit drugs" ${isE?'disabled style="opacity:.3"':''}><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="deletePatient('${p.id}')" class="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-[var(--danger)] transition-colors" aria-label="Delete patient" ${isE?'disabled style="opacity:.3"':''}><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div><div class="px-4 pb-2 space-y-3">${p.drugs.map((d,di)=>{return`<div class="drug-row text-sm border-b border-dashed border-[var(--border)] last:border-0 pb-2"><div class="flex justify-between font-bold text-[var(--fg)] items-center"><span class="drug-name">${drugName(d)}</span><span class="flex items-center gap-2">${d.isNutrient&&!d.isGIR?nutBadge(d):(d.hideDetails?'':`<span>${d.dose}${d.unit?esc(d.unit):''} ${esc(d.freq)}</span>`)}</span></div>${d.alert?`<p class="text-[var(--danger)] font-bold text-[10px] mt-1 arabic-text">${esc(d.alert)}</p>`:''}<p class="text-xs text-[var(--muted)] mt-1" style="direction:ltr;text-align:left">${renderM(d)}</p></div>`;}).join('')}</div></div></div>`;}).join('');
+};
+/* ===== ADMISSION QUEUE ===== */
+const renderAdmissionQueue=()=>{
+const fl=getFilteredAdmission();
+const es=$('admissionEmptyState'),em=$('admissionEmptyStateMsg'),eh=$('admissionEmptyStateHint');
+if(!initialLoaded){es.classList.remove('hidden');em.innerHTML='<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Loading patients...';eh.textContent='';$('admissionQueue').innerHTML='';return;}
+if(fl.length===0){es.classList.remove('hidden');if(admissionSearch.trim()){em.textContent='No patients match "'+admissionSearch.trim()+'"';eh.textContent='Clear the search to see all patients';}else{em.textContent='No patients in list';eh.textContent='Add patient information above to begin';}$('admissionQueue').innerHTML='';return;}
+es.classList.add('hidden');
+$('admissionQueue').innerHTML=fl.map((p,i)=>{const isE=editingPatientId===p.id,la=getLiveAge(p),ad=fmtAge(la),rm=p.room&&ROOMS.includes(p.room)?p.room:null,rb=rm?`<span class="room-tag ${ROOM_STYLES[rm].tag}">${ROOM_STYLES[rm].label}</span>`:'<span class="room-tag un">--</span>',dc=p.drugs.length;
+return`<div class="patient-card bg-[var(--card)] rounded-2xl border ${isE?'border-amber-400 ring-2 ring-amber-400/30':'border-[var(--border)]'} shadow-sm overflow-hidden card-hover" style="animation-delay:${i*40}ms"><div class="px-4 py-3 flex items-center justify-between cursor-pointer select-none" onclick="toggleAdmissionCard('${p.id}')"><div class="flex items-center gap-3 min-w-0"><div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="font-bold text-[var(--fg)] truncate">${esc(p.name)}</h3>${rb}</div><div class="flex items-center gap-2 flex-wrap"><span class="text-xs text-[var(--muted)]">${p.weight}kg | GA:${esc(p.ga)}w | D${ad}</span>${dc>0?`<span class="text-xs font-medium text-[var(--muted)] bg-[var(--surface)] px-2 py-0.5 rounded">${dc} drug${dc!==1?'s':''}</span>`:''}${isE?'<span class="live-badge" style="background:#F59E0B">EDITING</span>':''}</div></div></div><svg id="admission-chev-${p.id}" onclick="event.stopPropagation();toggleAdmissionCard('${p.id}')" class="w-5 h-5 text-[var(--muted)] chevron-icon ${admissionExpandedIds.has(p.id)?'rotated':''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div><div id="admission-body-${p.id}" class="card-body ${admissionExpandedIds.has(p.id)?'expanded':''}"><div class="px-4 border-t border-[var(--border)] pt-3 flex justify-end gap-1 mb-3"><button onclick="editPatientInfo('${p.id}')" class="p-2 hover:bg-[var(--accent)]/10 rounded-lg text-[var(--accent)] transition-colors" aria-label="Edit patient info"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="deletePatient('${p.id}')" class="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-[var(--danger)] transition-colors" aria-label="Delete patient"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div><div class="px-4 pb-3 space-y-2 text-sm"><div class="flex justify-between"><span class="text-[var(--muted)]">Weight</span><span class="font-semibold text-[var(--fg)]">${p.weight} kg</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Date of Birth</span><span class="font-semibold text-[var(--fg)]">${p.dob?p.dob:'—'}</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">GA</span><span class="font-semibold text-[var(--fg)]">${p.ga||'—'} w</span></div><div class="flex justify-between"><span class="text-[var(--muted)]">Room</span><span class="font-semibold text-[var(--fg)]">${p.room||'—'}</span></div></div></div></div>`;}).join('');
+};
+
+/* ===== DISCHARGE QUEUE (Step 5) =====
+   Renders two sections: pending (fate===null) and completed (fate!==null).
+   Each card shows patient identity + drug duration display computed from drugLog.
+   Pending cards include the fate form (Step 6 will add interactivity) and a Restore button (Step 7).
+   Completed cards show fate badge + notes. */
+const FATE_OPTIONS=[
+  {value:'home',label:'Discharged home',icon:'fa-home',color:'#10B981'},
+  {value:'transfer_hospital',label:'Transferred to another hospital',icon:'fa-hospital',color:'#3B82F6'},
+  {value:'transfer_pediatric',label:'Transferred to pediatric ward',icon:'fa-baby',color:'#8B5CF6'},
+  {value:'death',label:'Death (died)',icon:'fa-cross',color:'#EF4444'}
+];
+const FATE_MAP=Object.fromEntries(FATE_OPTIONS.map(f=>[f.value,f]));
+/* format a date range with duration: "2026-09-18 → 2026-09-25 (7d)"
+   returns '—' if either date is missing */
+const fmtRange=(startISO,endISO)=>{if(!startISO||!endISO)return'—';const s=new Date(startISO),e=new Date(endISO);if(isNaN(s)||isNaN(e))return'—';const sd=s.toLocaleDateString('en-CA'),ed=e.toLocaleDateString('en-CA');const days=Math.round((e-s)/(86400000));return`${sd} → ${ed} (${days}d)`;};
+/* compute drug duration display from drugLog for a discharge record.
+   returns {current:[], previous:[]} — current drugs have no remove event; previous have both add+remove. */
+const computeDrugHistory=discharge=>{
+  const log=discharge.drugLog||[];
+  const dischargeDate=discharge.dischargedAt||discharge.dischargeDate;
+  const dischargeISO=dischargeDate?new Date(dischargeDate).toISOString():new Date().toISOString();
+  /* group events by uid */
+  const byUid={};
+  log.forEach(ev=>{if(!ev.uid)return;if(!byUid[ev.uid])byUid[ev.uid]={add:null,remove:null,name:ev.name,dose:ev.dose,unit:ev.unit,freq:ev.freq};if(ev.type==='add')byUid[ev.uid].add=ev.ts;if(ev.type==='remove')byUid[ev.uid].remove=ev.ts;});
+  const current=[],previous=[];
+  Object.values(byUid).forEach(d=>{
+    if(!d.add){return;} /* skip orphan remove events */
+    const entry={name:d.name||'—',dose:d.dose,unit:d.unit||'',freq:d.freq||'',range:fmtRange(d.add,d.remove||dischargeISO)};
+    if(d.remove)previous.push(entry);else current.push(entry);
+  });
+  return{current,previous};
+};
+/* render drug history subsection for a discharge card */
+const renderDrugHistory=discharge=>{
+  const{current,previous}=computeDrugHistory(discharge);
+  /* fallback: if no drugLog exists, show current drugs[] without durations */
+  let html='';
+  if(current.length===0&&previous.length===0){
+    /* old records without drugLog — show drugs[] as current with '—' duration */
+    const drugs=discharge.drugs||[];
+    if(drugs.length===0){return'<p class="text-xs text-[var(--muted)] italic">No drugs recorded</p>';}
+    html+='<div class="space-y-1">';
+    drugs.forEach(d=>{html+=`<div class="text-xs flex justify-between gap-2"><span class="text-[var(--fg)] font-medium">${esc(drugName(d))}</span><span class="text-[var(--muted)]">${d.dose||''}${d.unit?esc(d.unit):''} ${esc(d.freq||'')} · —</span></div>`;});
+    html+='</div>';
+    return html;
+  }
+  if(current.length>0){
+    html+='<p class="text-[10px] font-bold text-[var(--accent)] uppercase tracking-wide mb-1">Current at discharge</p>';
+    html+='<div class="space-y-1 mb-3">';
+    current.forEach(d=>{html+=`<div class="text-xs"><span class="text-[var(--fg)] font-medium">${esc(d.name)}</span> <span class="text-[var(--muted)]">${d.dose||''}${d.unit?esc(d.unit):''} ${esc(d.freq||'')}</span><div class="text-[10px] text-[var(--muted)]/80" style="direction:ltr;text-align:left">${d.range}</div></div>`;});
+    html+='</div>';
+  }
+  if(previous.length>0){
+    html+='<p class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wide mb-1">Previously prescribed</p>';
+    html+='<div class="space-y-1">';
+    previous.forEach(d=>{html+=`<div class="text-xs"><span class="text-[var(--fg)]/80 font-medium">${esc(d.name)}</span> <span class="text-[var(--muted)]">${d.dose||''}${d.unit?esc(d.unit):''} ${esc(d.freq||'')}</span><div class="text-[10px] text-[var(--muted)]/80" style="direction:ltr;text-align:left">${d.range}</div></div>`;});
+    html+='</div>';
+  }
+  return html;
+};
+/* render a single discharge card (shared by pending + completed).
+   Pending cards show fate form. Completed cards show fate badge + Edit/Delete buttons.
+   When editingDischargeId===d.id, completed cards show the fate form (pre-filled) with Save Changes. */
+const renderDischargeCard=(d,isPending)=>{
+  const isExp=dischargeExpandedIds.has(d.id);
+  const isEditing=editingDischargeId===d.id;
+  const rm=d.room&&ROOMS.includes(d.room)?d.room:null;
+  const rb=rm?`<span class="room-tag ${ROOM_STYLES[rm].tag}">${ROOM_STYLES[rm].label}</span>`:'<span class="room-tag un">--</span>';
+  const ad=d.dob?ageDay(d.dob,d.dischargeDate||new Date()):'—';
+  const fate=d.fate?FATE_MAP[d.fate]:null;
+  const fateBadge=fate?`<span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:${fate.color}20;color:${fate.color}"><i class="fas ${fate.icon} mr-1"></i>${fate.label}</span>`:'';
+  /* compute the form/actions HTML based on state */
+  let formHtml='';
+  if(isPending||isEditing){
+    const currentFate=d.fate||'';
+    const currentNotes=d.dischargeNotes||'';
+    const saveBtnText=d.fate?'Save Changes':'Complete Discharge';
+    const saveOnclick=d.fate?`updateDischarge('${d.id}')`:`saveDischarge('${d.id}')`;
+    const leftBtn=d.fate
+      ?`<button onclick="cancelEditDischarge()" class="px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--muted)] font-semibold text-sm hover:bg-[var(--surface)] hover:text-[var(--fg)] transition-colors">Cancel</button>`
+      :`<button onclick="restoreDischarge('${d.id}')" class="px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--muted)] font-semibold text-sm hover:bg-[var(--surface)] hover:text-[var(--fg)] transition-colors flex items-center gap-1.5"><i class="fas fa-undo"></i>Restore</button>`;
+    formHtml=`<div class="border-t border-[var(--border)] pt-3 space-y-3">
+      <div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Fate <span class="text-[var(--danger)]">*</span></label><select id="dischargeFate-${d.id}" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--fg)]" onchange="document.getElementById('dischargeSave-${d.id}').disabled=!this.value"><option value="">-- Select fate --</option>${FATE_OPTIONS.map(f=>`<option value="${f.value}" ${currentFate===f.value?'selected':''}>${f.label}</option>`).join('')}</select></div>
+      <div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Discharge Notes</label><textarea id="dischargeNotes-${d.id}" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--fg)]" placeholder="Diagnosis at discharge, summary, etc.">${esc(currentNotes)}</textarea></div>
+      <div class="flex justify-end gap-2">${leftBtn}<button id="dischargeSave-${d.id}" onclick="${saveOnclick}" ${!currentFate?'disabled':''} class="btn-primary px-6 py-2.5 rounded-xl text-white font-semibold text-sm">${saveBtnText}</button></div>
+    </div>`;
+  }else{
+    /* completed card, not editing — show Edit + Delete buttons */
+    formHtml=`<div class="border-t border-[var(--border)] pt-3 flex justify-end gap-2">
+      <button onclick="editDischarge('${d.id}')" class="px-4 py-2.5 rounded-xl border border-[var(--border)] text-[var(--accent)] font-semibold text-sm hover:bg-[var(--accent)]/10 transition-colors flex items-center gap-1.5"><i class="fas fa-edit"></i>Edit</button>
+      <button onclick="deleteDischarge('${d.id}')" class="px-4 py-2.5 rounded-xl border border-[var(--danger)]/30 text-[var(--danger)] font-semibold text-sm hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-1.5"><i class="fas fa-trash"></i>Delete</button>
+    </div>`;
+  }
+  return`<div class="patient-card bg-[var(--card)] rounded-2xl border ${isPending||isEditing?'border-amber-300':'border-[var(--border)]'} shadow-sm overflow-hidden card-hover" style="animation-delay:0ms"><div class="px-4 py-3 flex items-center justify-between cursor-pointer select-none" onclick="toggleDischargeCard('${d.id}')"><div class="flex items-center gap-3 min-w-0"><div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="font-bold text-[var(--fg)] truncate">${esc(d.name||'Unnamed')}</h3>${rb}${isPending?'<span class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700"><i class="fas fa-clock mr-1"></i>Pending</span>':fateBadge}</div><div class="flex items-center gap-2 flex-wrap mt-0.5"><span class="text-xs text-[var(--muted)]">${d.weight||'—'}kg | GA:${esc(d.ga||'—')}w | D${ad}</span><span class="text-xs text-[var(--muted)] bg-[var(--surface)] px-2 py-0.5 rounded">Discharged: ${d.dischargeDate||'—'}</span></div></div></div><svg id="discharge-chev-${d.id}" onclick="event.stopPropagation();toggleDischargeCard('${d.id}')" class="w-5 h-5 text-[var(--muted)] chevron-icon ${isExp?'rotated':''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div><div id="discharge-body-${d.id}" class="card-body ${isExp?'expanded':''}"><div class="px-4 border-t border-[var(--border)] pt-3 pb-3 space-y-3">
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+    <div><p class="text-[10px] text-[var(--muted)] uppercase font-semibold">Admission Wt</p><p class="font-semibold text-[var(--fg)]">${d.admissionWeight?d.admissionWeight+' kg':'—'}</p></div>
+    <div><p class="text-[10px] text-[var(--muted)] uppercase font-semibold">Discharge Wt</p><p class="font-semibold text-[var(--fg)]">${d.dischargeWeight?d.dischargeWeight+' kg':'—'}</p></div>
+    <div><p class="text-[10px] text-[var(--muted)] uppercase font-semibold">DOB</p><p class="font-semibold text-[var(--fg)]">${d.dob||'—'}</p></div>
+    <div><p class="text-[10px] text-[var(--muted)] uppercase font-semibold">GA</p><p class="font-semibold text-[var(--fg)]">${d.ga||'—'} w</p></div>
+    <div><p class="text-[10px] text-[var(--muted)] uppercase font-semibold">Age at Discharge</p><p class="font-semibold text-[var(--fg)]">Day ${ad}</p></div>
+    <div><p class="text-[10px] text-[var(--muted)] uppercase font-semibold">Room</p><p class="font-semibold text-[var(--fg)]">${d.room||'—'}</p></div>
+  </div>
+  <div class="border-t border-[var(--border)] pt-3"><p class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wide mb-2">Drug History</p>${renderDrugHistory(d)}</div>
+  ${d.dischargeNotes&&!isEditing?`<div class="border-t border-[var(--border)] pt-3"><p class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wide mb-1">Notes</p><p class="text-sm text-[var(--fg)] whitespace-pre-wrap">${esc(d.dischargeNotes)}</p></div>`:''}
+  ${formHtml}
+</div></div></div>`;
+};
+const renderDischargeQueue=()=>{
+  const pending=discharges.filter(d=>!d.fate);
+  const completed=discharges.filter(d=>d.fate);
+  const pc=$('pendingCount'),cc=$('completedCount');
+  if(pc)pc.textContent=pending.length;
+  if(cc)cc.textContent=completed.length;
+  /* pending section */
+  const pe=$('pendingEmptyState'),pq=$('pendingDischargeQueue');
+  if(pending.length===0){pe.classList.remove('hidden');pq.innerHTML='';}else{pe.classList.add('hidden');pq.innerHTML=pending.map(d=>renderDischargeCard(d,true)).join('');}
+  /* completed section */
+  const ce=$('completedEmptyState'),cq=$('completedDischargeQueue');
+  if(completed.length===0){ce.classList.remove('hidden');cq.innerHTML='';}else{ce.classList.add('hidden');cq.innerHTML=completed.map(d=>renderDischargeCard(d,false)).join('');}
+};
+window.toggleDischargeCard=id=>{const b=$('discharge-body-'+id),c=$('discharge-chev-'+id);if(!b||!c)return;const on=!b.classList.contains('expanded');b.classList.toggle('expanded',on);c.classList.toggle('rotated',on);if(on)dischargeExpandedIds.add(id);else dischargeExpandedIds.delete(id);};
+/* saveDischarge: writes fate + dischargeNotes to Firestore, moves card from pending to completed.
+   Optimistic update + rollback on failure. */
+window.saveDischarge=async id=>{
+  const fateSel=$('dischargeFate-'+id),notesEl=$('dischargeNotes-'+id);
+  if(!fateSel||!notesEl)return;
+  const fate=fateSel.value;
+  if(!fate){showToast('Select a fate','error');return;}
+  const notes=notesEl.value.trim();
+  const di=discharges.findIndex(x=>x.id===id);
+  if(di<0)return;
+  const bk={...discharges[di]};
+  discharges[di]={...discharges[di],fate,dischargeNotes:notes};
+  renderDischargeQueue();
+  showToast('Saving...','info');
+  try{await setDoc(doc(db,"discharges",id),{fate,dischargeNotes:notes},{merge:true});showToast('Discharge completed');}
+  catch(e){discharges[di]=bk;renderDischargeQueue();showToast(`Failed: ${e.message}`,'error');}
+};
+/* exportDischargesCsv: generates a CSV from completed discharges and triggers a download.
+   Columns: Name, DOB, GA, Admission Wt, Discharge Wt, Age at Discharge (days), Room,
+   Discharge Date, Fate, Notes, Current Drugs, Previously Prescribed.
+   If no completed discharges, shows toast and aborts. */
+const csvEscape=v=>{
+  if(v===null||v===undefined)return '';
+  let s=String(v);
+  /* wrap in quotes if contains comma, quote, newline, or leading/trailing space */
+  if(/[",\n\r]/.test(s)||s!==s.trim()){s='"'+s.replace(/"/g,'""')+'"';}
+  return s;
+};
+const exportDischargesCsv=()=>{
+  const completed=discharges.filter(d=>d.fate);
+  if(completed.length===0){showToast('No completed discharges to export','error');return;}
+  const headers=['Name','DOB','GA (weeks)','Admission Weight (kg)','Discharge Weight (kg)','Age at Discharge (days)','Room','Discharge Date','Fate','Notes','Current Drugs','Previously Prescribed'];
+  const rows=completed.map(d=>{
+    const{current,previous}=computeDrugHistory(d);
+    const ageAtDischarge=d.dob?ageDay(d.dob,d.dischargeDate||new Date()):'';
+    const fateLabel=d.fate&&FATE_MAP[d.fate]?FATE_MAP[d.fate].label:d.fate||'';
+    /* format drug lists: "Name dose unit freq (range); Name dose unit freq (range)" */
+    const fmtDrugList=arr=>arr.map(x=>`${x.name} ${x.dose||''}${x.unit||''} ${x.freq||''} (${x.range})`).join('; ');
+    return [
+      d.name||'',d.dob||'',d.ga||'',d.admissionWeight||'',d.dischargeWeight||'',
+      ageAtDischarge,d.room||'',d.dischargeDate||'',fateLabel,d.dischargeNotes||'',
+      fmtDrugList(current),fmtDrugList(previous)
+    ].map(csvEscape).join(',');
+  });
+  const csv='\ufeff'+headers.join(',')+'\n'+rows.join('\n');
+  /* \ufeff = BOM for Excel to detect UTF-8 (handles Arabic names correctly) */
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`discharges_${new Date().toLocaleDateString('en-CA')}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${completed.length} discharge${completed.length!==1?'s':''}`);
+};
+/* restoreDischarge: moves a PENDING discharge back to the active patients collection.
+   Only available on pending cards (fate===null). Writes the patient doc back to `patients`,
+   deletes from `discharges`. Patient reappears in Documentation/Admission tabs.
+   Strips discharge-specific fields (dischargeDate, fate, dischargeNotes, dischargeWeight, dischargedAt)
+   so the restored patient doc looks like a normal active patient. */
+window.restoreDischarge=async id=>{
+  const d=discharges.find(x=>x.id===id);
+  if(!d)return;
+  if(d.fate){showToast('Cannot restore a completed discharge','error');return;}
+  if(!confirm(`Restore "${d.name}" to active patients?\nThey will return to the Documentation and Admission tabs.`))return;
+  /* build the patient doc — preserve identity + drugs + drugLog, strip discharge fields */
+  const patientDoc={
+    name:d.name,weight:d.weight,admissionWeight:d.admissionWeight||null,dob:d.dob||null,ga:d.ga||null,room:d.room||null,
+    drugs:d.drugs||[],drugLog:d.drugLog||[],
+    saveDate:new Date().toLocaleDateString('en-CA')
+  };
+  /* optimistic: remove from discharges, add to patients */
+  const di=discharges.findIndex(x=>x.id===id);
+  if(di<0)return;
+  const bk={...discharges[di]};
+  discharges.splice(di,1);
+  patients.unshift({...patientDoc,id});
+  renderDischargeQueue();renderQueue();renderFilterBar();renderAdmissionQueue();
+  showToast('Restoring...','info');
+  try{
+    /* write back to patients collection (same doc id) */
+    await setDoc(doc(db,"patients",id),patientDoc);
+    /* delete from discharges collection */
+    await deleteDoc(doc(db,"discharges",id));
+    showToast(`${d.name} restored to active patients`);
+  }catch(e){
+    /* rollback */
+    discharges.splice(di,0,bk);
+    const pi=patients.findIndex(x=>x.id===id);
+    if(pi>=0)patients.splice(pi,1);
+    renderDischargeQueue();renderQueue();renderFilterBar();renderAdmissionQueue();
+    showToast(`Failed: ${e.message}`,'error');
+  }
+};
+/* editDischarge: enters edit mode for a completed discharge card.
+   Shows the fate form pre-filled with current values, card auto-expands. */
+window.editDischarge=id=>{
+  editingDischargeId=id;
+  dischargeExpandedIds.add(id);
+  renderDischargeQueue();
+};
+/* cancelEditDischarge: exits edit mode without saving. */
+window.cancelEditDischarge=()=>{
+  editingDischargeId=null;
+  renderDischargeQueue();
+};
+/* updateDischarge: saves edits to a completed discharge (fate + notes).
+   Same pattern as saveDischarge — optimistic + rollback. */
+window.updateDischarge=async id=>{
+  const fateSel=$('dischargeFate-'+id),notesEl=$('dischargeNotes-'+id);
+  if(!fateSel||!notesEl)return;
+  const fate=fateSel.value;
+  if(!fate){showToast('Select a fate','error');return;}
+  const notes=notesEl.value.trim();
+  const di=discharges.findIndex(x=>x.id===id);
+  if(di<0)return;
+  const bk={...discharges[di]};
+  discharges[di]={...discharges[di],fate,dischargeNotes:notes};
+  editingDischargeId=null;
+  renderDischargeQueue();
+  showToast('Saving...','info');
+  try{await setDoc(doc(db,"discharges",id),{fate,dischargeNotes:notes},{merge:true});showToast('Discharge updated');}
+  catch(e){discharges[di]=bk;renderDischargeQueue();showToast(`Failed: ${e.message}`,'error');}
+};
+/* deleteDischarge: PERMANENTLY deletes a completed discharge record from `discharges` collection.
+   This is a hard delete — the record is gone forever (no undo). */
+window.deleteDischarge=async id=>{
+  const d=discharges.find(x=>x.id===id);
+  if(!d)return;
+  if(!confirm(`Permanently delete the discharge record for "${d.name}"?\nThis CANNOT be undone.`))return;
+  const di=discharges.findIndex(x=>x.id===id);
+  if(di<0)return;
+  const bk={...discharges[di]};
+  discharges.splice(di,1);
+  if(editingDischargeId===id)editingDischargeId=null;
+  renderDischargeQueue();
+  showToast('Deleting...','info');
+  try{await deleteDoc(doc(db,"discharges",id));showToast('Discharge record deleted');}
+  catch(e){discharges.splice(di,0,bk);renderDischargeQueue();showToast(`Failed: ${e.message}`,'error');}
+};
+
+/* ===== CHART TAB (Daily Supply Request) =====
+   SPECIAL_DRUG_IDS: the 6 drugs that appear in Section 1 (Specific Drugs).
+   These are also allowed in the grid even if they're in the "Fluids" category (TPN). */
+const SPECIAL_DRUG_IDS=[5,6,24,7,8,12];
+const SPECIAL_DRUG_NAMES={5:'Colistin Loading',6:'Colistin Maint.',24:'Colistin neb.',7:'Tigecycline',8:'Meropenem',12:'TPN'};
+/* renderChartTab: renders Section 1 (Specific Drugs) — Step 3.
+   Section 2 (Grid) is left as empty state for Step 4.
+   Filters: active patients with assigned room (Room 1/2/Reception) who are on ≥1 special drug. */
+const getChartPatients=()=>patients.filter(p=>p.room&&ROOMS.includes(p.room));
+const renderChartTab=()=>{
+  /* === Section 1: Specific Drugs === */
+  const s1=$('chartSpecificDrugs'),s1e=$('chartSpecificEmpty');
+  const chartPatients=getChartPatients();
+  /* collect entries per special drug */
+  const groups=SPECIAL_DRUG_IDS.map(did=>{
+    const entries=[];
+    chartPatients.forEach(p=>{
+      (p.drugs||[]).forEach(d=>{
+        if(d.drugId===did){
+          entries.push({patient:p,drug:d});
+        }
+      });
+    });
+    return{drugId:did,name:SPECIAL_DRUG_NAMES[did],entries};
+  });
+  const totalEntries=groups.reduce((s,g)=>s+g.entries.length,0);
+  if(totalEntries===0){
+    s1.innerHTML='';
+    s1e.classList.remove('hidden');
+  }else{
+    s1e.classList.add('hidden');
+    s1.innerHTML=groups.map(g=>{
+      if(g.entries.length===0)return''; /* skip drugs with no patients */
+      return`<div class="mb-4 last:mb-0">
+        <div class="flex items-center gap-2 mb-2 pb-1 border-b border-[var(--border)]"><i class="fas fa-circle text-[8px] text-[var(--accent)]"></i><h4 class="font-bold text-[var(--fg)] text-sm">${esc(g.name)}</h4><span class="text-xs text-[var(--muted)] bg-[var(--surface)] px-2 py-0.5 rounded-full">${g.entries.length}</span></div>
+        <div class="space-y-1.5">
+          ${g.entries.map(e=>{
+            const p=e.patient,d=e.drug;
+            const doseStr=d.isNutrient&&d.isGIR?`${d.dose} ml`:`${d.dose||''}${d.unit?esc(d.unit):''}`;
+            const freqStr=d.freq||'';
+            return`<div class="flex items-center gap-3 text-sm bg-[var(--surface)] rounded-lg px-3 py-2">
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold text-[var(--fg)] truncate">${esc(p.name)}</p>
+                <p class="text-xs text-[var(--muted)]">File: ${p.fileId||'—'}</p>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <p class="font-semibold text-[var(--accent)]">${esc(doseStr)}</p>
+                <p class="text-xs text-[var(--muted)]">${esc(freqStr)}</p>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+  /* === Section 2: Grid (Step 4) ===
+     Eligible drug columns: prescribed by ≥1 chart patient, category≠'Fluids' OR drugId∈SPECIAL_DRUG_IDS,
+     dose is numeric (excludes 'Infusion'). Sorted by DRUG_CATEGORIES order.
+     Cells: single-dose quantity (number only). Blank for not-prescribed (handwriting space).
+     Layout: 34 patient rows per page + 1 sum row. 39 drug columns per page. Overflow → second page. */
+  const s2=$('chartGrid'),s2e=$('chartGridEmpty');
+  /* build eligible drug list */
+  const drugMap=new Map(); /* key: drugId+name, value: {drugId,name,category} */
+  chartPatients.forEach(p=>{
+    (p.drugs||[]).forEach(d=>{
+      if(d.drugId===undefined||d.drugId==='other')return;
+      const did=typeof d.drugId==='number'?d.drugId:parseInt(d.drugId);
+      if(isNaN(did))return;
+      /* exclude 'Infusion' or non-numeric doses */
+      const doseStr=String(d.dose||'');
+      if(doseStr==='Infusion'||doseStr==='')return;
+      const doseNum=parseFloat(doseStr);
+      if(isNaN(doseNum))return;
+      /* exclude Fluids category unless it's a special drug */
+      const config=DRUG_CONFIG.find(c=>c.id===did);
+      if(!config)return;
+      const cat=DRUG_CATEGORIES.find(c=>c.ids.includes(did));
+      const isFluids=cat&&cat.name==='Fluids';
+      const isSpecial=SPECIAL_DRUG_IDS.includes(did);
+      if(isFluids&&!isSpecial)return;
+      const key=did+'|'+config.name;
+      if(!drugMap.has(key))drugMap.set(key,{drugId:did,name:config.name,category:cat?cat.name:'Other+',order:DRUG_CATEGORIES.indexOf(cat)});
+    });
+  });
+  const eligibleDrugs=[...drugMap.values()].sort((a,b)=>{
+    if(a.order!==b.order)return a.order-b.order;
+    return a.name.localeCompare(b.name);
+  });
+  if(eligibleDrugs.length===0){
+    s2.innerHTML='';
+    s2e.classList.remove('hidden');
+  }else{
+    s2e.classList.add('hidden');
+    const MAX_COLS=39,PATIENT_ROWS=34;
+    /* paginate drug columns */
+    const pages=[];
+    for(let i=0;i<eligibleDrugs.length;i+=MAX_COLS){
+      pages.push(eligibleDrugs.slice(i,i+MAX_COLS));
+    }
+    /* paginate patients (34 per page) */
+    const patientPages=[];
+    for(let i=0;i<chartPatients.length;i+=PATIENT_ROWS){
+      patientPages.push(chartPatients.slice(i,i+PATIENT_ROWS));
+    }
+    if(patientPages.length===0)patientPages.push([]);
+    /* render: for each patient-page, render all drug-pages (so each page has 34 patients + ≤39 drugs) */
+    let html='';
+    patientPages.forEach((patPage,pi)=>{
+      pages.forEach((drugPage,di)=>{
+        const pageLabel=(patientPages.length>1||pages.length>1)?`<div class="text-xs text-[var(--muted)] mb-2 font-semibold">Page ${pi*pages.length+di+1}</div>`:'';
+        html+=pageLabel+`<table class="chart-grid"><thead><tr>`;
+        html+=`<th class="patient-cell corner-cell">الخدج</th>`;
+        drugPage.forEach(d=>{html+=`<th class="drug-head"><span>${esc(d.name)}</span></th>`;});
+        html+=`</tr></thead><tbody>`;
+        patPage.forEach(p=>{
+          html+=`<tr><td class="patient-cell">${esc(p.name)}</td>`;
+          drugPage.forEach(d=>{
+            const drug=(p.drugs||[]).find(x=>x.drugId===d.drugId);
+            if(drug){
+              const doseNum=parseFloat(String(drug.dose||''));
+              if(!isNaN(doseNum)){
+                html+=`<td class="dose-cell has-dose">${doseNum}</td>`;
+              }else{
+                html+=`<td class="dose-cell"></td>`;
+              }
+            }else{
+              html+=`<td class="dose-cell empty-grid-cell"></td>`;
+            }
+          });
+          html+=`</tr>`;
+        });
+        /* fill empty patient rows up to PATIENT_ROWS (for handwriting) */
+        const emptyRows=PATIENT_ROWS-patPage.length;
+        for(let r=0;r<emptyRows;r++){
+          html+=`<tr><td class="patient-cell">&nbsp;</td>`;
+          drugPage.forEach(()=>{html+=`<td class="dose-cell empty-grid-cell"></td>`;});
+          html+=`</tr>`;
+        }
+        /* sum row (blank for now — Q4.a) */
+        html+=`<tr class="sum-row"><td class="patient-cell">المجموع</td>`;
+        drugPage.forEach(()=>{html+=`<td></td>`;});
+        html+=`</tr>`;
+        html+=`</tbody></table>`;
+        if(pi<patientPages.length-1||di<pages.length-1)html+=`<div class="h-6"></div>`; /* spacer between pages */
+      });
+    });
+    s2.innerHTML=html;
+  }
 };
 
 const popDropdowns=()=>{$('selectCategory').innerHTML='<option value="">-- Select Category --</option>'+DRUG_CATEGORIES.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');$('selectDrug').innerHTML='<option value="">-- Select Category First --</option>';$('selectCustomMethod').innerHTML='<option value="">-- Select Method --</option>'+METHOD_OPTIONS.map(m=>`<option value="${m.value}">${m.label}</option>`).join('');};
-const renderDrugList=()=>{$('drugsList').innerHTML=currentDrugs.map((d,i)=>{const pa=d.active===false;let bh;if(d.isGIR)bh='';else if(d.isNutrient)bh=`<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose} ml${d.addonVol?' (+ '+d.addonVol+' ml '+esc(d.addonType)+')':''} / 24 hr</span>`;else if(d.hideDetails)bh='';else bh=`<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose}${d.unit?esc(d.unit):''} ${esc(d.freq)}</span>`;if(pa)bh=`<span class="drug-badge paused-badge px-2 py-0.5 rounded-full text-xs font-semibold">⏸ Paused</span>`;return`<div class="drug-row animate-slide-in bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-3 ${pa?'paused':''}"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><p class="drug-name font-bold text-[var(--fg)]">${drugName(d)}</p>${bh}</div>${d.alert?`<p class="text-[var(--danger)] font-bold text-xs mb-1 arabic-text">${esc(d.alert)}</p>`:''}<p class="text-sm text-[var(--muted)] mt-1" style="direction:ltr;text-align:left">${renderM(d)}</p></div><div class="flex items-center gap-1 flex-shrink-0"><button onclick="toggleDrugActiveForm(${i})" class="drug-toggle ${pa?'paused':''}" aria-label="${pa?'Resume drug':'Pause drug'}" title="${pa?'Resume':'Pause'}"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${pa?'<path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/>':'<path stroke-linecap="round" stroke-linejoin="round" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>'}</svg></button><button onclick="removeDrug(${i})" class="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg group flex-shrink-0" aria-label="Remove drug"><svg class="w-5 h-5 text-[var(--muted)] group-hover:text-[var(--danger)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div></div>`;}).join('');updateCounter();};
+const renderDrugList=()=>{$('drugsList').innerHTML=currentDrugs.map((d,i)=>{let bh;if(d.isGIR)bh='';else if(d.isNutrient)bh=`<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose} ml${d.addonVol?' (+ '+d.addonVol+' ml '+esc(d.addonType)+')':''} / 24 hr</span>`;else if(d.hideDetails)bh='';else bh=`<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose}${d.unit?esc(d.unit):''} ${esc(d.freq)}</span>`;return`<div class="drug-row animate-slide-in bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-3"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><p class="drug-name font-bold text-[var(--fg)]">${drugName(d)}</p>${bh}</div>${d.alert?`<p class="text-[var(--danger)] font-bold text-xs mb-1 arabic-text">${esc(d.alert)}</p>`:''}<p class="text-sm text-[var(--muted)] mt-1" style="direction:ltr;text-align:left">${renderM(d)}</p></div><div class="flex items-center gap-1 flex-shrink-0"><button onclick="removeDrug(${i})" class="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg group flex-shrink-0" aria-label="Remove drug"><svg class="w-5 h-5 text-[var(--muted)] group-hover:text-[var(--danger)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div></div>`;}).join('');updateCounter();};
 
 const addDrug=()=>{
 const w=cleanN($('inputWeight').value);if(!w||w<=0){showToast('Enter weight','error');return;}
@@ -474,24 +1037,135 @@ else{const drug=dobj,dose=cleanN($('inputDose').value);let av=drug.isNutrient?cl
 if(drug.inputMode==='dopaminePump')currentDrugs.push({id:genId(),active:true,drugId:drug.id,name:drug.name,dose:'Infusion',unit:'',freq:'',method:'1 ml dopamin + 39 ml GW',hideDetails:false,isNutrient:false,isDopamine:true,isGIR:false,alert:drug.alert||'',addonVol:0,addonType:'',methodIndex:null,targetVol:null,factor:null});
 else if(drug.isGIR){const gt=cleanN($('inputGIR').value),bv=cleanN($('inputBagVol').value);if(gt<=0||bv<=0){showToast('Enter GIR and volume','error');return;}const r=calcGIR(w,gt,bv);currentDrugs.push({id:genId(),active:true,drugId:drug.id,name:drug.name,dose:bv,unit:'ml',freq:'',method:genMethod(drug,bv),hideDetails:false,isNutrient:true,isDopamine:false,isGIR:true,girRate:(r?r.actualGIR:gt).toFixed(1),girConc:(r?r.conc:0).toFixed(1),alert:r&&r.warnings.length?r.warnings.join(' | '):'',addonVol:av,addonType:at,methodIndex:null,targetVol:null,factor:null});}
 else{const tv=(drug.methodIndex===3||drug.methodIndex===10||drug.methodIndex===16)?parseInt($('inputTargetVol').value):null;currentDrugs.push({id:genId(),active:true,drugId:drug.id,name:drug.name,dose,unit:drug.unit||'',freq:(drug.hideDetails||drug.name==='TPN'||$('selectCategory').value==='Fluids')?'':fd,method:genMethod(drug,dose),hideDetails:drug.hideDetails||false,noPrint:drug.noPrint||false,isNutrient:drug.isNutrient||false,isDopamine:drug.isDopamine||false,isGIR:false,alert:drug.alert||'',addonVol:av,addonType:at,methodIndex:drug.methodIndex,targetVol:tv,factor:drug.factor||null});}}
-renderDrugList();updateFluidBar();showToast('Added');$('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';
+renderDrugList();updateFluidBar();showToast('Added');
+/* log the add event for drug-duration tracking (Step 3.5 — drugLog) */
+const lastDrug=currentDrugs[currentDrugs.length-1];
+if(lastDrug)currentDrugLog.push({type:'add',uid:lastDrug.id,name:drugName(lastDrug),dose:lastDrug.dose,unit:lastDrug.unit||'',freq:lastDrug.freq||'',ts:new Date().toISOString()});
+$('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';
 };
-window.removeDrug=i=>{currentDrugs.splice(i,1);renderDrugList();updateFluidBar();};
+window.removeDrug=i=>{const d=currentDrugs[i];if(d)currentDrugLog.push({type:'remove',uid:d.id,name:drugName(d),ts:new Date().toISOString()});currentDrugs.splice(i,1);renderDrugList();updateFluidBar();};
 const toggleSelAll=e=>{const f=getFiltered();if(e.target.checked)f.forEach(p=>selectedPatientIds.add(p.id));else f.forEach(p=>selectedPatientIds.delete(p.id));updateCounter();renderQueue();};
 
 /* ===== DOCUMENTATION SAVE/EDIT/DELETE ===== */
-const savePatient=async()=>{
-const name=$('inputName').value.trim(),weight=cleanN($('inputWeight').value),room=$('inputRoom').value,dob=$('inputDOB').value;
-if(!name||!weight||currentDrugs.length===0){showToast('Missing info','error');return;}
+/* savePatientInfo: Admission tab — saves identity fields only.
+   admissionWeight is set ONLY on first admission (preserved across edits, never overwritten).
+   For old records without admissionWeight, it stays undefined (shown as '—' in discharge card). */
+const savePatientInfo=async()=>{
+const name=$('inputName').value.trim(),weight=cleanN($('admissionWeight').value),room=$('inputRoom').value,dob=$('inputDOB').value,ga=$('inputGA').value,fileId=$('inputFileId').value.trim();
+if(!name||!weight){showToast('Name and weight are required','error');return;}
 if(!editingPatientId&&!dob){showToast('Select Date of Birth','error');return;}
-const sorted=[...currentDrugs].sort((a,b)=>{if(a.isNutrient&&!b.isNutrient)return 1;if(!a.isNutrient&&b.isNutrient)return-1;return 0;});
-const np={name,weight,dob:dob||null,ga:$('inputGA').value,room,drugs:sorted,saveDate:new Date().toLocaleDateString('en-CA')};
+const np={name,weight,dob:dob||null,ga,room,fileId:fileId||null,saveDate:new Date().toLocaleDateString('en-CA')};
+if(!editingPatientId){np.admissionWeight=weight;}
+else{const existing=patients.find(p=>p.id===editingPatientId);if(existing&&existing.admissionWeight)np.admissionWeight=existing.admissionWeight;}
 showToast('Saving...','info');
-try{if(editingPatientId)await setDoc(doc(db,"patients",editingPatientId),np,{merge:true});else await addDoc(patientsRef,np);dirty=false;clearForm();renderQueue();renderFilterBar();showToast('Saved');}
+try{if(editingPatientId)await setDoc(doc(db,"patients",editingPatientId),np,{merge:true});else await addDoc(patientsRef,np);dirty=false;clearAdmissionForm();renderAdmissionQueue();renderQueue();renderFilterBar();showToast(editingPatientId?'Patient updated':'Patient admitted');}
 catch(e){showToast(`Save Failed: ${e.message}`,'error');}
 };
-window.deletePatient=async id=>{if(editingPatientId===id)return;const p=patients.find(x=>x.id===id);if(!p||!confirm(`Delete "${p.name}"?`))return;const pi=patients.findIndex(x=>x.id===id),bk=patients[pi];patients.splice(pi,1);selectedPatientIds.delete(id);renderQueue();renderFilterBar();try{await deleteDoc(doc(db,"patients",id));renderQueue();renderFilterBar();}catch(e){patients.splice(pi,0,bk);renderQueue();renderFilterBar();showToast(`Failed: ${e.message}`,'error');}};
-window.editPatient=async id=>{const p=patients.find(x=>x.id===id);if(!p)return;editingPatientId=id;$('inputName').value=p.name;$('inputWeight').value=p.weight;$('inputGA').value=p.ga;$('inputDOB').value=p.dob||'';if(p.dob){const ps=p.dob.split('-');$('dobText').textContent=`${ps[2]}/${ps[1]}/${ps[0]}`;$('dobFake').classList.add('has-date');updatePna();}else{$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('pnaDisplay').classList.add('hidden');}$('inputRoom').value=p.room||'';currentDrugs=[...p.drugs];renderDrugList();updateFluidBar();$('editingBannerName').textContent=p.name;$('editingBanner').classList.remove('hidden');$('btnSavePatient').textContent='Update Patient';renderQueue();renderFilterBar();window.scrollTo({top:0,behavior:'smooth'});};
+/* saveDrugTherapy: Documentation tab — saves drugs[] only (requires docPatientId).
+   Also appends currentDrugLog (new add/remove events from this edit session) to the patient's persisted drugLog. */
+const saveDrugTherapy=async()=>{
+if(!docPatientId){showToast('Select a patient first','error');return;}
+if(currentDrugs.length===0){showToast('Add at least one drug','error');return;}
+const sorted=[...currentDrugs].sort((a,b)=>{if(a.isNutrient&&!b.isNutrient)return 1;if(!a.isNutrient&&b.isNutrient)return-1;return 0;});
+/* merge currentDrugLog with the patient's existing drugLog (from Firestore) */
+const existing=patients.find(p=>p.id===docPatientId);
+const existingLog=(existing&&existing.drugLog)?existing.drugLog:[];
+const mergedLog=[...existingLog,...currentDrugLog];
+showToast('Saving...','info');
+try{await setDoc(doc(db,"patients",docPatientId),{drugs:sorted,drugLog:mergedLog,saveDate:new Date().toLocaleDateString('en-CA')},{merge:true});dirty=false;clearDocForm();renderQueue();renderFilterBar();showToast('Drug therapy saved');}
+catch(e){showToast(`Save Failed: ${e.message}`,'error');}
+};
+/* deletePatient → MOVE TO DISCHARGE (Step 4).
+   Copies patient doc from `patients` to `discharges` collection with new fields:
+     dischargeDate (today, YYYY-MM-DD local tz), fate: null, dischargeNotes: null, dischargeWeight: patient.weight
+   Then deletes the original from `patients`. Patient disappears from all active tabs;
+   a new discharge card appears in the Discharge tab.
+   The patient's drugs[] and drugLog[] are carried along unchanged. */
+window.deletePatient=async id=>{
+  if(editingPatientId===id||docPatientId===id){showToast('Cannot discharge a patient being edited','error');return;}
+  const p=patients.find(x=>x.id===id);
+  if(!p)return;
+  if(!confirm(`Move "${p.name}" to Discharge?\nThey will be removed from all active tabs and a discharge card will be created.`))return;
+  /* build the discharge doc — preserve all existing fields, add discharge-specific ones */
+  const dischargeDoc={
+    name:p.name,weight:p.weight,admissionWeight:p.admissionWeight||null,dob:p.dob||null,ga:p.ga||null,room:p.room||null,
+    drugs:p.drugs||[],drugLog:p.drugLog||[],
+    saveDate:p.saveDate||null,
+    dischargeDate:new Date().toLocaleDateString('en-CA'),
+    dischargeWeight:p.weight,
+    fate:null,dischargeNotes:null,
+    dischargedAt:new Date().toISOString()
+  };
+  /* optimistic: remove from local patients, add to local discharges */
+  const pi=patients.findIndex(x=>x.id===id);
+  if(pi<0)return;
+  const bk=patients[pi];
+  patients.splice(pi,1);
+  selectedPatientIds.delete(id);
+  discharges.unshift({...dischargeDoc,id});
+  renderQueue();renderFilterBar();renderAdmissionQueue();
+  if(activeTab==='discharge')renderDischargeQueue();
+  showToast('Moving to discharge...','info');
+  try{
+    /* write to discharges collection (using same doc id to preserve identity) */
+    await setDoc(doc(db,"discharges",id),dischargeDoc);
+    /* delete from patients collection */
+    await deleteDoc(doc(db,"patients",id));
+    showToast(`${p.name} moved to Discharge`);
+  }catch(e){
+    /* rollback: restore patient, remove from discharges */
+    patients.splice(pi,0,bk);
+    const di=discharges.findIndex(x=>x.id===id);
+    if(di>=0)discharges.splice(di,1);
+    renderQueue();renderFilterBar();renderAdmissionQueue();
+    if(activeTab==='discharge')renderDischargeQueue();
+    showToast(`Failed: ${e.message}`,'error');
+  }
+};
+/* clearAllToDischarge: bulk move-to-discharge for the "Clear All" button.
+   If patients are selected, moves only selected. Otherwise moves ALL patients.
+   Filters out patients being edited (can't discharge those). One batch confirm dialog. */
+const clearAllToDischarge=async()=>{
+  if(!patients.length)return;
+  const sc=selectedPatientIds.size;
+  let ids,cm,sm;
+  if(sc>0){ids=[...selectedPatientIds];cm=`Move ${sc} selected patient${sc!==1?'s':''} to Discharge?`;sm=`${sc} moved to Discharge`;}
+  else{ids=patients.map(p=>p.id);cm=`Move ALL ${patients.length} patient${patients.length!==1?'s':''} to Discharge?`;sm='All moved to Discharge';}
+  /* filter out patients being edited */
+  const skipped=ids.filter(id=>id===editingPatientId||id===docPatientId);
+  ids=ids.filter(id=>id!==editingPatientId&&id!==docPatientId);
+  if(ids.length===0){showToast('Cannot move patients being edited','error');return;}
+  if(!confirm(cm))return;
+  const today=new Date().toLocaleDateString('en-CA'),nowISO=new Date().toISOString();
+  const movedDocs=[];
+  ids.forEach(id=>{const i=patients.findIndex(p=>p.id===id);if(i<0)return;const p=patients[i];const dischargeDoc={name:p.name,weight:p.weight,admissionWeight:p.admissionWeight||null,dob:p.dob||null,ga:p.ga||null,room:p.room||null,drugs:p.drugs||[],drugLog:p.drugLog||[],saveDate:p.saveDate||null,dischargeDate:today,dischargeWeight:p.weight,fate:null,dischargeNotes:null,dischargedAt:nowISO};movedDocs.push({patient:p,discharge:dischargeDoc,id,originalIndex:i});});
+  /* sort by originalIndex descending so splice doesn't shift indices */
+  movedDocs.sort((a,b)=>b.originalIndex-a.originalIndex);
+  movedDocs.forEach(m=>{patients.splice(m.originalIndex,1);selectedPatientIds.delete(m.id);discharges.unshift({...m.discharge,id:m.id});});
+  renderQueue();renderFilterBar();renderAdmissionQueue();
+  if(activeTab==='discharge')renderDischargeQueue();
+  showToast('Moving to discharge...','info');
+  try{
+    /* write all discharge docs first, then delete all patient docs */
+    await Promise.all(movedDocs.map(m=>setDoc(doc(db,"discharges",m.id),m.discharge)));
+    await Promise.all(movedDocs.map(m=>deleteDoc(doc(db,"patients",m.id))));
+    let msg=sm;
+    if(skipped.length>0)msg+=` (${skipped.length} skipped — being edited)`;
+    showToast(msg);
+  }catch(e){
+    /* rollback: restore patients, remove from discharges */
+    movedDocs.forEach(m=>{patients.push(m.patient);const di=discharges.findIndex(d=>d.id===m.id);if(di>=0)discharges.splice(di,1);});
+    renderQueue();renderFilterBar();renderAdmissionQueue();
+    if(activeTab==='discharge')renderDischargeQueue();
+    showToast(`Failed: ${e.message}`,'error');
+  }
+};
+/* editPatientInfo: Admission tab — loads identity into Admission form */
+window.editPatientInfo=async id=>{const p=patients.find(x=>x.id===id);if(!p)return;editingPatientId=id;$('inputName').value=p.name;$('admissionWeight').value=p.weight;$('inputGA').value=p.ga;$('inputDOB').value=p.dob||'';if(p.dob){const ps=p.dob.split('-');$('dobText').textContent=`${ps[2]}/${ps[1]}/${ps[0]}`;$('dobFake').classList.add('has-date');updatePna();}else{$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('pnaDisplay').classList.add('hidden');}$('inputRoom').value=p.room||'';$('inputFileId').value=p.fileId||'';$('admissionEditingName').textContent=p.name;$('admissionEditingBanner').classList.remove('hidden');$('btnSavePatientInfo').textContent='Update Patient';renderAdmissionQueue();window.scrollTo({top:0,behavior:'smooth'});};
+/* editPatientDrugs: Documentation tab — loads drugs into Documentation form, sets docPatientId */
+window.editPatient=async id=>{const p=patients.find(x=>x.id===id);if(!p)return;docPatientId=id;editingPatientId=id;$('inputWeight').value=p.weight;$('inputWeight').readOnly=true;$('docWeightLock').classList.remove('hidden');currentDrugs=[...p.drugs];currentDrugLog=[];renderDrugList();updateFluidBar();$('editingBannerName').textContent=p.name;$('editingBanner').classList.remove('hidden');$('docPatientEmpty').classList.add('hidden');$('docPatientSelected').classList.remove('hidden');$('docPatientName').textContent=p.name;const la=getLiveAge(p),ad=fmtAge(la),rm=p.room&&ROOMS.includes(p.room)?p.room:null;$('docPatientMeta').innerHTML=`${p.weight}kg | GA:${esc(p.ga)}w | D${ad}${rm?' | '+rm:''}`;const pnaTxt=p.dob?`Day ${ageDay(p.dob,new Date())}`:'—';$('docPnaBadge').textContent=pnaTxt;$('docPnaBadge').className='px-4 py-3 rounded-xl border border-[var(--accent)]/30 text-sm font-semibold bg-[var(--accent)]/5';$('btnSavePatient').disabled=false;$('btnSavePatient').textContent='Update Drug Therapy';renderQueue();window.scrollTo({top:0,behavior:'smooth'});};
+/* clearDocPatient: Documentation tab — exits drug-editing mode, returns to experimentation */
+window.clearDocPatient=()=>{clearDocForm();renderQueue();};
 
 /* ===== DOCUMENTATION PDF ===== */
 const genPDF=async()=>{
@@ -509,6 +1183,124 @@ el.innerHTML=`<div class="pdf-cell-header"><div style="display:flex;justify-cont
 container.appendChild(pd);await document.fonts.ready;await new Promise(r=>setTimeout(r,200));const canvas=await html2canvas(pd,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',0,0,210,297);if(i<pages.length-1)doc.addPage();container.removeChild(pd);}
 doc.save('NICU_Report.pdf');showToast('PDF Generated');}catch(err){showToast('PDF failed: '+err.message,'error');}finally{container.style.opacity='0';container.innerHTML='';}};
 
+/* genChartPdf: generates A4 landscape PDF of the Chart tab (Section 1 + Section 2).
+   Uses same pattern as genPDF — renders to #pdf-render-container, captures with html2canvas.
+   Button disables during generation (prevents double-click race). */
+const genChartPdf=async()=>{
+  if(!window.jspdf||!window.html2canvas){showToast('PDF libs not loaded','error');return;}
+  const btn=$('btnChartPdf');if(btn)btn.disabled=true;
+  const container=$('pdf-render-container');container.innerHTML='';container.style.opacity='1';
+  showToast('Generating...','info');
+  try{
+    const now=new Date(),ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}),ts=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const chartPatients=getChartPatients();
+    /* === build Section 1 data (same logic as renderChartTab) === */
+    const groups=SPECIAL_DRUG_IDS.map(did=>{
+      const entries=[];
+      chartPatients.forEach(p=>{(p.drugs||[]).forEach(d=>{if(d.drugId===did)entries.push({patient:p,drug:d});});});
+      return{drugId:did,name:SPECIAL_DRUG_NAMES[did],entries};
+    }).filter(g=>g.entries.length>0);
+    /* === build Section 2 data (same logic as renderChartTab) === */
+    const drugMap=new Map();
+    chartPatients.forEach(p=>{
+      (p.drugs||[]).forEach(d=>{
+        if(d.drugId===undefined||d.drugId==='other')return;
+        const did=typeof d.drugId==='number'?d.drugId:parseInt(d.drugId);
+        if(isNaN(did))return;
+        const doseStr=String(d.dose||'');
+        if(doseStr==='Infusion'||doseStr==='')return;
+        if(isNaN(parseFloat(doseStr)))return;
+        const config=DRUG_CONFIG.find(c=>c.id===did);
+        if(!config)return;
+        const cat=DRUG_CATEGORIES.find(c=>c.ids.includes(did));
+        const isFluids=cat&&cat.name==='Fluids';
+        const isSpecial=SPECIAL_DRUG_IDS.includes(did);
+        if(isFluids&&!isSpecial)return;
+        const key=did+'|'+config.name;
+        if(!drugMap.has(key))drugMap.set(key,{drugId:did,name:config.name,order:DRUG_CATEGORIES.indexOf(cat)});
+      });
+    });
+    const eligibleDrugs=[...drugMap.values()].sort((a,b)=>a.order!==b.order?a.order-b.order:a.name.localeCompare(b.name));
+    /* paginate: 39 cols/page, 34 patients/page */
+    const MAX_COLS=39,PATIENT_ROWS=34;
+    const drugPages=[];
+    for(let i=0;i<eligibleDrugs.length;i+=MAX_COLS)drugPages.push(eligibleDrugs.slice(i,i+MAX_COLS));
+    const patientPages=[];
+    for(let i=0;i<chartPatients.length;i+=PATIENT_ROWS)patientPages.push(chartPatients.slice(i,i+PATIENT_ROWS));
+    if(patientPages.length===0)patientPages.push([]);
+    const totalGridPages=patientPages.length*drugPages.length;
+    const totalPages=(groups.length>0?1:0)+totalGridPages;
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'l',unit:'mm',format:'a4'}); /* landscape A4 = 297×210 */
+    let pageNum=0;
+    /* === Page 1: Section 1 (Specific Drugs) — only if there are entries === */
+    if(groups.length>0){
+      const pd=document.createElement('div');pd.className='pdf-chart-page';
+      let html=`<h2>NICU Daily Supply Request</h2><div class="pdf-date">Baghdad Teaching Hospital — ${ds} ${ts}</div>`;
+      html+=`<h3>Specific Drugs</h3><div class="pdf-chart-specific">`;
+      groups.forEach(g=>{
+        html+=`<div class="pdf-chart-specific-group"><div class="gname">${esc(g.name)} (${g.entries.length})</div>`;
+        g.entries.forEach(e=>{
+          const p=e.patient,d=e.drug;
+          const doseStr=d.isNutrient&&d.isGIR?`${d.dose} ml`:`${d.dose||''}${d.unit?esc(d.unit):''}`;
+          html+=`<div class="pdf-chart-specific-entry"><div><div class="pname">${esc(p.name)}</div><div class="pfile">File: ${p.fileId||'—'}</div></div><div class="pdose">${esc(doseStr)} ${esc(d.freq||'')}</div></div>`;
+        });
+        html+=`</div>`;
+      });
+      html+=`</div>`;
+      pd.innerHTML=html;
+      container.appendChild(pd);await document.fonts.ready;await new Promise(r=>setTimeout(r,200));
+      const canvas=await html2canvas(pd,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});
+      doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',0,0,297,210);
+      pageNum++;
+      if(pageNum<totalPages)doc.addPage();
+      container.removeChild(pd);
+    }
+    /* === Pages 2+: Section 2 (Grid) — one page per patient-page × drug-page combo === */
+    for(let pi=0;pi<patientPages.length;pi++){
+      for(let di=0;di<drugPages.length;di++){
+        const patPage=patientPages[pi],drugPage=drugPages[di];
+        const pd=document.createElement('div');pd.className='pdf-chart-page';
+        let html=`<h2>NICU Daily Supply Request — Drug Grid</h2><div class="pdf-date">Baghdad Teaching Hospital — ${ds} ${ts}${(patientPages.length>1||drugPages.length>1)?' — Page '+(pi*drugPages.length+di+1):''}</div>`;
+        html+=`<table class="pdf-chart-grid-table"><thead><tr>`;
+        html+=`<th class="pdf-patient-cell pdf-corner">الخدج</th>`;
+        drugPage.forEach(d=>{html+=`<th class="pdf-drug-head"><span>${esc(d.name)}</span></th>`;});
+        html+=`</tr></thead><tbody>`;
+        patPage.forEach(p=>{
+          html+=`<tr><td class="pdf-patient-cell">${esc(p.name)}</td>`;
+          drugPage.forEach(d=>{
+            const drug=(p.drugs||[]).find(x=>x.drugId===d.drugId);
+            if(drug){
+              const doseNum=parseFloat(String(drug.dose||''));
+              if(!isNaN(doseNum)){html+=`<td class="pdf-dose has">${doseNum}</td>`;}
+              else{html+=`<td class="pdf-dose"></td>`;}
+            }else{html+=`<td class="pdf-dose pdf-empty"></td>`;}
+          });
+          html+=`</tr>`;
+        });
+        const emptyRows=PATIENT_ROWS-patPage.length;
+        for(let r=0;r<emptyRows;r++){
+          html+=`<tr><td class="pdf-patient-cell">&nbsp;</td>`;
+          drugPage.forEach(()=>{html+=`<td class="pdf-dose pdf-empty"></td>`;});
+          html+=`</tr>`;
+        }
+        html+=`<tr class="pdf-sum-row"><td class="pdf-patient-cell">المجموع</td>`;
+        drugPage.forEach(()=>{html+=`<td></td>`;});
+        html+=`</tr></tbody></table>`;
+        pd.innerHTML=html;
+        container.appendChild(pd);await document.fonts.ready;await new Promise(r=>setTimeout(r,200));
+        const canvas=await html2canvas(pd,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});
+        doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',0,0,297,210);
+        pageNum++;
+        if(pageNum<totalPages)doc.addPage();
+        container.removeChild(pd);
+      }
+    }
+    doc.save(`daily_supply_request_${now.toLocaleDateString('en-CA')}.pdf`);
+    showToast('PDF Generated');
+  }catch(err){showToast('PDF failed: '+err.message,'error');}
+  finally{container.style.opacity='0';container.innerHTML='';if(btn)btn.disabled=false;}
+};
 /* ===== TPN CALCULATION ENGINE ===== */
 function tpnCalc(p,brand){
 const b=TPN_B[brand],el=p.loss,aoV=p.ao.reduce((s,a)=>s+(parseFloat(a.v)||0),0),tv=(p.fi*p.w)-p.tv-aoV,errs=[];
@@ -799,37 +1591,59 @@ function genTpnLabels(){
 }
 
 /* ===== TAB SWITCHING ===== */
+const TABS=[{id:'doc'},{id:'tpn'},{id:'admission'},{id:'discharge'},{id:'chart'}];
 function switchTab(tab){
-activeTab=tab;$('docSection').style.display=tab==='doc'?'':'none';$('tpnSection').style.display=tab==='tpn'?'':'none';$('tabDoc').classList.toggle('active',tab==='doc');$('tabTpn').classList.toggle('active',tab==='tpn');if(tab==='tpn')renderTpnQueue();
+activeTab=tab;TABS.forEach(t=>{const sec=$(t.id+'Section');if(sec)sec.style.display=tab===t.id?'':'none';const nav=document.querySelector('.nav-item[data-tab="'+t.id+'"]');if(nav)nav.classList.toggle('active',tab===t.id);});safeSet('activeTab',tab);if(tab==='tpn')renderTpnQueue();if(tab==='admission')renderAdmissionQueue();if(tab==='discharge')renderDischargeQueue();if(tab==='chart')renderChartTab();closeSidebar();
 }
+function openSidebar(){$('sidebar').classList.add('open');$('sidebarBackdrop').classList.add('show');}
+function closeSidebar(){$('sidebar').classList.remove('open');$('sidebarBackdrop').classList.remove('show');}
 
 /* ===== FIREBASE LISTENERS ===== */
 const unsub=onSnapshot(query(patientsRef,orderBy("saveDate","desc")),snap=>{
-setConn(true);initialLoaded=true;patients=snap.docs.map(d=>({drugs:[],...d.data(),id:d.id}));
+setConn(true);initialLoaded=true;
+/* normalize patient docs: ensure drugs[] and drugLog[] exist as arrays (defensive against old docs) */
+patients=snap.docs.map(d=>{const data=d.data();return{drugs:[],drugLog:[],...data,id:d.id};});
 if(editingPatientId&&!patients.find(p=>p.id===editingPatientId)){clearForm();showToast('Patient deleted by another user','error');}
-renderQueue();renderFilterBar();updateCounter();if(activeTab==='tpn')renderTpnQueue();
-},err=>{console.error("Firestore error:",err);setConn(false);if(!patients.length){showToast('Connection failed. Retrying...','error');}else{showToast(`Connection lost — showing cached data (${patients.length} patients).`,'error');}renderQueue();renderFilterBar();updateCounter();if(activeTab==='tpn')renderTpnQueue();});
+renderQueue();renderFilterBar();updateCounter();renderAdmissionQueue();if(activeTab==='tpn')renderTpnQueue();if(activeTab==='chart')renderChartTab();
+},err=>{console.error("Firestore error:",err);setConn(false);if(!patients.length){showToast('Connection failed. Retrying...','error');}else{showToast(`Connection lost — showing cached data (${patients.length} patients).`,'error');}renderQueue();renderFilterBar();updateCounter();renderAdmissionQueue();if(activeTab==='tpn')renderTpnQueue();if(activeTab==='chart')renderChartTab();});
 
 const unsubTpn=onSnapshot(query(tpnStandRef,orderBy("weight","desc")),snap=>{
 standaloneTpn=snap.docs.map(d=>({id:d.id,...d.data()}));if(activeTab==='tpn')renderTpnQueue();
 },err=>console.warn("Standalone TPN error:",err));
 
+/* discharges listener — keeps discharges[] in sync for the Discharge tab.
+   Error handling mirrors the patients listener: keep cached data, show toast, don't wipe.
+   Sorted by dischargeDate desc (pending cards have fate=null, but still get a date). */
+const unsubDischarges=onSnapshot(query(dischargesRef,orderBy("dischargeDate","desc")),snap=>{
+discharges=snap.docs.map(d=>({drugs:[],drugLog:[],...d.data(),id:d.id}));
+if(activeTab==='discharge')renderDischargeQueue();
+},err=>{console.error("Discharges Firestore error:",err);if(!discharges.length){showToast('Discharge list connection failed.','error');}else{showToast(`Discharge list connection lost — showing cached data (${discharges.length} records).`,'error');}if(activeTab==='discharge')renderDischargeQueue();});
+
 /* ===== EVENT LISTENERS ===== */
- $('tabDoc').addEventListener('click',()=>switchTab('doc'));
- $('tabTpn').addEventListener('click',()=>switchTab('tpn'));
+ document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+ $('navToggle').addEventListener('click',()=>{if($('sidebar').classList.contains('open'))closeSidebar();else openSidebar();});
+ $('sidebarBackdrop').addEventListener('click',closeSidebar);
+ $('sidebarClose').addEventListener('click',closeSidebar);
  $('btnAddDrug').addEventListener('click',addDrug);
- $('btnSavePatient').addEventListener('click',savePatient);
+ $('btnSavePatient').addEventListener('click',saveDrugTherapy);
+ $('btnSavePatientInfo').addEventListener('click',savePatientInfo);
  $('btnPdf').addEventListener('click',genPDF);
- $('btnClearAll').addEventListener('click',async()=>{if(!patients.length)return;const sc=selectedPatientIds.size;let ids,cm,sm;if(sc>0){ids=[...selectedPatientIds];cm=`Delete ${sc} selected?`;sm=`${sc} deleted`;}else{ids=patients.map(p=>p.id);cm=`Delete ALL ${patients.length}?`;sm='All deleted';}if(!confirm(cm))return;const bks=ids.map(id=>{const i=patients.findIndex(p=>p.id===id);const b=patients[i];patients.splice(i,1);return b;});selectedPatientIds.clear();renderQueue();renderFilterBar();try{await Promise.all(ids.map(id=>deleteDoc(doc(db,"patients",id))));showToast(sm);}catch(e){bks.forEach(b=>patients.push(b));renderQueue();renderFilterBar();showToast(`Failed: ${e.message}`,'error');}});
- $('btnCancelEdit').addEventListener('click',()=>{clearForm();renderQueue();renderFilterBar();showToast('Edit cancelled','info');});
+ $('btnClearAll').addEventListener('click',clearAllToDischarge);
+ $('btnExportCsv').addEventListener('click',exportDischargesCsv);
+ $('btnChartPdf').addEventListener('click',genChartPdf);
+ $('btnCancelEdit').addEventListener('click',()=>{clearDocForm();renderQueue();renderFilterBar();showToast('Edit cancelled','info');});
+ $('btnAdmissionCancelEdit').addEventListener('click',()=>{clearAdmissionForm();renderAdmissionQueue();showToast('Edit cancelled','info');});
+ $('btnClearDocPatient').addEventListener('click',()=>{clearDocPatient();showToast('Cleared — calculator in experimentation mode','info');});
  $('selectAllCheckbox').addEventListener('change',toggleSelAll);
  $('selectCategory').addEventListener('change',updateDrugList);
  $('selectDrug').addEventListener('change',handleDrugSel);
  $('selectCustomMethod').addEventListener('change',handleCustMethod);
  const debouncedDoc=debounce(handleDrugSel,150);
- $('inputWeight').addEventListener('input',()=>{validateClin();debouncedDoc();updateFluidBar();});
+ $('inputWeight').addEventListener('input',()=>{validateDocWeight();debouncedDoc();updateFluidBar();});
+ $('admissionWeight').addEventListener('input',()=>{validateClin();});
  $('inputGA').addEventListener('input',()=>{validateClin();debouncedDoc();});
- $('inputDOB').addEventListener('change',()=>{updatePna();handleDrugSel();});
+ $('inputDOB').addEventListener('change',()=>{updatePna();validateClin();});
+ $('inputRoom').addEventListener('change',validateClin);
  $('inputDose').addEventListener('input',()=>handleDoseChange('totalDose'));
  $('inputDosePerKg').addEventListener('input',()=>handleDoseChange('dosePerKg'));
  $('inputFreq').addEventListener('change',()=>handleDoseChange('freq'));
@@ -842,14 +1656,18 @@ standaloneTpn=snap.docs.map(d=>({id:d.id,...d.data()}));if(activeTab==='tpn')ren
  $('inputCustomMethod').addEventListener('input',()=>{const ct=$('inputCustomMethod').value.trim();if(ct){$('methodPreviewContainer').classList.remove('hidden');$('previewMethod').innerHTML=`<span class="arabic-text">${safeBN(ct)}</span>`;}else $('methodPreviewContainer').classList.add('hidden');});
  $('darkModeToggle').addEventListener('click',()=>{const d=safeGet('theme')==='dark',n=!d;document.body.classList.toggle('dark-mode',n);safeSet('theme',n?'dark':'light');$('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!n);$('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',n);});
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
-$('docSection').addEventListener('input',()=>{if(editingPatientId)dirty=true;});
+$('docSection').addEventListener('input',()=>{if(docPatientId)dirty=true;});
+$('admissionSection').addEventListener('input',()=>{if(editingPatientId)dirty=true;});
 $('tpnSection').addEventListener('input',()=>{if(tpnEditId)dirty=true;});
 /* ===== v2: doc-tab search + keyboard shortcuts ===== */
 const debouncedDocSearch=debounce(q=>{docSearch=q;safeSet('docSearch',q);renderQueue();updateCounter();},150);
+const debouncedAdmissionSearch=debounce(q=>{admissionSearch=q;safeSet('admissionSearch',q);renderAdmissionQueue();},150);
 $('docSearch').addEventListener('input',e=>{const q=e.target.value;$('docSearchClear').classList.toggle('show',q.length>0);debouncedDocSearch(q);});
 $('docSearchClear').addEventListener('click',()=>{$('docSearch').value='';docSearch='';safeSet('docSearch','');$('docSearchClear').classList.remove('show');renderQueue();updateCounter();$('docSearch').focus();});
+$('admissionSearch').addEventListener('input',e=>{const q=e.target.value;$('admissionSearchClear').classList.toggle('show',q.length>0);debouncedAdmissionSearch(q);});
+$('admissionSearchClear').addEventListener('click',()=>{$('admissionSearch').value='';admissionSearch='';safeSet('admissionSearch','');$('admissionSearchClear').classList.remove('show');renderAdmissionQueue();$('admissionSearch').focus();});
 $('docSort').addEventListener('change',e=>{docSort=e.target.value;safeSet('docSort',docSort);renderQueue();updateCounter();});
-document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'){e.preventDefault();if(activeTab==='doc')savePatient();else saveTpn();}});
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'){e.preventDefault();if(activeTab==='doc')saveDrugTherapy();else if(activeTab==='admission')savePatientInfo();else if(activeTab==='tpn')saveTpn();}});
 
 /* ===== TPN EVENT LISTENERS ===== */
  $('tpnBrand').addEventListener('change',()=>{safeSet('tpnBrand',$('tpnBrand').value);updTpnPreview();renderTpnQueue();});
@@ -884,6 +1702,9 @@ const sb=safeGet('tpnBrand');if(sb&&[...$('tpnBrand').options].some(o=>o.value==
 const df=safeGet('docFilter');if(df)activeFilter=df;
 const ds=safeGet('docSearch');if(ds){docSearch=ds;const el=$('docSearch');if(el){el.value=ds;el.parentNode.querySelector('.ds-clear')?.classList.add('show');}}
 const ss=safeGet('docSort');if(ss){docSort=ss;const sel=$('docSort');if(sel)sel.value=ss;}
+const as=safeGet('admissionSearch');if(as){admissionSearch=as;const el=$('admissionSearch');if(el){el.value=as;el.parentNode.querySelector('.ds-clear')?.classList.add('show');}}
+const persistedTab=safeGet('activeTab');if(persistedTab&&TABS.some(t=>t.id===persistedTab)){switchTab(persistedTab);}else{switchTab('doc');}
+renderAdmissionQueue();
 </script>
 </body>
 </html>
