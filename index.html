@@ -71,31 +71,23 @@ body.dark-mode input:-webkit-autofill,body.dark-mode input:-webkit-autofill:hove
 .chart-grid .sum-row td:not(.patient-cell){position:static;z-index:auto}
 .chart-grid .empty-grid-cell{background:repeating-linear-gradient(45deg,transparent,transparent 4px,var(--surface) 4px,var(--surface) 8px)}
 #chartGrid{max-height:70vh;overflow:auto}
-/* PDF render of chart grid — forced light mode, sized for A4 landscape */
-.pdf-chart-page{width:297mm;min-height:210mm;padding:8mm;background:#fff;color:#000;box-sizing:border-box;font-family:'Inter','Cairo','Noto Sans Arabic',sans-serif}
-.pdf-chart-page h2{font-size:14pt;font-weight:900;margin:0 0 2mm 0;color:#000;font-family:'Crimson Pro',serif}
-.pdf-chart-page h3{font-size:11pt;font-weight:700;margin:4mm 0 2mm 0;color:#000;padding-bottom:1mm;border-bottom:1.5px solid #000}
-.pdf-chart-page .pdf-date{font-size:9pt;color:#333;margin-bottom:3mm}
-.pdf-chart-specific{font-size:9pt;margin-bottom:3mm}
-.pdf-chart-specific-group{margin-bottom:2.5mm;page-break-inside:avoid}
-.pdf-chart-specific-group .gname{font-weight:700;color:#000;margin-bottom:1mm;font-size:9.5pt}
-.pdf-chart-specific-entry{display:flex;justify-content:space-between;padding:1mm 2mm;background:#f5f5f5;border-radius:2px;margin-bottom:0.8mm;font-size:8.5pt}
-.pdf-chart-specific-entry .pname{font-weight:600;color:#000}
-.pdf-chart-specific-entry .pfile{color:#555;font-size:7.5pt}
-.pdf-chart-specific-entry .pdose{font-weight:700;color:#0F766E}
-.pdf-chart-grid-table{border-collapse:collapse;font-size:7pt;table-layout:fixed;width:100%}
-.pdf-chart-grid-table th,.pdf-chart-grid-table td{border:0.5px solid #000;padding:1.5px 2px;text-align:center;vertical-align:middle}
-.pdf-chart-grid-table thead th{background:#f0f0f0;font-weight:700;color:#000}
-.pdf-chart-grid-table .pdf-corner{background:#0F766E;color:#fff;font-weight:700;writing-mode:vertical-rl;transform:rotate(180deg);font-size:9pt;letter-spacing:1px;width:8mm}
-.pdf-chart-grid-table .pdf-drug-head{height:32mm;width:6mm;background:#f0f0f0;position:relative}
-.pdf-chart-grid-table .pdf-drug-head span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(180deg);white-space:nowrap;font-size:6.5pt;font-weight:600;color:#000;max-height:30mm;overflow:hidden;text-orientation:mixed}
-.pdf-chart-grid-table .pdf-patient-cell{text-align:left;font-weight:600;color:#000;min-width:30mm;max-width:35mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#fff}
-.pdf-chart-grid-table thead .pdf-patient-cell{background:#f0f0f0}
-.pdf-chart-grid-table .pdf-dose{background:#fff;color:#000;font-weight:500}
-.pdf-chart-grid-table .pdf-dose.has{background:rgba(15,118,110,.1);color:#0F766E;font-weight:700}
-.pdf-chart-grid-table .pdf-empty{background:repeating-linear-gradient(45deg,transparent,transparent 2px,#f5f5f5 2px,#f5f5f5 4px)}
-.pdf-chart-grid-table .pdf-sum-row td{background:#f0f0f0;font-weight:700;color:#555;font-style:italic}
-.pdf-chart-grid-table .pdf-sum-row .pdf-patient-cell{background:#f0f0f0;color:#555}
+/* PDF render of chart grid — B&W only, fixed 40×36 grid, scaled to A4 landscape */
+.pdf-chart-page{width:297mm;height:210mm;padding:6mm;background:#fff;color:#000;box-sizing:border-box;font-family:'Inter','Cairo','Noto Sans Arabic',sans-serif;overflow:hidden}
+.pdf-chart-page .pdf-title{font-size:11pt;font-weight:900;margin:0 0 1mm 0;color:#000;font-family:'Crimson Pro',serif}
+.pdf-chart-page .pdf-date{font-size:7pt;color:#000;margin-bottom:2mm}
+.pdf-chart-grid-table{border-collapse:collapse;font-size:6pt;table-layout:fixed;margin:0 auto}
+.pdf-chart-grid-table th,.pdf-chart-grid-table td{border:0.5px solid #000;padding:0;text-align:center;vertical-align:middle;overflow:hidden}
+.pdf-chart-grid-table thead th{border-top:1.5px solid #000;border-bottom:1.5px solid #000;font-weight:700;color:#000;background:#fff}
+.pdf-chart-grid-table .pdf-corner{writing-mode:vertical-rl;transform:rotate(180deg);font-size:8pt;letter-spacing:1px;font-weight:700;color:#000}
+.pdf-chart-grid-table .pdf-drug-head{position:relative;background:#fff}
+.pdf-chart-grid-table .pdf-drug-head span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(180deg);white-space:nowrap;font-size:5.5pt;font-weight:600;color:#000;text-orientation:mixed}
+.pdf-chart-grid-table .pdf-patient-cell{text-align:left;font-weight:600;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 1.5px;background:#fff;font-size:5.5pt}
+.pdf-chart-grid-table thead .pdf-patient-cell{font-weight:700}
+.pdf-chart-grid-table .pdf-dose{background:#fff;color:#000;font-weight:500;font-size:5.5pt}
+.pdf-chart-grid-table .pdf-dose.has{font-weight:700}
+.pdf-chart-grid-table .pdf-sum-row td{border-top:1.5px solid #000;font-weight:700;color:#000;font-style:italic;background:#fff}
+.pdf-chart-grid-table .pdf-sum-row .pdf-patient-cell{font-weight:700;color:#000}
+.pdf-chart-grid-table .pdf-empty{background:#fff}
 /* ===== sidebar navigation ===== */
 .app-layout{display:flex;gap:1.5rem;align-items:flex-start}
 .sidebar{width:200px;flex-shrink:0;position:sticky;top:80px}
@@ -177,7 +169,7 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 .search-item .si-info{font-size:11px;color:var(--muted);flex-shrink:0}
 .linked-badge{font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(15,118,110,.1);color:var(--accent);font-weight:700}
 .standalone-badge{font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(100,116,139,.1);color:var(--muted);font-weight:700}
-/* ===== v2: doc search + census + toolbar ===== */
+/* ===== v2: doc search + toolbar ===== */
 .doc-search-wrap{position:relative;flex:1;min-width:0}
 .doc-search-wrap>input{padding-left:36px;padding-right:30px}
 .ds-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;width:16px;height:16px}
@@ -246,7 +238,13 @@ body.dark-mode .room-tag.un{color:var(--muted);background:rgba(156,163,175,.1);b
 <div id="editingBanner" class="hidden editing-banner px-6 py-3 flex items-center justify-between"><div class="flex items-center gap-2"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><span class="text-white font-semibold text-sm">Editing drugs for: <span id="editingBannerName" class="font-bold"></span></span></div><button id="btnCancelEdit" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition-colors">Cancel</button></div>
 <div class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] px-6 py-4"><h2 class="text-xl text-white font-semibold">Medication & Dosage</h2><p class="text-white/75 text-sm mt-1">Calculate precise dosages by weight</p></div>
 <div class="p-6 space-y-6">
-<div id="docWeightSection" class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Weight (kg) <span id="docWeightLock" class="text-[10px] text-[var(--accent)] font-bold uppercase tracking-wide hidden">· locked</span></label><input type="text" id="inputWeight" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Enter weight to calculate doses"></div>
+<div id="docWeightSection" class="space-y-3">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">Weight (kg) <span id="docWeightLock" class="text-[10px] text-[var(--accent)] font-bold uppercase tracking-wide hidden">· locked</span></label><input type="text" id="inputWeight" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="Enter weight to calculate doses"></div>
+<div class="space-y-2"><label class="block text-sm font-semibold text-[var(--fg)]">GA (weeks)</label><input type="text" id="docInputGA" inputmode="decimal" oninput="this.value=this.value.replace(/[^0-9.]/g,'')" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]" placeholder="e.g., 34"></div>
+</div>
+<div id="docClinicalWarning" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2"><svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><p id="docClinicalWarningText" class="text-sm text-amber-700 font-semibold"></p></div>
+</div>
 <div class="flex items-center gap-2 mb-4"><svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg><h3 class="text-lg font-semibold text-[var(--fg)]">Medication & Dosage</h3></div>
 <div class="med-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 items-start">
 <div class="space-y-2 lg:col-span-1"><label class="block text-sm font-semibold text-[var(--fg)]">Category</label><select id="selectCategory" class="w-full px-4 py-3 rounded-xl border border-[var(--border)]"></select></div>
@@ -466,6 +464,12 @@ const DRUG_CONFIG=[
 {id:45,name:'Ceftazidem/Avibactam',dosePerKg:25,unit:'mg',factor:6.25,methodIndex:16,defaultFreq:3,inputMode:'weightBased'},
 ];
 const DRUG_CATEGORIES=[{name:'Antibiotics',ids:[1,16,2,5,6,7,8,11,24,45]},{name:'Sedatives & Inotropes',ids:[9,17,18,19,20,22,23,26,27,37]},{name:'Miscellaneous',ids:[3,4,10,25,28,35,36,38,41]},{name:'Fluids',ids:[12,13,14,15,43,44]},{name:'Oral & Ocular',ids:[21,29,30,31,39,40,42]},{name:'Nebulization',ids:[32,33,34]},{name:'Other+',ids:['other']}];
+/* Drug sort priority — does NOT affect the dropdown order (which uses DRUG_CATEGORIES).
+   Used by sortCurrentDrugs() to order drugs in the list + on save.
+   Order: Antibiotics(0) → Miscellaneous(1) → Sedatives & Inotropes(2) → Other categories(3) → Fluids incl. TPN(4) */
+const DRUG_SORT_PRIORITY={Antibiotics:0,Miscellaneous:1,'Sedatives & Inotropes':2,'Oral & Ocular':3,Nebulization:3,'Other+':3,Fluids:4};
+const getDrugSortPriority=d=>{const did=d.drugId;if(did===undefined||did==='other')return 3;const cat=DRUG_CATEGORIES.find(c=>c.ids.includes(did));return cat?DRUG_SORT_PRIORITY[cat.name]:3;};
+const sortCurrentDrugs=()=>{const indexed=currentDrugs.map((d,i)=>({d,i}));indexed.sort((a,b)=>{const pa=getDrugSortPriority(a.d),pb=getDrugSortPriority(b.d);if(pa!==pb)return pa-pb;return a.i-b.i;});currentDrugs=indexed.map(x=>x.d);};
 const ROOMS=['Room 1','Room 2','Reception'];
 const ROOM_STYLES={'Room 1':{tag:'r1',label:'R1'},'Room 2':{tag:'r2',label:'R2'},'Reception':{tag:'rec',label:'REC'}};
 
@@ -481,6 +485,7 @@ let discharges=[],dischargeExpandedIds=new Set(),editingDischargeId=null;
    On saveDrugTherapy, these are appended to the patient's persisted drugLog array.
    On editPatient or clearDocForm, currentDrugLog is reset to []. */
 let currentDrugLog=[];
+let editingDrugIndex=null; /* index into currentDrugs being inline-edited; null = not editing */
 
 /* ===== UTILITIES ===== */
 const $=id=>document.getElementById(id);
@@ -502,7 +507,6 @@ const isOver30=v=>v==='>30'||parseInt(v)>=999;
 const getLiveAge=p=>{if(p.dob)return ageDay(p.dob,new Date());if(p.saveDate&&p.ageBaseline&&!isOver30(p.ageBaseline))return(parseInt(p.ageBaseline)||0)+daysDiff(p.saveDate,new Date());if(isOver30(p.ageBaseline))return 999;return parseInt(p.ageBaseline)||0;};
 /* ===== PNA / CLINICAL VALIDATION ===== */
 const getFormPna=()=>{const d=$('inputDOB').value;return d?daysDiff(d,new Date()):0;};
-const isAgeLive=p=>{if(p.dob)return true;return p.saveDate&&!isOver30(p.ageBaseline)&&daysDiff(p.saveDate,new Date())>0;};
 const fmtAge=a=>a>=999?'30+':a;
 const updatePna=()=>{const d=$('inputDOB').value;if(!d){$('pnaDisplay').classList.add('hidden');$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';return;}const p=ageDay(d,new Date()),ps=d.split('-');$('dobText').textContent=`${ps[2]}/${ps[1]}/${ps[0]}`;$('dobFake').classList.add('has-date');$('pnaDisplay').textContent=`Postnatal Age: Day ${p}`;$('pnaDisplay').classList.remove('hidden');};
 
@@ -511,8 +515,8 @@ const safeGet=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
 const safeSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
 const initDark=()=>{const d=safeGet('theme')==='dark';document.body.classList.toggle('dark-mode',d);$('darkModeToggle').querySelector('.sun-icon').classList.toggle('hidden',!d);$('darkModeToggle').querySelector('.moon-icon').classList.toggle('hidden',d);};
 const validateClin=()=>{const w=cleanN($('admissionWeight').value),ga=cleanN($('inputGA').value),ws=[];if(w>0&&(w<.4||w>6))ws.push(`Weight ${w}kg outside NICU range (0.4–6 kg)`);if(ga>0&&(ga<22||ga>44))ws.push(`GA ${ga}w outside range (22–44 weeks)`);if(ws.length){$('clinicalWarningText').innerHTML=ws.join('<br>');$('clinicalWarning').classList.remove('hidden');}else $('clinicalWarning').classList.add('hidden');};
-const validateDocWeight=()=>{const w=cleanN($('inputWeight').value);if(w>0&&(w<.4||w>6)){$('clinicalWarningText').innerHTML=`Weight ${w}kg outside NICU range (0.4–6 kg)`;$('clinicalWarning').classList.remove('hidden');}else if(!docPatientId){$('clinicalWarning').classList.add('hidden');}};
-const getDocGa=()=>{if(docPatientId){const p=patients.find(x=>x.id===docPatientId);if(p)return cleanN(p.ga);}return cleanN($('inputGA').value);};
+const validateDocWeight=()=>{const w=cleanN($('inputWeight').value);const ws=[];if(w>0&&(w<.4||w>6))ws.push(`Weight ${w}kg outside NICU range (0.4–6 kg)`);if(!docPatientId){const ga=cleanN($('docInputGA')?.value||'0');if(ga>0&&(ga<22||ga>44))ws.push(`GA ${ga}w outside range (22–44 weeks)`);}if(ws.length){$('docClinicalWarningText').innerHTML=ws.join('<br>');$('docClinicalWarning').classList.remove('hidden');}else $('docClinicalWarning').classList.add('hidden');};
+const getDocGa=()=>{if(docPatientId){const p=patients.find(x=>x.id===docPatientId);if(p)return cleanN(p.ga);}return cleanN($('docInputGA')?.value||'0');};
 const getDocPna=()=>{if(docPatientId){const p=patients.find(x=>x.id===docPatientId);if(p&&p.dob)return daysDiff(p.dob,new Date());}return getFormPna();};
 const checkAlerts=drug=>{const ga=getDocGa(),a=getDocPna(),f=$('inputFreq').value,w=cleanN($('inputWeight').value);$('warningMessage').classList.add('hidden');if(drug&&drug.warning_rule){const r=drug.warning_rule(ga,a,f,w);if(r){$('warningMessage').innerHTML=r;$('warningMessage').classList.remove('hidden');}}};
 const calcGIR=(w,g,v)=>{if(w<=0||g<=0||v<=0)return null;let ht=Math.round(((w*g*1440/50)-v)/9),gw=v-ht,ws=[];if(ht<0){ht=0;gw=v;ws.push("تنبيه: 5% GW يوفر تركيزاً أعلى من GIR المطلوب.");}else if(ht>v){ht=v;gw=0;ws.push("خطأ: الحجم غير كافٍ.");}const td=gw*50+ht*500,c=td/v/10,ag=td/w/1440;if(c>12.5)ws.push("تحذير: التركيز أعلى من 12.5%");return{gw,ht,conc:c,actualGIR:ag,warnings:ws};};
@@ -571,7 +575,7 @@ const updPreview=(d,dose)=>{$('previewMethod').innerHTML=genMethod(d,dose);$('me
 const renderDopTable=w=>{const tb=$('dopamineTableBody');if(w<=0){tb.innerHTML='<tr><td colspan="2" class="p-4 text-center text-[var(--muted)]">Enter weight</td></tr>';return;}tb.innerHTML=[2,5,7,10].map(d=>`<tr><td class="p-2 text-center font-bold text-[var(--accent)] border border-[var(--border)]">${((d*w*1440)/1000).toFixed(0)} ml/24hr</td><td class="p-2 text-center border border-[var(--border)]">${d}</td></tr>`).join('');};
 
 /* ===== FORM CLEAR (split) ===== */
-const clearDocForm=()=>{editingPatientId=null;dirty=false;docPatientId=null;$('inputWeight').value='';$('inputWeight').readOnly=false;$('docWeightLock').classList.add('hidden');$('docWeightSection').classList.remove('hidden');$('inputGIR').value='';$('inputBagVol').value='';currentDrugs=[];currentDrugLog=[];renderDrugList();updateFluidBar();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');$('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';$('inputConcentration').value='';$('concentrationContainer').classList.add('hidden');$('editingBanner').classList.add('hidden');$('clinicalWarning').classList.add('hidden');$('fluidSummary').classList.add('hidden');$('docPatientEmpty').classList.remove('hidden');$('docPatientSelected').classList.add('hidden');$('btnSavePatient').disabled=true;$('btnSavePatient').textContent='Save Drug Therapy';};
+const clearDocForm=()=>{editingPatientId=null;dirty=false;docPatientId=null;editingDrugIndex=null;$('inputWeight').value='';$('inputWeight').readOnly=false;$('docWeightLock').classList.add('hidden');$('docWeightSection').classList.remove('hidden');$('docInputGA').value='';$('docClinicalWarning').classList.add('hidden');$('inputGIR').value='';$('inputBagVol').value='';currentDrugs=[];currentDrugLog=[];renderDrugList();updateFluidBar();$('methodPreviewContainer').classList.add('hidden');$('dopamineTableContainer').classList.add('hidden');$('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';$('inputConcentration').value='';$('concentrationContainer').classList.add('hidden');$('editingBanner').classList.add('hidden');$('clinicalWarning').classList.add('hidden');$('fluidSummary').classList.add('hidden');$('docPatientEmpty').classList.remove('hidden');$('docPatientSelected').classList.add('hidden');$('btnSavePatient').disabled=true;$('btnSavePatient').textContent='Save Drug Therapy';};
 const clearAdmissionForm=()=>{editingPatientId=null;dirty=false;$('inputName').value='';$('admissionWeight').value='';$('inputGA').value='';$('inputDOB').value='';$('inputRoom').value='';$('inputFileId').value='';$('pnaDisplay').classList.add('hidden');$('clinicalWarning').classList.add('hidden');$('dobFake').classList.remove('has-date');$('dobText').textContent='Select date...';$('admissionEditingBanner').classList.add('hidden');$('btnSavePatientInfo').textContent='Save Patient';};
 /* legacy alias for code that still references clearForm() — clears BOTH forms */
 const clearForm=()=>{clearDocForm();clearAdmissionForm();};
@@ -1031,7 +1035,10 @@ const renderChartTab=()=>{
 };
 
 const popDropdowns=()=>{$('selectCategory').innerHTML='<option value="">-- Select Category --</option>'+DRUG_CATEGORIES.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');$('selectDrug').innerHTML='<option value="">-- Select Category First --</option>';$('selectCustomMethod').innerHTML='<option value="">-- Select Method --</option>'+METHOD_OPTIONS.map(m=>`<option value="${m.value}">${m.label}</option>`).join('');};
-const renderDrugList=()=>{$('drugsList').innerHTML=currentDrugs.map((d,i)=>{let bh;if(d.isGIR)bh='';else if(d.isNutrient)bh=`<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose} ml${d.addonVol?' (+ '+d.addonVol+' ml '+esc(d.addonType)+')':''} / 24 hr</span>`;else if(d.hideDetails)bh='';else bh=`<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose}${d.unit?esc(d.unit):''} ${esc(d.freq)}</span>`;return`<div class="drug-row animate-slide-in bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-3"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><p class="drug-name font-bold text-[var(--fg)]">${drugName(d)}</p>${bh}</div>${d.alert?`<p class="text-[var(--danger)] font-bold text-xs mb-1 arabic-text">${esc(d.alert)}</p>`:''}<p class="text-sm text-[var(--muted)] mt-1" style="direction:ltr;text-align:left">${renderM(d)}</p></div><div class="flex items-center gap-1 flex-shrink-0"><button onclick="removeDrug(${i})" class="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg group flex-shrink-0" aria-label="Remove drug"><svg class="w-5 h-5 text-[var(--muted)] group-hover:text-[var(--danger)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div></div>`;}).join('');updateCounter();};
+const renderDrugList=()=>{$('drugsList').innerHTML=currentDrugs.map((d,i)=>{let bh;if(d.isGIR)bh='';else if(d.isNutrient)bh=`<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose} ml${d.addonVol?' (+ '+d.addonVol+' ml '+esc(d.addonType)+')':''} / 24 hr</span>`;else if(d.hideDetails)bh='';else bh=`<span class="px-2 py-0.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold">${d.dose}${d.unit?esc(d.unit):''} ${esc(d.freq)}</span>`;const isEditing=editingDrugIndex===i;/* can edit dose if it's numeric; can edit freq if not hidden */const doseStr=String(d.dose||'');const doseEditable=doseStr!==''&&doseStr!=='Infusion'&&!isNaN(parseFloat(doseStr));const freqEditable=!d.hideDetails&&d.drugId!==12&&!d.isNutrient||d.isDopamine;if(isEditing){const freqOpts=['1','2','3','4','q36hr','q48hr'];return`<div class="drug-row animate-slide-in bg-[var(--surface)] border-2 border-[var(--accent)] rounded-xl p-4 space-y-3"><div class="flex items-center gap-2 flex-wrap"><p class="drug-name font-bold text-[var(--fg)]">${drugName(d)}</p><span class="text-[10px] font-bold text-[var(--accent)] uppercase tracking-wide">Editing</span></div>${d.alert?`<p class="text-[var(--danger)] font-bold text-xs mb-1 arabic-text">${esc(d.alert)}</p>`:''}<div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="space-y-1"><label class="block text-xs font-semibold text-[var(--muted)]">Dose${d.unit?' ('+esc(d.unit)+')':''}</label><input type="text" id="editDose-${i}" inputmode="decimal" oninput="this.value=this.value.replace(/[،,٫]/g,'.')" class="w-full px-3 py-2 rounded-lg border border-[var(--border)] text-sm" value="${esc(doseStr)}"${doseEditable?'':' disabled style="opacity:.5"'}></div><div class="space-y-1"><label class="block text-xs font-semibold text-[var(--muted)]">Frequency</label><select id="editFreq-${i}" class="w-full px-3 py-2 rounded-lg border border-[var(--border)] text-sm"${freqEditable?'':' disabled style="opacity:.5"'}><option value="">—</option>${freqOpts.map(f=>`<option value="${f}" ${d.freq===f?'selected':''}>${f==='q36hr'?'q36hr':f==='q48hr'?'q48hr':'x '+f}</option>`).join('')}</select></div></div><div class="flex justify-end gap-2"><button onclick="cancelEditDrug()" class="px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--muted)] text-sm font-medium hover:bg-[var(--card)] transition-colors">Cancel</button><button onclick="saveEditDrug(${i})" class="btn-primary px-4 py-1.5 rounded-lg text-white text-sm font-semibold">Save</button></div></div>`;}return`<div class="drug-row animate-slide-in bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-3"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><p class="drug-name font-bold text-[var(--fg)]">${drugName(d)}</p>${bh}</div>${d.alert?`<p class="text-[var(--danger)] font-bold text-xs mb-1 arabic-text">${esc(d.alert)}</p>`:''}<p class="text-sm text-[var(--muted)] mt-1" style="direction:ltr;text-align:left">${renderM(d)}</p></div><div class="flex items-center gap-1 flex-shrink-0"><button onclick="editDrugInline(${i})" class="p-2 hover:bg-[var(--accent)]/10 rounded-lg text-[var(--muted)] hover:text-[var(--accent)] transition-colors" aria-label="Edit drug"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="removeDrug(${i})" class="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg group flex-shrink-0" aria-label="Remove drug"><svg class="w-5 h-5 text-[var(--muted)] group-hover:text-[var(--danger)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div></div>`;}).join('');updateCounter();};
+window.editDrugInline=i=>{editingDrugIndex=i;renderDrugList();};
+window.cancelEditDrug=()=>{editingDrugIndex=null;renderDrugList();};
+window.saveEditDrug=i=>{const d=currentDrugs[i];if(!d)return;const doseEl=$('editDose-'+i),freqEl=$('editFreq-'+i);if(doseEl&&!doseEl.disabled){const newDose=cleanN(doseEl.value);if(newDose>0)d.dose=newDose;}if(freqEl&&!freqEl.disabled){d.freq=freqEl.value;}/* regenerate method string since dose may have changed */if(!d.isGIR&&!d.isDopamine)d.method=genMethod(d,d.dose);editingDrugIndex=null;renderDrugList();updateFluidBar();showToast('Drug updated');};
 
 const addDrug=()=>{
 const w=cleanN($('inputWeight').value);if(!w||w<=0){showToast('Enter weight','error');return;}
@@ -1045,10 +1052,10 @@ else{const drug=dobj,dose=cleanN($('inputDose').value);let av=drug.isNutrient?cl
 if(drug.inputMode==='dopaminePump')currentDrugs.push({id:genId(),active:true,drugId:drug.id,name:drug.name,dose:'Infusion',unit:'',freq:'',method:'1 ml dopamin + 39 ml GW',hideDetails:false,isNutrient:false,isDopamine:true,isGIR:false,alert:drug.alert||'',addonVol:0,addonType:'',methodIndex:null,targetVol:null,factor:null});
 else if(drug.isGIR){const gt=cleanN($('inputGIR').value),bv=cleanN($('inputBagVol').value);if(gt<=0||bv<=0){showToast('Enter GIR and volume','error');return;}const r=calcGIR(w,gt,bv);currentDrugs.push({id:genId(),active:true,drugId:drug.id,name:drug.name,dose:bv,unit:'ml',freq:'',method:genMethod(drug,bv),hideDetails:false,isNutrient:true,isDopamine:false,isGIR:true,girRate:(r?r.actualGIR:gt).toFixed(1),girConc:(r?r.conc:0).toFixed(1),alert:r&&r.warnings.length?r.warnings.join(' | '):'',addonVol:av,addonType:at,methodIndex:null,targetVol:null,factor:null});}
 else{const tv=(drug.methodIndex===3||drug.methodIndex===10||drug.methodIndex===16)?parseInt($('inputTargetVol').value):null;currentDrugs.push({id:genId(),active:true,drugId:drug.id,name:drug.name,dose,unit:drug.unit||'',freq:(drug.hideDetails||drug.name==='TPN'||$('selectCategory').value==='Fluids')?'':fd,method:genMethod(drug,dose),hideDetails:drug.hideDetails||false,noPrint:drug.noPrint||false,isNutrient:drug.isNutrient||false,isDopamine:drug.isDopamine||false,isGIR:false,alert:drug.alert||'',addonVol:av,addonType:at,methodIndex:drug.methodIndex,targetVol:tv,factor:drug.factor||null});}}
-renderDrugList();updateFluidBar();showToast('Added');
+const newDrugRef=currentDrugs[currentDrugs.length-1];/* capture ref before sort */
+renderDrugList();updateFluidBar();sortCurrentDrugs();renderDrugList();showToast('Added');
 /* log the add event for drug-duration tracking (Step 3.5 — drugLog) */
-const lastDrug=currentDrugs[currentDrugs.length-1];
-if(lastDrug)currentDrugLog.push({type:'add',uid:lastDrug.id,name:drugName(lastDrug),dose:lastDrug.dose,unit:lastDrug.unit||'',freq:lastDrug.freq||'',ts:new Date().toISOString()});
+if(newDrugRef)currentDrugLog.push({type:'add',uid:newDrugRef.id,name:drugName(newDrugRef),dose:newDrugRef.dose,unit:newDrugRef.unit||'',freq:newDrugRef.freq||'',ts:new Date().toISOString()});
 $('selectCategory').value='';updateDrugList();$('inputAddonVol').value='';$('inputAddonType').value='';
 };
 window.removeDrug=i=>{const d=currentDrugs[i];if(d)currentDrugLog.push({type:'remove',uid:d.id,name:drugName(d),ts:new Date().toISOString()});currentDrugs.splice(i,1);renderDrugList();updateFluidBar();};
@@ -1074,7 +1081,7 @@ catch(e){showToast(`Save Failed: ${e.message}`,'error');}
 const saveDrugTherapy=async()=>{
 if(!docPatientId){showToast('Select a patient first','error');return;}
 if(currentDrugs.length===0){showToast('Add at least one drug','error');return;}
-const sorted=[...currentDrugs].sort((a,b)=>{if(a.isNutrient&&!b.isNutrient)return 1;if(!a.isNutrient&&b.isNutrient)return-1;return 0;});
+const sorted=[...currentDrugs].sort((a,b)=>{const pa=getDrugSortPriority(a),pb=getDrugSortPriority(b);if(pa!==pb)return pa-pb;return 0;});
 /* merge currentDrugLog with the patient's existing drugLog (from Firestore) */
 const existing=patients.find(p=>p.id===docPatientId);
 const existingLog=(existing&&existing.drugLog)?existing.drugLog:[];
@@ -1191,9 +1198,11 @@ el.innerHTML=`<div class="pdf-cell-header"><div style="display:flex;justify-cont
 container.appendChild(pd);await document.fonts.ready;await new Promise(r=>setTimeout(r,200));const canvas=await html2canvas(pd,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',0,0,210,297);if(i<pages.length-1)doc.addPage();container.removeChild(pd);}
 doc.save('NICU_Report.pdf');showToast('PDF Generated');}catch(err){showToast('PDF failed: '+err.message,'error');}finally{container.style.opacity='0';container.innerHTML='';}};
 
-/* genChartPdf: generates A4 landscape PDF of the Chart tab — DRUG GRID ONLY (Step 5 fix).
-   Uses same pattern as genPDF — renders to #pdf-render-container, captures with html2canvas.
-   Button disables during generation (prevents double-click race). */
+/* genChartPdf: generates A4 landscape PDF — fixed 40×36 grid (39 drug cols + 1 patient col on right,
+   1 header row + 34 patient rows + 1 sum row). B&W only. Data filled from current patients/drugs;
+   unused rows/cols stay blank for handwriting. Scaled to fit one A4 landscape page.
+   Measurements (from user): first col=2.25in, other cols=0.54in, first row=1.32in, other rows=0.4in.
+   Total grid: 23.31in × 15.32in → scaled proportionally to fit A4 landscape (297×210mm). */
 const genChartPdf=async()=>{
   if(!window.jspdf||!window.html2canvas){showToast('PDF libs not loaded','error');return;}
   const btn=$('btnChartPdf');if(btn)btn.disabled=true;
@@ -1202,7 +1211,7 @@ const genChartPdf=async()=>{
   try{
     const now=new Date(),ds=now.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}),ts=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
     const chartPatients=getChartPatients();
-    /* === build Section 2 data (same logic as renderChartTab) === */
+    /* build eligible drugs (same logic as renderChartTab Section 2) */
     const drugMap=new Map();
     chartPatients.forEach(p=>{
       (p.drugs||[]).forEach(d=>{
@@ -1223,59 +1232,63 @@ const genChartPdf=async()=>{
       });
     });
     const eligibleDrugs=[...drugMap.values()].sort((a,b)=>a.order!==b.order?a.order-b.order:a.name.localeCompare(b.name));
-    if(eligibleDrugs.length===0){showToast('No drugs to export','error');return;}
-    /* paginate: 39 cols/page, 34 patients/page */
+    /* fixed grid: 39 drug columns + 1 patient column = 40; 1 header + 34 patients + 1 sum = 36 rows */
     const MAX_COLS=39,PATIENT_ROWS=34;
-    const drugPages=[];
-    for(let i=0;i<eligibleDrugs.length;i+=MAX_COLS)drugPages.push(eligibleDrugs.slice(i,i+MAX_COLS));
-    const patientPages=[];
-    for(let i=0;i<chartPatients.length;i+=PATIENT_ROWS)patientPages.push(chartPatients.slice(i,i+PATIENT_ROWS));
-    if(patientPages.length===0)patientPages.push([]);
-    const totalPages=patientPages.length*drugPages.length;
+    const TOTAL_COLS=MAX_COLS+1,TOTAL_ROWS=PATIENT_ROWS+2;
+    /* calculate column widths in mm (scaled from inches to fit A4 landscape usable area) */
+    const usableW=297-12,usableH=210-12; /* 6mm padding each side */
+    const rawFirstCol=2.25,rawOtherCol=0.54,rawFirstRow=1.32,rawOtherRow=0.4;
+    const rawTotalW=rawFirstCol+MAX_COLS*rawOtherCol,rawTotalH=rawFirstRow+(TOTAL_ROWS-1)*rawOtherRow;
+    const scale=Math.min(usableW/(rawTotalW*25.4),usableH/(rawTotalH*25.4));
+    const firstColMm=rawFirstCol*25.4*scale,otherColMm=rawOtherCol*25.4*scale;
+    const firstRowMm=rawFirstRow*25.4*scale,otherRowMm=rawOtherRow*25.4*scale;
+    /* build HTML table */
+    let html=`<div class="pdf-chart-page">`;
+    html+=`<div class="pdf-title">NICU Daily Supply Request — Drug Grid</div>`;
+    html+=`<div class="pdf-date">Baghdad Teaching Hospital — ${ds} ${ts}</div>`;
+    html+=`<table class="pdf-chart-grid-table" style="width:${firstColMm+MAX_COLS*otherColMm}mm"><colgroup>`;
+    /* drug columns first (left), patient column last (right) */
+    for(let c=0;c<MAX_COLS;c++)html+=`<col style="width:${otherColMm}mm">`;
+    html+=`<col style="width:${firstColMm}mm">`;
+    html+=`</colgroup><thead><tr style="height:${firstRowMm}mm">`;
+    /* drug headers */
+    for(let c=0;c<MAX_COLS;c++){
+      const drug=c<eligibleDrugs.length?eligibleDrugs[c]:null;
+      html+=`<th class="pdf-drug-head">${drug?`<span>${esc(drug.name)}</span>`:''}</th>`;
+    }
+    /* corner cell (patient column header) */
+    html+=`<th class="pdf-patient-cell pdf-corner">الخدج</th>`;
+    html+=`</tr></thead><tbody>`;
+    /* patient rows (34) */
+    for(let r=0;r<PATIENT_ROWS;r++){
+      const p=r<chartPatients.length?chartPatients[r]:null;
+      html+=`<tr style="height:${otherRowMm}mm">`;
+      for(let c=0;c<MAX_COLS;c++){
+        if(p&&c<eligibleDrugs.length){
+          const drug=(p.drugs||[]).find(x=>x.drugId===eligibleDrugs[c].drugId);
+          if(drug){
+            const doseNum=parseFloat(String(drug.dose||''));
+            if(!isNaN(doseNum)){html+=`<td class="pdf-dose has">${doseNum}</td>`;continue;}
+          }
+        }
+        html+=`<td class="pdf-dose pdf-empty"></td>`;
+      }
+      /* patient name cell (rightmost) */
+      html+=`<td class="pdf-patient-cell">${p?esc(p.name):''}</td>`;
+      html+=`</tr>`;
+    }
+    /* sum row */
+    html+=`<tr class="pdf-sum-row" style="height:${otherRowMm}mm">`;
+    for(let c=0;c<MAX_COLS;c++)html+=`<td></td>`;
+    html+=`<td class="pdf-patient-cell">المجموع</td>`;
+    html+=`</tr></tbody></table></div>`;
+    const pd=document.createElement('div');pd.innerHTML=html;
+    const pageEl=pd.firstChild;
+    container.appendChild(pageEl);await document.fonts.ready;await new Promise(r=>setTimeout(r,300));
+    const canvas=await html2canvas(pageEl,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});
     const{jsPDF}=window.jspdf;
     const doc=new jsPDF({orientation:'l',unit:'mm',format:'a4'});
-    let pageNum=0;
-    /* === Grid pages — patient column on the RIGHT === */
-    for(let pi=0;pi<patientPages.length;pi++){
-      for(let di=0;di<drugPages.length;di++){
-        const patPage=patientPages[pi],drugPage=drugPages[di];
-        const pd=document.createElement('div');pd.className='pdf-chart-page';
-        let html=`<h2>NICU Daily Supply Request — Drug Grid</h2><div class="pdf-date">Baghdad Teaching Hospital — ${ds} ${ts}${(patientPages.length>1||drugPages.length>1)?' — Page '+(pi*drugPages.length+di+1)+'/'+totalPages:''}</div>`;
-        html+=`<table class="pdf-chart-grid-table"><thead><tr>`;
-        drugPage.forEach(d=>{html+=`<th class="pdf-drug-head"><span>${esc(d.name)}</span></th>`;});
-        html+=`<th class="pdf-patient-cell pdf-corner">الخدج</th>`;
-        html+=`</tr></thead><tbody>`;
-        patPage.forEach(p=>{
-          html+=`<tr>`;
-          drugPage.forEach(d=>{
-            const drug=(p.drugs||[]).find(x=>x.drugId===d.drugId);
-            if(drug){
-              const doseNum=parseFloat(String(drug.dose||''));
-              if(!isNaN(doseNum)){html+=`<td class="pdf-dose has">${doseNum}</td>`;}
-              else{html+=`<td class="pdf-dose"></td>`;}
-            }else{html+=`<td class="pdf-dose pdf-empty"></td>`;}
-          });
-          html+=`<td class="pdf-patient-cell">${esc(p.name)}</td></tr>`;
-        });
-        const emptyRows=PATIENT_ROWS-patPage.length;
-        for(let r=0;r<emptyRows;r++){
-          html+=`<tr>`;
-          drugPage.forEach(()=>{html+=`<td class="pdf-dose pdf-empty"></td>`;});
-          html+=`<td class="pdf-patient-cell">&nbsp;</td></tr>`;
-        }
-        html+=`<tr class="pdf-sum-row">`;
-        drugPage.forEach(()=>{html+=`<td></td>`;});
-        html+=`<td class="pdf-patient-cell">المجموع</td></tr>`;
-        html+=`</tbody></table>`;
-        pd.innerHTML=html;
-        container.appendChild(pd);await document.fonts.ready;await new Promise(r=>setTimeout(r,200));
-        const canvas=await html2canvas(pd,{scale:2,useCORS:true,logging:false,backgroundColor:'#fff'});
-        doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',0,0,297,210);
-        pageNum++;
-        if(pageNum<totalPages)doc.addPage();
-        container.removeChild(pd);
-      }
-    }
+    doc.addImage(canvas.toDataURL('image/jpeg',.95),'JPEG',0,0,297,210);
     doc.save(`daily_supply_request_${now.toLocaleDateString('en-CA')}.pdf`);
     showToast('PDF Generated');
   }catch(err){showToast('PDF failed: '+err.message,'error');}
@@ -1620,6 +1633,7 @@ if(activeTab==='discharge')renderDischargeQueue();
  $('selectCustomMethod').addEventListener('change',handleCustMethod);
  const debouncedDoc=debounce(handleDrugSel,150);
  $('inputWeight').addEventListener('input',()=>{validateDocWeight();debouncedDoc();updateFluidBar();});
+ $('docInputGA').addEventListener('input',()=>{validateDocWeight();debouncedDoc();});
  $('admissionWeight').addEventListener('input',()=>{validateClin();});
  $('inputGA').addEventListener('input',()=>{validateClin();debouncedDoc();});
  $('inputDOB').addEventListener('change',()=>{updatePna();validateClin();});
